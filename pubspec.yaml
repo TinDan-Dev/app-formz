@@ -3,7 +3,7 @@ description: Generalizes form validation
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+2
+version: '1.0.0+2'
 
 environment:
   sdk: '>=2.13.0 <3.0.0'
@@ -30,3 +30,9 @@ dev_dependencies:
 
   source_gen: ^1.0.2
   code_builder: ^4.0.0
+
+  bloc_test: ^8.0.2
+  mockito: ^5.0.10
+
+  formz_test:
+    git: https://github.com/TinDan-Dev/app-formz-test.git
