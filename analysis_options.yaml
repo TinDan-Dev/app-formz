@@ -1,0 +1,42 @@
+include: package:lint/analysis_options.yaml
+
+linter:
+  rules:
+    use_function_type_syntax_for_parameters: false
+    no_runtimeType_toString: false
+    type_annotate_public_apis: false
+    curly_braces_in_flow_control_structures: false
+    avoid_function_literals_in_foreach_calls: false
+    avoid_escaping_inner_quotes: false
+    avoid_bool_literals_in_conditional_expressions: false
+    always_require_non_null_named_parameters: false
+    sort_pub_dependencies: false
+    use_setters_to_change_properties: false
+    cast_nullable_to_non_nullable: true
+    unnecessary_nullable_for_final_variable_declarations: false
+    null_check_on_nullable_type_parameter: true
+    unnecessary_this: true
+    prefer_relative_imports: true
+    avoid_positional_boolean_parameters: false
+    sort_unnamed_constructors_first: false
+
+analyzer:
+  exclude:
+    - '**.g.dart'
+    - '**.freezed.dart'
+    - '**.mocks.dart'
+  strong-mode:
+    implicit-casts: true
+  errors:
+    missing_required_param: error
+    parameter_assignments: warning
+    void_checks: error
+    invalid_use_of_visible_for_testing_member: error
+    must_call_super: error
+    unawaited_futures: warning
+    avoid_void_async: ignore
+    unnecessary_this: info
+    prefer_relative_imports: info
+    unnecessary_await_in_return: warning
+    # https://github.com/dart-lang/sdk/issues/42910
+    include_file_not_found: ignore

@@ -1,0 +1,85 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'attachments.dart';
+import 'form_state.dart';
+import 'input/input.dart';
+import 'input_container.dart';
+import 'utils/consumable.dart';
+import 'utils/failure.dart';
+
+class _InputAttachment<T> {
+  final T value;
+  final void Function(T value)? _dispose;
+
+  _InputAttachment(this.value, this._dispose);
+
+  void dispose() => _dispose?.call(value);
+}
+
+abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableInputContainer {
+  final _attachments = <String, List<_InputAttachment>>{};
+
+  FormCubit(FormState initialState) : super(initialState);
+
+  @override
+  Iterable<Input> get inputs => state.inputs;
+
+  @override
+  void replaceInput(Input input) {
+    emit(state.copyWith(inputs: [input]));
+  }
+
+  T getAttachment<T>(
+    String name, {
+    required T create(),
+    void dispose(T value)?,
+  }) {
+    final attachments = _attachments.putIfAbsent(name, () => []);
+
+    final attachment = attachments.where((e) => e.value is T);
+    assert(attachment.length <= 1, '${attachment.length} attachments of Type $T found');
+
+    if (attachment.length < 1) {
+      final value = create();
+      attachments.add(_InputAttachment<T>(value, dispose));
+
+      return value;
+    } else {
+      return attachment.first.value;
+    }
+  }
+
+  Iterable<T> getAttachments<T>() {
+    return _attachments.values.expand((e) => e).where((e) => e.value is T).map((e) => e.value);
+  }
+
+  void setFailure(Failure? failure) => emit(state.copyWith(failure: () => failure));
+
+  Future<bool> submit(FutureOr<ConsumableAsync> action()) async {
+    assert(!state.submission, 'Another submission is currently in progress');
+    unfocusAll();
+
+    emit(state.copyWith(submission: true, failure: () => null));
+    final result = await action();
+
+    return result.consume(
+      onSuccess: (_) {
+        emit(state.copyWith(submission: false, failure: () => null));
+        return true;
+      },
+      onError: (failure) {
+        emit(state.copyWith(submission: false, failure: () => failure));
+        return false;
+      },
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    await super.close();
+
+    _attachments.values.forEach((attachments) => attachments.forEach((attachment) => attachment.dispose.call()));
+  }
+}
