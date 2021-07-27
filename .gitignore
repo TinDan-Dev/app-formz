@@ -14,9 +14,6 @@
 *.mocks.dart
 *.config.dart
 *.freezed.dart
-lib/formz.tuple.dart
-lib/formz.con.dart
-lib/formz.merge.dart
 
 # IntelliJ related
 *.iml
