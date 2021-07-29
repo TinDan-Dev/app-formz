@@ -18,9 +18,7 @@ class _MergeConsumable<A, B> with ConsumableMixin<Tuple<A, B>> {
   final Consumable<B> Function() second;
 
   @override
-  T consume<T>(
-          {required T Function(Tuple<A, B> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+  T consume<T>({required T Function(Tuple<A, B> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second().consume(
           onSuccess: (secondValue) => onSuccess(Tuple<A, B>(
@@ -64,9 +62,7 @@ class _MergeConsumableJoining<A, B> with ConsumableMixin<Tuple<A, B>> {
   final Consumable<B> Function(A previous) second;
 
   @override
-  T consume<T>(
-          {required T Function(Tuple<A, B> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+  T consume<T>({required T Function(Tuple<A, B> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second(firstValue).consume(
           onSuccess: (secondValue) => onSuccess(Tuple<A, B>(
@@ -79,8 +75,7 @@ class _MergeConsumableJoining<A, B> with ConsumableMixin<Tuple<A, B>> {
       );
 }
 
-class _MergeConsumableAsyncJoining<A, B>
-    with ConsumableAsyncMixin<Tuple<A, B>> {
+class _MergeConsumableAsyncJoining<A, B> with ConsumableAsyncMixin<Tuple<A, B>> {
   _MergeConsumableAsyncJoining({required this.first, required this.second});
 
   final ConsumableAsync<A> first;
@@ -104,8 +99,7 @@ class _MergeConsumableAsyncJoining<A, B>
 }
 
 class _MergeConsumable3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
-  _MergeConsumable3(
-      {required this.first, required this.second, required this.third});
+  _MergeConsumable3({required this.first, required this.second, required this.third});
 
   final Consumable<A> first;
 
@@ -114,9 +108,7 @@ class _MergeConsumable3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
   final Consumable<C> Function() third;
 
   @override
-  T consume<T>(
-          {required T Function(Tuple3<A, B, C> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+  T consume<T>({required T Function(Tuple3<A, B, C> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second().consume(
           onSuccess: (secondValue) => third().consume(
@@ -133,10 +125,8 @@ class _MergeConsumable3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
       );
 }
 
-class _MergeConsumableAsync3<A, B, C>
-    with ConsumableAsyncMixin<Tuple3<A, B, C>> {
-  _MergeConsumableAsync3(
-      {required this.first, required this.second, required this.third});
+class _MergeConsumableAsync3<A, B, C> with ConsumableAsyncMixin<Tuple3<A, B, C>> {
+  _MergeConsumableAsync3({required this.first, required this.second, required this.third});
 
   final ConsumableAsync<A> first;
 
@@ -165,8 +155,7 @@ class _MergeConsumableAsync3<A, B, C>
 }
 
 class _MergeConsumableJoining3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
-  _MergeConsumableJoining3(
-      {required this.first, required this.second, required this.third});
+  _MergeConsumableJoining3({required this.first, required this.second, required this.third});
 
   final Consumable<A> first;
 
@@ -175,9 +164,7 @@ class _MergeConsumableJoining3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
   final Consumable<C> Function(Tuple<A, B> previous) third;
 
   @override
-  T consume<T>(
-          {required T Function(Tuple3<A, B, C> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+  T consume<T>({required T Function(Tuple3<A, B, C> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second(firstValue).consume(
           onSuccess: (secondValue) => third(Tuple<A, B>(
@@ -197,10 +184,8 @@ class _MergeConsumableJoining3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
       );
 }
 
-class _MergeConsumableAsyncJoining3<A, B, C>
-    with ConsumableAsyncMixin<Tuple3<A, B, C>> {
-  _MergeConsumableAsyncJoining3(
-      {required this.first, required this.second, required this.third});
+class _MergeConsumableAsyncJoining3<A, B, C> with ConsumableAsyncMixin<Tuple3<A, B, C>> {
+  _MergeConsumableAsyncJoining3({required this.first, required this.second, required this.third});
 
   final ConsumableAsync<A> first;
 
@@ -233,11 +218,7 @@ class _MergeConsumableAsyncJoining3<A, B, C>
 }
 
 class _MergeConsumable4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
-  _MergeConsumable4(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth});
+  _MergeConsumable4({required this.first, required this.second, required this.third, required this.fourth});
 
   final Consumable<A> first;
 
@@ -249,8 +230,7 @@ class _MergeConsumable4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
 
   @override
   T consume<T>(
-          {required T Function(Tuple4<A, B, C, D> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+          {required T Function(Tuple4<A, B, C, D> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second().consume(
           onSuccess: (secondValue) => third().consume(
@@ -271,13 +251,8 @@ class _MergeConsumable4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
       );
 }
 
-class _MergeConsumableAsync4<A, B, C, D>
-    with ConsumableAsyncMixin<Tuple4<A, B, C, D>> {
-  _MergeConsumableAsync4(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth});
+class _MergeConsumableAsync4<A, B, C, D> with ConsumableAsyncMixin<Tuple4<A, B, C, D>> {
+  _MergeConsumableAsync4({required this.first, required this.second, required this.third, required this.fourth});
 
   final ConsumableAsync<A> first;
 
@@ -311,13 +286,8 @@ class _MergeConsumableAsync4<A, B, C, D>
       );
 }
 
-class _MergeConsumableJoining4<A, B, C, D>
-    with ConsumableMixin<Tuple4<A, B, C, D>> {
-  _MergeConsumableJoining4(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth});
+class _MergeConsumableJoining4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
+  _MergeConsumableJoining4({required this.first, required this.second, required this.third, required this.fourth});
 
   final Consumable<A> first;
 
@@ -329,8 +299,7 @@ class _MergeConsumableJoining4<A, B, C, D>
 
   @override
   T consume<T>(
-          {required T Function(Tuple4<A, B, C, D> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+          {required T Function(Tuple4<A, B, C, D> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second(firstValue).consume(
           onSuccess: (secondValue) => third(Tuple<A, B>(
@@ -358,13 +327,8 @@ class _MergeConsumableJoining4<A, B, C, D>
       );
 }
 
-class _MergeConsumableAsyncJoining4<A, B, C, D>
-    with ConsumableAsyncMixin<Tuple4<A, B, C, D>> {
-  _MergeConsumableAsyncJoining4(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth});
+class _MergeConsumableAsyncJoining4<A, B, C, D> with ConsumableAsyncMixin<Tuple4<A, B, C, D>> {
+  _MergeConsumableAsyncJoining4({required this.first, required this.second, required this.third, required this.fourth});
 
   final ConsumableAsync<A> first;
 
@@ -407,14 +371,9 @@ class _MergeConsumableAsyncJoining4<A, B, C, D>
       );
 }
 
-class _MergeConsumable5<A, B, C, D, E>
-    with ConsumableMixin<Tuple5<A, B, C, D, E>> {
+class _MergeConsumable5<A, B, C, D, E> with ConsumableMixin<Tuple5<A, B, C, D, E>> {
   _MergeConsumable5(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth,
-      required this.fifth});
+      {required this.first, required this.second, required this.third, required this.fourth, required this.fifth});
 
   final Consumable<A> first;
 
@@ -428,8 +387,7 @@ class _MergeConsumable5<A, B, C, D, E>
 
   @override
   T consume<T>(
-          {required T Function(Tuple5<A, B, C, D, E> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+          {required T Function(Tuple5<A, B, C, D, E> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second().consume(
           onSuccess: (secondValue) => third().consume(
@@ -454,14 +412,9 @@ class _MergeConsumable5<A, B, C, D, E>
       );
 }
 
-class _MergeConsumableAsync5<A, B, C, D, E>
-    with ConsumableAsyncMixin<Tuple5<A, B, C, D, E>> {
+class _MergeConsumableAsync5<A, B, C, D, E> with ConsumableAsyncMixin<Tuple5<A, B, C, D, E>> {
   _MergeConsumableAsync5(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth,
-      required this.fifth});
+      {required this.first, required this.second, required this.third, required this.fourth, required this.fifth});
 
   final ConsumableAsync<A> first;
 
@@ -501,14 +454,9 @@ class _MergeConsumableAsync5<A, B, C, D, E>
       );
 }
 
-class _MergeConsumableJoining5<A, B, C, D, E>
-    with ConsumableMixin<Tuple5<A, B, C, D, E>> {
+class _MergeConsumableJoining5<A, B, C, D, E> with ConsumableMixin<Tuple5<A, B, C, D, E>> {
   _MergeConsumableJoining5(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth,
-      required this.fifth});
+      {required this.first, required this.second, required this.third, required this.fourth, required this.fifth});
 
   final Consumable<A> first;
 
@@ -522,8 +470,7 @@ class _MergeConsumableJoining5<A, B, C, D, E>
 
   @override
   T consume<T>(
-          {required T Function(Tuple5<A, B, C, D, E> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
+          {required T Function(Tuple5<A, B, C, D, E> value) onSuccess, required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second(firstValue).consume(
           onSuccess: (secondValue) => third(Tuple<A, B>(
@@ -560,14 +507,9 @@ class _MergeConsumableJoining5<A, B, C, D, E>
       );
 }
 
-class _MergeConsumableAsyncJoining5<A, B, C, D, E>
-    with ConsumableAsyncMixin<Tuple5<A, B, C, D, E>> {
+class _MergeConsumableAsyncJoining5<A, B, C, D, E> with ConsumableAsyncMixin<Tuple5<A, B, C, D, E>> {
   _MergeConsumableAsyncJoining5(
-      {required this.first,
-      required this.second,
-      required this.third,
-      required this.fourth,
-      required this.fifth});
+      {required this.first, required this.second, required this.third, required this.fourth, required this.fifth});
 
   final ConsumableAsync<A> first;
 
@@ -577,8 +519,7 @@ class _MergeConsumableAsyncJoining5<A, B, C, D, E>
 
   final FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth;
 
-  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous)
-      fifth;
+  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth;
 
   @override
   Future<T> consume<T>(
@@ -623,8 +564,7 @@ class _MergeConsumableAsyncJoining5<A, B, C, D, E>
       );
 }
 
-class _MergeConsumable6<A, B, C, D, E, F>
-    with ConsumableMixin<Tuple6<A, B, C, D, E, F>> {
+class _MergeConsumable6<A, B, C, D, E, F> with ConsumableMixin<Tuple6<A, B, C, D, E, F>> {
   _MergeConsumable6(
       {required this.first,
       required this.second,
@@ -677,8 +617,7 @@ class _MergeConsumable6<A, B, C, D, E, F>
       );
 }
 
-class _MergeConsumableAsync6<A, B, C, D, E, F>
-    with ConsumableAsyncMixin<Tuple6<A, B, C, D, E, F>> {
+class _MergeConsumableAsync6<A, B, C, D, E, F> with ConsumableAsyncMixin<Tuple6<A, B, C, D, E, F>> {
   _MergeConsumableAsync6(
       {required this.first,
       required this.second,
@@ -701,8 +640,7 @@ class _MergeConsumableAsync6<A, B, C, D, E, F>
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second()).consume(
@@ -732,8 +670,7 @@ class _MergeConsumableAsync6<A, B, C, D, E, F>
       );
 }
 
-class _MergeConsumableJoining6<A, B, C, D, E, F>
-    with ConsumableMixin<Tuple6<A, B, C, D, E, F>> {
+class _MergeConsumableJoining6<A, B, C, D, E, F> with ConsumableMixin<Tuple6<A, B, C, D, E, F>> {
   _MergeConsumableJoining6(
       {required this.first,
       required this.second,
@@ -804,8 +741,7 @@ class _MergeConsumableJoining6<A, B, C, D, E, F>
       );
 }
 
-class _MergeConsumableAsyncJoining6<A, B, C, D, E, F>
-    with ConsumableAsyncMixin<Tuple6<A, B, C, D, E, F>> {
+class _MergeConsumableAsyncJoining6<A, B, C, D, E, F> with ConsumableAsyncMixin<Tuple6<A, B, C, D, E, F>> {
   _MergeConsumableAsyncJoining6(
       {required this.first,
       required this.second,
@@ -822,16 +758,13 @@ class _MergeConsumableAsyncJoining6<A, B, C, D, E, F>
 
   final FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth;
 
-  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous)
-      fifth;
+  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth;
 
-  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous)
-      sixth;
+  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth;
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second(firstValue)).consume(
@@ -853,15 +786,14 @@ class _MergeConsumableAsyncJoining6<A, B, C, D, E, F>
                 fourth: fourthValue,
               )))
                   .consume(
-                onSuccess: (fifthValue) async =>
-                    (await sixth(Tuple5<A, B, C, D, E>(
+                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
                   fifth: fifthValue,
                 )))
-                        .consume(
+                    .consume(
                   onSuccess: (sixthValue) => onSuccess(Tuple6<A, B, C, D, E, F>(
                     first: firstValue,
                     second: secondValue,
@@ -884,8 +816,7 @@ class _MergeConsumableAsyncJoining6<A, B, C, D, E, F>
       );
 }
 
-class _MergeConsumable7<A, B, C, D, E, F, G>
-    with ConsumableMixin<Tuple7<A, B, C, D, E, F, G>> {
+class _MergeConsumable7<A, B, C, D, E, F, G> with ConsumableMixin<Tuple7<A, B, C, D, E, F, G>> {
   _MergeConsumable7(
       {required this.first,
       required this.second,
@@ -920,8 +851,7 @@ class _MergeConsumable7<A, B, C, D, E, F, G>
               onSuccess: (fourthValue) => fifth().consume(
                 onSuccess: (fifthValue) => sixth().consume(
                   onSuccess: (sixthValue) => seventh().consume(
-                    onSuccess: (seventhValue) =>
-                        onSuccess(Tuple7<A, B, C, D, E, F, G>(
+                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -946,8 +876,7 @@ class _MergeConsumable7<A, B, C, D, E, F, G>
       );
 }
 
-class _MergeConsumableAsync7<A, B, C, D, E, F, G>
-    with ConsumableAsyncMixin<Tuple7<A, B, C, D, E, F, G>> {
+class _MergeConsumableAsync7<A, B, C, D, E, F, G> with ConsumableAsyncMixin<Tuple7<A, B, C, D, E, F, G>> {
   _MergeConsumableAsync7(
       {required this.first,
       required this.second,
@@ -973,8 +902,7 @@ class _MergeConsumableAsync7<A, B, C, D, E, F, G>
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second()).consume(
@@ -983,8 +911,7 @@ class _MergeConsumableAsync7<A, B, C, D, E, F, G>
               onSuccess: (fourthValue) async => (await fifth()).consume(
                 onSuccess: (fifthValue) async => (await sixth()).consume(
                   onSuccess: (sixthValue) async => (await seventh()).consume(
-                    onSuccess: (seventhValue) =>
-                        onSuccess(Tuple7<A, B, C, D, E, F, G>(
+                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1009,8 +936,7 @@ class _MergeConsumableAsync7<A, B, C, D, E, F, G>
       );
 }
 
-class _MergeConsumableJoining7<A, B, C, D, E, F, G>
-    with ConsumableMixin<Tuple7<A, B, C, D, E, F, G>> {
+class _MergeConsumableJoining7<A, B, C, D, E, F, G> with ConsumableMixin<Tuple7<A, B, C, D, E, F, G>> {
   _MergeConsumableJoining7(
       {required this.first,
       required this.second,
@@ -1070,8 +996,7 @@ class _MergeConsumableJoining7<A, B, C, D, E, F, G>
                     fifth: fifthValue,
                     sixth: sixthValue,
                   )).consume(
-                    onSuccess: (seventhValue) =>
-                        onSuccess(Tuple7<A, B, C, D, E, F, G>(
+                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1096,8 +1021,7 @@ class _MergeConsumableJoining7<A, B, C, D, E, F, G>
       );
 }
 
-class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>
-    with ConsumableAsyncMixin<Tuple7<A, B, C, D, E, F, G>> {
+class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G> with ConsumableAsyncMixin<Tuple7<A, B, C, D, E, F, G>> {
   _MergeConsumableAsyncJoining7(
       {required this.first,
       required this.second,
@@ -1115,19 +1039,15 @@ class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>
 
   final FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth;
 
-  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous)
-      fifth;
+  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth;
 
-  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous)
-      sixth;
+  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth;
 
-  final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous)
-      seventh;
+  final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh;
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second(firstValue)).consume(
@@ -1149,17 +1069,15 @@ class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>
                 fourth: fourthValue,
               )))
                   .consume(
-                onSuccess: (fifthValue) async =>
-                    (await sixth(Tuple5<A, B, C, D, E>(
+                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
                   fifth: fifthValue,
                 )))
-                        .consume(
-                  onSuccess: (sixthValue) async =>
-                      (await seventh(Tuple6<A, B, C, D, E, F>(
+                    .consume(
+                  onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
@@ -1167,9 +1085,8 @@ class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>
                     fifth: fifthValue,
                     sixth: sixthValue,
                   )))
-                          .consume(
-                    onSuccess: (seventhValue) =>
-                        onSuccess(Tuple7<A, B, C, D, E, F, G>(
+                      .consume(
+                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1194,8 +1111,7 @@ class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>
       );
 }
 
-class _MergeConsumable8<A, B, C, D, E, F, G, H>
-    with ConsumableMixin<Tuple8<A, B, C, D, E, F, G, H>> {
+class _MergeConsumable8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tuple8<A, B, C, D, E, F, G, H>> {
   _MergeConsumable8(
       {required this.first,
       required this.second,
@@ -1234,8 +1150,7 @@ class _MergeConsumable8<A, B, C, D, E, F, G, H>
                 onSuccess: (fifthValue) => sixth().consume(
                   onSuccess: (sixthValue) => seventh().consume(
                     onSuccess: (seventhValue) => eighth().consume(
-                      onSuccess: (eighthValue) =>
-                          onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
+                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1263,8 +1178,7 @@ class _MergeConsumable8<A, B, C, D, E, F, G, H>
       );
 }
 
-class _MergeConsumableAsync8<A, B, C, D, E, F, G, H>
-    with ConsumableAsyncMixin<Tuple8<A, B, C, D, E, F, G, H>> {
+class _MergeConsumableAsync8<A, B, C, D, E, F, G, H> with ConsumableAsyncMixin<Tuple8<A, B, C, D, E, F, G, H>> {
   _MergeConsumableAsync8(
       {required this.first,
       required this.second,
@@ -1293,8 +1207,7 @@ class _MergeConsumableAsync8<A, B, C, D, E, F, G, H>
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second()).consume(
@@ -1304,8 +1217,7 @@ class _MergeConsumableAsync8<A, B, C, D, E, F, G, H>
                 onSuccess: (fifthValue) async => (await sixth()).consume(
                   onSuccess: (sixthValue) async => (await seventh()).consume(
                     onSuccess: (seventhValue) async => (await eighth()).consume(
-                      onSuccess: (eighthValue) =>
-                          onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
+                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1333,8 +1245,7 @@ class _MergeConsumableAsync8<A, B, C, D, E, F, G, H>
       );
 }
 
-class _MergeConsumableJoining8<A, B, C, D, E, F, G, H>
-    with ConsumableMixin<Tuple8<A, B, C, D, E, F, G, H>> {
+class _MergeConsumableJoining8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tuple8<A, B, C, D, E, F, G, H>> {
   _MergeConsumableJoining8(
       {required this.first,
       required this.second,
@@ -1397,8 +1308,7 @@ class _MergeConsumableJoining8<A, B, C, D, E, F, G, H>
                     fifth: fifthValue,
                     sixth: sixthValue,
                   )).consume(
-                    onSuccess: (seventhValue) =>
-                        eighth(Tuple7<A, B, C, D, E, F, G>(
+                    onSuccess: (seventhValue) => eighth(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1407,8 +1317,7 @@ class _MergeConsumableJoining8<A, B, C, D, E, F, G, H>
                       sixth: sixthValue,
                       seventh: seventhValue,
                     )).consume(
-                      onSuccess: (eighthValue) =>
-                          onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
+                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1436,8 +1345,7 @@ class _MergeConsumableJoining8<A, B, C, D, E, F, G, H>
       );
 }
 
-class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>
-    with ConsumableAsyncMixin<Tuple8<A, B, C, D, E, F, G, H>> {
+class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H> with ConsumableAsyncMixin<Tuple8<A, B, C, D, E, F, G, H>> {
   _MergeConsumableAsyncJoining8(
       {required this.first,
       required this.second,
@@ -1456,22 +1364,17 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>
 
   final FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth;
 
-  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous)
-      fifth;
+  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth;
 
-  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous)
-      sixth;
+  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth;
 
-  final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous)
-      seventh;
+  final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh;
 
-  final FutureOr<ConsumableAsync<H>> Function(
-      Tuple7<A, B, C, D, E, F, G> previous) eighth;
+  final FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth;
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second(firstValue)).consume(
@@ -1493,17 +1396,15 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>
                 fourth: fourthValue,
               )))
                   .consume(
-                onSuccess: (fifthValue) async =>
-                    (await sixth(Tuple5<A, B, C, D, E>(
+                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
                   fifth: fifthValue,
                 )))
-                        .consume(
-                  onSuccess: (sixthValue) async =>
-                      (await seventh(Tuple6<A, B, C, D, E, F>(
+                    .consume(
+                  onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
@@ -1511,9 +1412,8 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>
                     fifth: fifthValue,
                     sixth: sixthValue,
                   )))
-                          .consume(
-                    onSuccess: (seventhValue) async =>
-                        (await eighth(Tuple7<A, B, C, D, E, F, G>(
+                      .consume(
+                    onSuccess: (seventhValue) async => (await eighth(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1522,9 +1422,8 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>
                       sixth: sixthValue,
                       seventh: seventhValue,
                     )))
-                            .consume(
-                      onSuccess: (eighthValue) =>
-                          onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
+                        .consume(
+                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1552,8 +1451,7 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>
       );
 }
 
-class _MergeConsumable9<A, B, C, D, E, F, G, H, I>
-    with ConsumableMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
+class _MergeConsumable9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
   _MergeConsumable9(
       {required this.first,
       required this.second,
@@ -1585,8 +1483,7 @@ class _MergeConsumable9<A, B, C, D, E, F, G, H, I>
 
   @override
   T consume<T>(
-          {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value)
-              onSuccess,
+          {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
           required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second().consume(
@@ -1597,8 +1494,7 @@ class _MergeConsumable9<A, B, C, D, E, F, G, H, I>
                   onSuccess: (sixthValue) => seventh().consume(
                     onSuccess: (seventhValue) => eighth().consume(
                       onSuccess: (eighthValue) => ninth().consume(
-                        onSuccess: (ninthValue) =>
-                            onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
+                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
                           first: firstValue,
                           second: secondValue,
                           third: thirdValue,
@@ -1629,8 +1525,7 @@ class _MergeConsumable9<A, B, C, D, E, F, G, H, I>
       );
 }
 
-class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>
-    with ConsumableAsyncMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
+class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I> with ConsumableAsyncMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
   _MergeConsumableAsync9(
       {required this.first,
       required this.second,
@@ -1662,9 +1557,7 @@ class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(
-                  Tuple9<A, B, C, D, E, F, G, H, I> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second()).consume(
@@ -1675,8 +1568,7 @@ class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>
                   onSuccess: (sixthValue) async => (await seventh()).consume(
                     onSuccess: (seventhValue) async => (await eighth()).consume(
                       onSuccess: (eighthValue) async => (await ninth()).consume(
-                        onSuccess: (ninthValue) =>
-                            onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
+                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
                           first: firstValue,
                           second: secondValue,
                           third: thirdValue,
@@ -1707,8 +1599,7 @@ class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>
       );
 }
 
-class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>
-    with ConsumableMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
+class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
   _MergeConsumableJoining9(
       {required this.first,
       required this.second,
@@ -1740,8 +1631,7 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>
 
   @override
   T consume<T>(
-          {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value)
-              onSuccess,
+          {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
           required T Function(Failure failure) onError}) =>
       first.consume(
         onSuccess: (firstValue) => second(firstValue).consume(
@@ -1775,8 +1665,7 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>
                     fifth: fifthValue,
                     sixth: sixthValue,
                   )).consume(
-                    onSuccess: (seventhValue) =>
-                        eighth(Tuple7<A, B, C, D, E, F, G>(
+                    onSuccess: (seventhValue) => eighth(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1785,8 +1674,7 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>
                       sixth: sixthValue,
                       seventh: seventhValue,
                     )).consume(
-                      onSuccess: (eighthValue) =>
-                          ninth(Tuple8<A, B, C, D, E, F, G, H>(
+                      onSuccess: (eighthValue) => ninth(Tuple8<A, B, C, D, E, F, G, H>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1796,8 +1684,7 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>
                         seventh: seventhValue,
                         eighth: eighthValue,
                       )).consume(
-                        onSuccess: (ninthValue) =>
-                            onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
+                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
                           first: firstValue,
                           second: secondValue,
                           third: thirdValue,
@@ -1849,26 +1736,19 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
 
   final FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth;
 
-  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous)
-      fifth;
+  final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth;
 
-  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous)
-      sixth;
+  final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth;
 
-  final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous)
-      seventh;
+  final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh;
 
-  final FutureOr<ConsumableAsync<H>> Function(
-      Tuple7<A, B, C, D, E, F, G> previous) eighth;
+  final FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth;
 
-  final FutureOr<ConsumableAsync<I>> Function(
-      Tuple8<A, B, C, D, E, F, G, H> previous) ninth;
+  final FutureOr<ConsumableAsync<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth;
 
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(
-                  Tuple9<A, B, C, D, E, F, G, H, I> value)
-              onSuccess,
+          {required FutureOr<T> Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
           required FutureOr<T> Function(Failure failure) onError}) async =>
       first.consume(
         onSuccess: (firstValue) async => (await second(firstValue)).consume(
@@ -1890,17 +1770,15 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
                 fourth: fourthValue,
               )))
                   .consume(
-                onSuccess: (fifthValue) async =>
-                    (await sixth(Tuple5<A, B, C, D, E>(
+                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
                   fifth: fifthValue,
                 )))
-                        .consume(
-                  onSuccess: (sixthValue) async =>
-                      (await seventh(Tuple6<A, B, C, D, E, F>(
+                    .consume(
+                  onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
@@ -1908,9 +1786,8 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
                     fifth: fifthValue,
                     sixth: sixthValue,
                   )))
-                          .consume(
-                    onSuccess: (seventhValue) async =>
-                        (await eighth(Tuple7<A, B, C, D, E, F, G>(
+                      .consume(
+                    onSuccess: (seventhValue) async => (await eighth(Tuple7<A, B, C, D, E, F, G>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -1919,9 +1796,8 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
                       sixth: sixthValue,
                       seventh: seventhValue,
                     )))
-                            .consume(
-                      onSuccess: (eighthValue) async =>
-                          (await ninth(Tuple8<A, B, C, D, E, F, G, H>(
+                        .consume(
+                      onSuccess: (eighthValue) async => (await ninth(Tuple8<A, B, C, D, E, F, G, H>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1931,9 +1807,8 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
                         seventh: seventhValue,
                         eighth: eighthValue,
                       )))
-                              .consume(
-                        onSuccess: (ninthValue) =>
-                            onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
+                          .consume(
+                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
                           first: firstValue,
                           second: secondValue,
                           third: thirdValue,
@@ -1965,34 +1840,28 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
 }
 
 extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
-  Future<Consumable<Tuple<A, B>>> merge<B>(
-          {required Consumable<B> Function() second}) async =>
-      _MergeConsumable<A, B>(
+  Future<Consumable<Tuple<A, B>>> merge<B>({required Consumable<B> Function() second}) async => _MergeConsumable<A, B>(
         first: await this,
         second: second,
       );
-  Future<ConsumableAsync<Tuple<A, B>>> mergeAsync<B>(
-          {required FutureOr<ConsumableAsync<B>> Function() second}) async =>
+  Future<ConsumableAsync<Tuple<A, B>>> mergeAsync<B>({required FutureOr<ConsumableAsync<B>> Function() second}) async =>
       _MergeConsumableAsync<A, B>(
         first: (await this).toConsumableAsync(),
         second: second,
       );
-  Future<Consumable<Tuple<A, B>>> mergeJoining<B>(
-          {required Consumable<B> Function(A previous) second}) async =>
+  Future<Consumable<Tuple<A, B>>> mergeJoining<B>({required Consumable<B> Function(A previous) second}) async =>
       _MergeConsumableJoining<A, B>(
         first: await this,
         second: second,
       );
   Future<ConsumableAsync<Tuple<A, B>>> mergeAsyncJoining<B>(
-          {required FutureOr<ConsumableAsync<B>> Function(A previous)
-              second}) async =>
+          {required FutureOr<ConsumableAsync<B>> Function(A previous) second}) async =>
       _MergeConsumableAsyncJoining<A, B>(
         first: (await this).toConsumableAsync(),
         second: second,
       );
   Future<Consumable<Tuple3<A, B, C>>> merge3<B, C>(
-          {required Consumable<B> Function() second,
-          required Consumable<C> Function() third}) async =>
+          {required Consumable<B> Function() second, required Consumable<C> Function() third}) async =>
       _MergeConsumable3<A, B, C>(
         first: await this,
         second: second,
@@ -2016,8 +1885,7 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
       );
   Future<ConsumableAsync<Tuple3<A, B, C>>> mergeAsyncJoining3<B, C>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third}) async =>
       _MergeConsumableAsyncJoining3<A, B, C>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2046,8 +1914,7 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
   Future<Consumable<Tuple4<A, B, C, D>>> mergeJoining4<B, C, D>(
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
-          required Consumable<D> Function(Tuple3<A, B, C> previous)
-              fourth}) async =>
+          required Consumable<D> Function(Tuple3<A, B, C> previous) fourth}) async =>
       _MergeConsumableJoining4<A, B, C, D>(
         first: await this,
         second: second,
@@ -2056,11 +1923,8 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
       );
   Future<ConsumableAsync<Tuple4<A, B, C, D>>> mergeAsyncJoining4<B, C, D>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth}) async =>
       _MergeConsumableAsyncJoining4<A, B, C, D>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2095,8 +1959,7 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
-          required Consumable<E> Function(Tuple4<A, B, C, D> previous)
-              fifth}) async =>
+          required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth}) async =>
       _MergeConsumableJoining5<A, B, C, D, E>(
         first: await this,
         second: second,
@@ -2106,14 +1969,9 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
       );
   Future<ConsumableAsync<Tuple5<A, B, C, D, E>>> mergeAsyncJoining5<B, C, D, E>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth}) async =>
       _MergeConsumableAsyncJoining5<A, B, C, D, E>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2154,8 +2012,7 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
-          required Consumable<F> Function(Tuple5<A, B, C, D, E> previous)
-              sixth}) async =>
+          required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth}) async =>
       _MergeConsumableJoining6<A, B, C, D, E, F>(
         first: await this,
         second: second,
@@ -2164,20 +2021,12 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         fifth: fifth,
         sixth: sixth,
       );
-  Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> mergeAsyncJoining6<B, C, D,
-              E, F>(
+  Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> mergeAsyncJoining6<B, C, D, E, F>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth}) async =>
       _MergeConsumableAsyncJoining6<A, B, C, D, E, F>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2202,8 +2051,7 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         sixth: sixth,
         seventh: seventh,
       );
-  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeAsync7<B, C, D, E,
-              F, G>(
+  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeAsync7<B, C, D, E, F, G>(
           {required FutureOr<ConsumableAsync<B>> Function() second,
           required FutureOr<ConsumableAsync<C>> Function() third,
           required FutureOr<ConsumableAsync<D>> Function() fourth,
@@ -2219,15 +2067,13 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         sixth: sixth,
         seventh: seventh,
       );
-  Future<Consumable<Tuple7<A, B, C, D, E, F, G>>> mergeJoining7<B, C, D, E, F,
-              G>(
+  Future<Consumable<Tuple7<A, B, C, D, E, F, G>>> mergeJoining7<B, C, D, E, F, G>(
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
           required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth,
-          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous)
-              seventh}) async =>
+          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) async =>
       _MergeConsumableJoining7<A, B, C, D, E, F, G>(
         first: await this,
         second: second,
@@ -2237,23 +2083,13 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         sixth: sixth,
         seventh: seventh,
       );
-  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeAsyncJoining7<B, C,
-              D, E, F, G>(
+  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeAsyncJoining7<B, C, D, E, F, G>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) async =>
       _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2263,55 +2099,50 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         sixth: sixth,
         seventh: seventh,
       );
-  Future<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>
-      merge8<B, C, D, E, F, G, H>(
-              {required Consumable<B> Function() second,
-              required Consumable<C> Function() third,
-              required Consumable<D> Function() fourth,
-              required Consumable<E> Function() fifth,
-              required Consumable<F> Function() sixth,
-              required Consumable<G> Function() seventh,
-              required Consumable<H> Function() eighth}) async =>
-          _MergeConsumable8<A, B, C, D, E, F, G, H>(
-            first: await this,
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-          );
-  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>
-      mergeAsync8<B, C, D, E, F, G, H>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth}) async =>
-          _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
-            first: (await this).toConsumableAsync(),
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-          );
-  Future<Consumable<Tuple8<A, B, C, D, E, F, G, H>>> mergeJoining8<B, C, D, E,
-              F, G, H>(
+  Future<Consumable<Tuple8<A, B, C, D, E, F, G, H>>> merge8<B, C, D, E, F, G, H>(
+          {required Consumable<B> Function() second,
+          required Consumable<C> Function() third,
+          required Consumable<D> Function() fourth,
+          required Consumable<E> Function() fifth,
+          required Consumable<F> Function() sixth,
+          required Consumable<G> Function() seventh,
+          required Consumable<H> Function() eighth}) async =>
+      _MergeConsumable8<A, B, C, D, E, F, G, H>(
+        first: await this,
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+      );
+  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeAsync8<B, C, D, E, F, G, H>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth}) async =>
+      _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
+        first: (await this).toConsumableAsync(),
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+      );
+  Future<Consumable<Tuple8<A, B, C, D, E, F, G, H>>> mergeJoining8<B, C, D, E, F, G, H>(
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
           required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth,
-          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) async =>
+          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) async =>
       _MergeConsumableJoining8<A, B, C, D, E, F, G, H>(
         first: await this,
         second: second,
@@ -2322,26 +2153,14 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         seventh: seventh,
         eighth: eighth,
       );
-  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeAsyncJoining8<B,
-              C, D, E, F, G, H>(
+  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeAsyncJoining8<B, C, D, E, F, G, H>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) async =>
       _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2352,62 +2171,55 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         seventh: seventh,
         eighth: eighth,
       );
-  Future<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>
-      merge9<B, C, D, E, F, G, H, I>(
-              {required Consumable<B> Function() second,
-              required Consumable<C> Function() third,
-              required Consumable<D> Function() fourth,
-              required Consumable<E> Function() fifth,
-              required Consumable<F> Function() sixth,
-              required Consumable<G> Function() seventh,
-              required Consumable<H> Function() eighth,
-              required Consumable<I> Function() ninth}) async =>
-          _MergeConsumable9<A, B, C, D, E, F, G, H, I>(
-            first: await this,
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-            ninth: ninth,
-          );
-  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>
-      mergeAsync9<B, C, D, E, F, G, H, I>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth,
-              required FutureOr<ConsumableAsync<I>> Function() ninth}) async =>
-          _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
-            first: (await this).toConsumableAsync(),
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-            ninth: ninth,
-          );
-  Future<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeJoining9<B, C, D,
-              E, F, G, H, I>(
+  Future<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>> merge9<B, C, D, E, F, G, H, I>(
+          {required Consumable<B> Function() second,
+          required Consumable<C> Function() third,
+          required Consumable<D> Function() fourth,
+          required Consumable<E> Function() fifth,
+          required Consumable<F> Function() sixth,
+          required Consumable<G> Function() seventh,
+          required Consumable<H> Function() eighth,
+          required Consumable<I> Function() ninth}) async =>
+      _MergeConsumable9<A, B, C, D, E, F, G, H, I>(
+        first: await this,
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+        ninth: ninth,
+      );
+  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeAsync9<B, C, D, E, F, G, H, I>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth,
+          required FutureOr<ConsumableAsync<I>> Function() ninth}) async =>
+      _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
+        first: (await this).toConsumableAsync(),
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+        ninth: ninth,
+      );
+  Future<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeJoining9<B, C, D, E, F, G, H, I>(
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
           required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth,
-          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required Consumable<I> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) async =>
+          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required Consumable<I> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) async =>
       _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>(
         first: await this,
         second: second,
@@ -2419,29 +2231,15 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
         eighth: eighth,
         ninth: ninth,
       );
-  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeAsyncJoining9<
-              B, C, D, E, F, G, H, I>(
+  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeAsyncJoining9<B, C, D, E, F, G, H, I>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required FutureOr<ConsumableAsync<I>> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required FutureOr<ConsumableAsync<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) async =>
       _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>(
         first: (await this).toConsumableAsync(),
         second: second,
@@ -2456,34 +2254,28 @@ extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {
 }
 
 extension MergeConsumableExtension<A> on Consumable<A> {
-  Consumable<Tuple<A, B>> merge<B>(
-          {required Consumable<B> Function() second}) =>
-      _MergeConsumable<A, B>(
+  Consumable<Tuple<A, B>> merge<B>({required Consumable<B> Function() second}) => _MergeConsumable<A, B>(
         first: this,
         second: second,
       );
-  ConsumableAsync<Tuple<A, B>> mergeAsync<B>(
-          {required FutureOr<ConsumableAsync<B>> Function() second}) =>
+  ConsumableAsync<Tuple<A, B>> mergeAsync<B>({required FutureOr<ConsumableAsync<B>> Function() second}) =>
       _MergeConsumableAsync<A, B>(
         first: toConsumableAsync(),
         second: second,
       );
-  Consumable<Tuple<A, B>> mergeJoining<B>(
-          {required Consumable<B> Function(A previous) second}) =>
+  Consumable<Tuple<A, B>> mergeJoining<B>({required Consumable<B> Function(A previous) second}) =>
       _MergeConsumableJoining<A, B>(
         first: this,
         second: second,
       );
   ConsumableAsync<Tuple<A, B>> mergeAsyncJoining<B>(
-          {required FutureOr<ConsumableAsync<B>> Function(A previous)
-              second}) =>
+          {required FutureOr<ConsumableAsync<B>> Function(A previous) second}) =>
       _MergeConsumableAsyncJoining<A, B>(
         first: toConsumableAsync(),
         second: second,
       );
   Consumable<Tuple3<A, B, C>> merge3<B, C>(
-          {required Consumable<B> Function() second,
-          required Consumable<C> Function() third}) =>
+          {required Consumable<B> Function() second, required Consumable<C> Function() third}) =>
       _MergeConsumable3<A, B, C>(
         first: this,
         second: second,
@@ -2507,8 +2299,7 @@ extension MergeConsumableExtension<A> on Consumable<A> {
       );
   ConsumableAsync<Tuple3<A, B, C>> mergeAsyncJoining3<B, C>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third}) =>
       _MergeConsumableAsyncJoining3<A, B, C>(
         first: toConsumableAsync(),
         second: second,
@@ -2546,11 +2337,8 @@ extension MergeConsumableExtension<A> on Consumable<A> {
       );
   ConsumableAsync<Tuple4<A, B, C, D>> mergeAsyncJoining4<B, C, D>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth}) =>
       _MergeConsumableAsyncJoining4<A, B, C, D>(
         first: toConsumableAsync(),
         second: second,
@@ -2585,8 +2373,7 @@ extension MergeConsumableExtension<A> on Consumable<A> {
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
-          required Consumable<E> Function(Tuple4<A, B, C, D> previous)
-              fifth}) =>
+          required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth}) =>
       _MergeConsumableJoining5<A, B, C, D, E>(
         first: this,
         second: second,
@@ -2596,14 +2383,9 @@ extension MergeConsumableExtension<A> on Consumable<A> {
       );
   ConsumableAsync<Tuple5<A, B, C, D, E>> mergeAsyncJoining5<B, C, D, E>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth}) =>
       _MergeConsumableAsyncJoining5<A, B, C, D, E>(
         first: toConsumableAsync(),
         second: second,
@@ -2644,8 +2426,7 @@ extension MergeConsumableExtension<A> on Consumable<A> {
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
-          required Consumable<F> Function(Tuple5<A, B, C, D, E> previous)
-              sixth}) =>
+          required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth}) =>
       _MergeConsumableJoining6<A, B, C, D, E, F>(
         first: this,
         second: second,
@@ -2656,17 +2437,10 @@ extension MergeConsumableExtension<A> on Consumable<A> {
       );
   ConsumableAsync<Tuple6<A, B, C, D, E, F>> mergeAsyncJoining6<B, C, D, E, F>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth}) =>
       _MergeConsumableAsyncJoining6<A, B, C, D, E, F>(
         first: toConsumableAsync(),
         second: second,
@@ -2713,8 +2487,7 @@ extension MergeConsumableExtension<A> on Consumable<A> {
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
           required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth,
-          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous)
-              seventh}) =>
+          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) =>
       _MergeConsumableJoining7<A, B, C, D, E, F, G>(
         first: this,
         second: second,
@@ -2724,23 +2497,13 @@ extension MergeConsumableExtension<A> on Consumable<A> {
         sixth: sixth,
         seventh: seventh,
       );
-  ConsumableAsync<Tuple7<A, B, C, D, E, F, G>> mergeAsyncJoining7<B, C, D, E, F,
-              G>(
+  ConsumableAsync<Tuple7<A, B, C, D, E, F, G>> mergeAsyncJoining7<B, C, D, E, F, G>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) =>
       _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>(
         first: toConsumableAsync(),
         second: second,
@@ -2768,35 +2531,32 @@ extension MergeConsumableExtension<A> on Consumable<A> {
         seventh: seventh,
         eighth: eighth,
       );
-  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>
-      mergeAsync8<B, C, D, E, F, G, H>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth}) =>
-          _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
-            first: toConsumableAsync(),
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-          );
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeAsync8<B, C, D, E, F, G, H>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth}) =>
+      _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
+        first: toConsumableAsync(),
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+      );
   Consumable<Tuple8<A, B, C, D, E, F, G, H>> mergeJoining8<B, C, D, E, F, G, H>(
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
           required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth,
-          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) =>
+          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) =>
       _MergeConsumableJoining8<A, B, C, D, E, F, G, H>(
         first: this,
         second: second,
@@ -2807,26 +2567,14 @@ extension MergeConsumableExtension<A> on Consumable<A> {
         seventh: seventh,
         eighth: eighth,
       );
-  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeAsyncJoining8<B, C, D, E,
-              F, G, H>(
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeAsyncJoining8<B, C, D, E, F, G, H>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) =>
       _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>(
         first: toConsumableAsync(),
         second: second,
@@ -2857,41 +2605,35 @@ extension MergeConsumableExtension<A> on Consumable<A> {
         eighth: eighth,
         ninth: ninth,
       );
-  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>
-      mergeAsync9<B, C, D, E, F, G, H, I>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth,
-              required FutureOr<ConsumableAsync<I>> Function() ninth}) =>
-          _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
-            first: toConsumableAsync(),
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-            ninth: ninth,
-          );
-  Consumable<Tuple9<A, B, C, D, E, F, G, H, I>> mergeJoining9<B, C, D, E, F, G,
-              H, I>(
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeAsync9<B, C, D, E, F, G, H, I>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth,
+          required FutureOr<ConsumableAsync<I>> Function() ninth}) =>
+      _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
+        first: toConsumableAsync(),
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+        ninth: ninth,
+      );
+  Consumable<Tuple9<A, B, C, D, E, F, G, H, I>> mergeJoining9<B, C, D, E, F, G, H, I>(
           {required Consumable<B> Function(A previous) second,
           required Consumable<C> Function(Tuple<A, B> previous) third,
           required Consumable<D> Function(Tuple3<A, B, C> previous) fourth,
           required Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth,
           required Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth,
-          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required Consumable<I> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) =>
+          required Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required Consumable<I> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) =>
       _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I>(
         first: this,
         second: second,
@@ -2903,29 +2645,15 @@ extension MergeConsumableExtension<A> on Consumable<A> {
         eighth: eighth,
         ninth: ninth,
       );
-  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeAsyncJoining9<B, C, D,
-              E, F, G, H, I>(
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeAsyncJoining9<B, C, D, E, F, G, H, I>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required FutureOr<ConsumableAsync<I>> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required FutureOr<ConsumableAsync<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) =>
       _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>(
         first: toConsumableAsync(),
         second: second,
@@ -2940,32 +2668,27 @@ extension MergeConsumableExtension<A> on Consumable<A> {
 }
 
 extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
-  Future<ConsumableAsync<Tuple<A, B>>> merge<B>(
-          {required FutureOr<ConsumableAsync<B>> Function() second}) async =>
+  Future<ConsumableAsync<Tuple<A, B>>> merge<B>({required FutureOr<ConsumableAsync<B>> Function() second}) async =>
       _MergeConsumableAsync<A, B>(
         first: await this,
         second: second,
       );
-  Future<ConsumableAsync<Tuple<A, B>>> mergeSync<B>(
-          {required FutureOr<Consumable<B>> Function() second}) async =>
+  Future<ConsumableAsync<Tuple<A, B>>> mergeSync<B>({required FutureOr<Consumable<B>> Function() second}) async =>
       _MergeConsumableAsync<A, B>(
         first: await this,
         second: () async => (await second()).toConsumableAsync(),
       );
   Future<ConsumableAsync<Tuple<A, B>>> mergeJoining<B>(
-          {required FutureOr<ConsumableAsync<B>> Function(A previous)
-              second}) async =>
+          {required FutureOr<ConsumableAsync<B>> Function(A previous) second}) async =>
       _MergeConsumableAsyncJoining<A, B>(
         first: await this,
         second: second,
       );
   Future<ConsumableAsync<Tuple<A, B>>> mergeSyncJoining<B>(
-          {required FutureOr<Consumable<B>> Function(A previous)
-              second}) async =>
+          {required FutureOr<Consumable<B>> Function(A previous) second}) async =>
       _MergeConsumableAsyncJoining<A, B>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
       );
   Future<ConsumableAsync<Tuple3<A, B, C>>> merge3<B, C>(
           {required FutureOr<ConsumableAsync<B>> Function() second,
@@ -2985,8 +2708,7 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
       );
   Future<ConsumableAsync<Tuple3<A, B, C>>> mergeJoining3<B, C>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third}) async =>
       _MergeConsumableAsyncJoining3<A, B, C>(
         first: await this,
         second: second,
@@ -2994,12 +2716,10 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
       );
   Future<ConsumableAsync<Tuple3<A, B, C>>> mergeSyncJoining3<B, C>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
-          required FutureOr<Consumable<C>> Function(Tuple<A, B> previous)
-              third}) async =>
+          required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third}) async =>
       _MergeConsumableAsyncJoining3<A, B, C>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
       );
   Future<ConsumableAsync<Tuple4<A, B, C, D>>> merge4<B, C, D>(
@@ -3024,11 +2744,8 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
       );
   Future<ConsumableAsync<Tuple4<A, B, C, D>>> mergeJoining4<B, C, D>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth}) async =>
       _MergeConsumableAsyncJoining4<A, B, C, D>(
         first: await this,
         second: second,
@@ -3038,15 +2755,12 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
   Future<ConsumableAsync<Tuple4<A, B, C, D>>> mergeSyncJoining4<B, C, D>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth}) async =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth}) async =>
       _MergeConsumableAsyncJoining4<A, B, C, D>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
       );
   Future<ConsumableAsync<Tuple5<A, B, C, D, E>>> merge5<B, C, D, E>(
           {required FutureOr<ConsumableAsync<B>> Function() second,
@@ -3074,14 +2788,9 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
       );
   Future<ConsumableAsync<Tuple5<A, B, C, D, E>>> mergeJoining5<B, C, D, E>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth}) async =>
       _MergeConsumableAsyncJoining5<A, B, C, D, E>(
         first: await this,
         second: second,
@@ -3092,17 +2801,13 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
   Future<ConsumableAsync<Tuple5<A, B, C, D, E>>> mergeSyncJoining5<B, C, D, E>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth}) async =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth}) async =>
       _MergeConsumableAsyncJoining5<A, B, C, D, E>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
       );
   Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> merge6<B, C, D, E, F>(
@@ -3133,20 +2838,12 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
         fifth: () async => (await fifth()).toConsumableAsync(),
         sixth: () async => (await sixth()).toConsumableAsync(),
       );
-  Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> mergeJoining6<B, C, D, E,
-              F>(
+  Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> mergeJoining6<B, C, D, E, F>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth}) async =>
       _MergeConsumableAsyncJoining6<A, B, C, D, E, F>(
         first: await this,
         second: second,
@@ -3155,24 +2852,17 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
         fifth: fifth,
         sixth: sixth,
       );
-  Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> mergeSyncJoining6<B, C, D,
-              E, F>(
+  Future<ConsumableAsync<Tuple6<A, B, C, D, E, F>>> mergeSyncJoining6<B, C, D, E, F>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth}) async =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth}) async =>
       _MergeConsumableAsyncJoining6<A, B, C, D, E, F>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
       );
@@ -3192,40 +2882,29 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
         sixth: sixth,
         seventh: seventh,
       );
-  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>
-      mergeSync7<B, C, D, E, F, G>(
-              {required FutureOr<Consumable<B>> Function() second,
-              required FutureOr<Consumable<C>> Function() third,
-              required FutureOr<Consumable<D>> Function() fourth,
-              required FutureOr<Consumable<E>> Function() fifth,
-              required FutureOr<Consumable<F>> Function() sixth,
-              required FutureOr<Consumable<G>> Function() seventh}) async =>
-          _MergeConsumableAsync7<A, B, C, D, E, F, G>(
-            first: await this,
-            second: () async => (await second()).toConsumableAsync(),
-            third: () async => (await third()).toConsumableAsync(),
-            fourth: () async => (await fourth()).toConsumableAsync(),
-            fifth: () async => (await fifth()).toConsumableAsync(),
-            sixth: () async => (await sixth()).toConsumableAsync(),
-            seventh: () async => (await seventh()).toConsumableAsync(),
-          );
-  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeJoining7<B, C, D, E,
-              F, G>(
+  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeSync7<B, C, D, E, F, G>(
+          {required FutureOr<Consumable<B>> Function() second,
+          required FutureOr<Consumable<C>> Function() third,
+          required FutureOr<Consumable<D>> Function() fourth,
+          required FutureOr<Consumable<E>> Function() fifth,
+          required FutureOr<Consumable<F>> Function() sixth,
+          required FutureOr<Consumable<G>> Function() seventh}) async =>
+      _MergeConsumableAsync7<A, B, C, D, E, F, G>(
+        first: await this,
+        second: () async => (await second()).toConsumableAsync(),
+        third: () async => (await third()).toConsumableAsync(),
+        fourth: () async => (await fourth()).toConsumableAsync(),
+        fifth: () async => (await fifth()).toConsumableAsync(),
+        sixth: () async => (await sixth()).toConsumableAsync(),
+        seventh: () async => (await seventh()).toConsumableAsync(),
+      );
+  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeJoining7<B, C, D, E, F, G>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) async =>
       _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>(
         first: await this,
         second: second,
@@ -3235,90 +2914,66 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
         sixth: sixth,
         seventh: seventh,
       );
-  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeSyncJoining7<B, C,
-              D, E, F, G>(
+  Future<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>> mergeSyncJoining7<B, C, D, E, F, G>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<Consumable<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh}) async =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<Consumable<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) async =>
       _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
-        seventh: (previous) async =>
-            (await seventh(previous)).toConsumableAsync(),
+        seventh: (previous) async => (await seventh(previous)).toConsumableAsync(),
       );
-  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>
-      merge8<B, C, D, E, F, G, H>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth}) async =>
-          _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
-            first: await this,
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-          );
-  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>
-      mergeSync8<B, C, D, E, F, G, H>(
-              {required FutureOr<Consumable<B>> Function() second,
-              required FutureOr<Consumable<C>> Function() third,
-              required FutureOr<Consumable<D>> Function() fourth,
-              required FutureOr<Consumable<E>> Function() fifth,
-              required FutureOr<Consumable<F>> Function() sixth,
-              required FutureOr<Consumable<G>> Function() seventh,
-              required FutureOr<Consumable<H>> Function() eighth}) async =>
-          _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
-            first: await this,
-            second: () async => (await second()).toConsumableAsync(),
-            third: () async => (await third()).toConsumableAsync(),
-            fourth: () async => (await fourth()).toConsumableAsync(),
-            fifth: () async => (await fifth()).toConsumableAsync(),
-            sixth: () async => (await sixth()).toConsumableAsync(),
-            seventh: () async => (await seventh()).toConsumableAsync(),
-            eighth: () async => (await eighth()).toConsumableAsync(),
-          );
-  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeJoining8<B, C, D,
-              E, F, G, H>(
+  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> merge8<B, C, D, E, F, G, H>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth}) async =>
+      _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
+        first: await this,
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+      );
+  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeSync8<B, C, D, E, F, G, H>(
+          {required FutureOr<Consumable<B>> Function() second,
+          required FutureOr<Consumable<C>> Function() third,
+          required FutureOr<Consumable<D>> Function() fourth,
+          required FutureOr<Consumable<E>> Function() fifth,
+          required FutureOr<Consumable<F>> Function() sixth,
+          required FutureOr<Consumable<G>> Function() seventh,
+          required FutureOr<Consumable<H>> Function() eighth}) async =>
+      _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
+        first: await this,
+        second: () async => (await second()).toConsumableAsync(),
+        third: () async => (await third()).toConsumableAsync(),
+        fourth: () async => (await fourth()).toConsumableAsync(),
+        fifth: () async => (await fifth()).toConsumableAsync(),
+        sixth: () async => (await sixth()).toConsumableAsync(),
+        seventh: () async => (await seventh()).toConsumableAsync(),
+        eighth: () async => (await eighth()).toConsumableAsync(),
+      );
+  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeJoining8<B, C, D, E, F, G, H>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) async =>
       _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>(
         first: await this,
         second: second,
@@ -3329,102 +2984,73 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
         seventh: seventh,
         eighth: eighth,
       );
-  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeSyncJoining8<B,
-              C, D, E, F, G, H>(
+  Future<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>> mergeSyncJoining8<B, C, D, E, F, G, H>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<Consumable<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<Consumable<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) async =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<Consumable<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<Consumable<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) async =>
       _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
-        seventh: (previous) async =>
-            (await seventh(previous)).toConsumableAsync(),
-        eighth: (previous) async =>
-            (await eighth(previous)).toConsumableAsync(),
+        seventh: (previous) async => (await seventh(previous)).toConsumableAsync(),
+        eighth: (previous) async => (await eighth(previous)).toConsumableAsync(),
       );
-  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>
-      merge9<B, C, D, E, F, G, H, I>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth,
-              required FutureOr<ConsumableAsync<I>> Function() ninth}) async =>
-          _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
-            first: await this,
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-            ninth: ninth,
-          );
-  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>
-      mergeSync9<B, C, D, E, F, G, H, I>(
-              {required FutureOr<Consumable<B>> Function() second,
-              required FutureOr<Consumable<C>> Function() third,
-              required FutureOr<Consumable<D>> Function() fourth,
-              required FutureOr<Consumable<E>> Function() fifth,
-              required FutureOr<Consumable<F>> Function() sixth,
-              required FutureOr<Consumable<G>> Function() seventh,
-              required FutureOr<Consumable<H>> Function() eighth,
-              required FutureOr<Consumable<I>> Function() ninth}) async =>
-          _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
-            first: await this,
-            second: () async => (await second()).toConsumableAsync(),
-            third: () async => (await third()).toConsumableAsync(),
-            fourth: () async => (await fourth()).toConsumableAsync(),
-            fifth: () async => (await fifth()).toConsumableAsync(),
-            sixth: () async => (await sixth()).toConsumableAsync(),
-            seventh: () async => (await seventh()).toConsumableAsync(),
-            eighth: () async => (await eighth()).toConsumableAsync(),
-            ninth: () async => (await ninth()).toConsumableAsync(),
-          );
-  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeJoining9<B, C,
-              D, E, F, G, H, I>(
+  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> merge9<B, C, D, E, F, G, H, I>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth,
+          required FutureOr<ConsumableAsync<I>> Function() ninth}) async =>
+      _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
+        first: await this,
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+        ninth: ninth,
+      );
+  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeSync9<B, C, D, E, F, G, H, I>(
+          {required FutureOr<Consumable<B>> Function() second,
+          required FutureOr<Consumable<C>> Function() third,
+          required FutureOr<Consumable<D>> Function() fourth,
+          required FutureOr<Consumable<E>> Function() fifth,
+          required FutureOr<Consumable<F>> Function() sixth,
+          required FutureOr<Consumable<G>> Function() seventh,
+          required FutureOr<Consumable<H>> Function() eighth,
+          required FutureOr<Consumable<I>> Function() ninth}) async =>
+      _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
+        first: await this,
+        second: () async => (await second()).toConsumableAsync(),
+        third: () async => (await third()).toConsumableAsync(),
+        fourth: () async => (await fourth()).toConsumableAsync(),
+        fifth: () async => (await fifth()).toConsumableAsync(),
+        sixth: () async => (await sixth()).toConsumableAsync(),
+        seventh: () async => (await seventh()).toConsumableAsync(),
+        eighth: () async => (await eighth()).toConsumableAsync(),
+        ninth: () async => (await ninth()).toConsumableAsync(),
+      );
+  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeJoining9<B, C, D, E, F, G, H, I>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required FutureOr<ConsumableAsync<I>> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) async =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required FutureOr<ConsumableAsync<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) async =>
       _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>(
         first: await this,
         second: second,
@@ -3436,69 +3062,48 @@ extension FutureMergeConsumableAsyncExtension<A> on Future<ConsumableAsync<A>> {
         eighth: eighth,
         ninth: ninth,
       );
-  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeSyncJoining9<
-              B, C, D, E, F, G, H, I>(
+  Future<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>> mergeSyncJoining9<B, C, D, E, F, G, H, I>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<Consumable<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<Consumable<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required FutureOr<Consumable<I>> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) async =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<Consumable<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<Consumable<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required FutureOr<Consumable<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) async =>
       _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>(
         first: await this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
-        seventh: (previous) async =>
-            (await seventh(previous)).toConsumableAsync(),
-        eighth: (previous) async =>
-            (await eighth(previous)).toConsumableAsync(),
+        seventh: (previous) async => (await seventh(previous)).toConsumableAsync(),
+        eighth: (previous) async => (await eighth(previous)).toConsumableAsync(),
         ninth: (previous) async => (await ninth(previous)).toConsumableAsync(),
       );
 }
 
 extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
-  ConsumableAsync<Tuple<A, B>> merge<B>(
-          {required FutureOr<ConsumableAsync<B>> Function() second}) =>
+  ConsumableAsync<Tuple<A, B>> merge<B>({required FutureOr<ConsumableAsync<B>> Function() second}) =>
       _MergeConsumableAsync<A, B>(
         first: this,
         second: second,
       );
-  ConsumableAsync<Tuple<A, B>> mergeSync<B>(
-          {required FutureOr<Consumable<B>> Function() second}) =>
+  ConsumableAsync<Tuple<A, B>> mergeSync<B>({required FutureOr<Consumable<B>> Function() second}) =>
       _MergeConsumableAsync<A, B>(
         first: this,
         second: () async => (await second()).toConsumableAsync(),
       );
-  ConsumableAsync<Tuple<A, B>> mergeJoining<B>(
-          {required FutureOr<ConsumableAsync<B>> Function(A previous)
-              second}) =>
+  ConsumableAsync<Tuple<A, B>> mergeJoining<B>({required FutureOr<ConsumableAsync<B>> Function(A previous) second}) =>
       _MergeConsumableAsyncJoining<A, B>(
         first: this,
         second: second,
       );
-  ConsumableAsync<Tuple<A, B>> mergeSyncJoining<B>(
-          {required FutureOr<Consumable<B>> Function(A previous) second}) =>
+  ConsumableAsync<Tuple<A, B>> mergeSyncJoining<B>({required FutureOr<Consumable<B>> Function(A previous) second}) =>
       _MergeConsumableAsyncJoining<A, B>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
       );
   ConsumableAsync<Tuple3<A, B, C>> merge3<B, C>(
           {required FutureOr<ConsumableAsync<B>> Function() second,
@@ -3509,8 +3114,7 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
         third: third,
       );
   ConsumableAsync<Tuple3<A, B, C>> mergeSync3<B, C>(
-          {required FutureOr<Consumable<B>> Function() second,
-          required FutureOr<Consumable<C>> Function() third}) =>
+          {required FutureOr<Consumable<B>> Function() second, required FutureOr<Consumable<C>> Function() third}) =>
       _MergeConsumableAsync3<A, B, C>(
         first: this,
         second: () async => (await second()).toConsumableAsync(),
@@ -3518,8 +3122,7 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
       );
   ConsumableAsync<Tuple3<A, B, C>> mergeJoining3<B, C>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third}) =>
       _MergeConsumableAsyncJoining3<A, B, C>(
         first: this,
         second: second,
@@ -3527,12 +3130,10 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
       );
   ConsumableAsync<Tuple3<A, B, C>> mergeSyncJoining3<B, C>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
-          required FutureOr<Consumable<C>> Function(Tuple<A, B> previous)
-              third}) =>
+          required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third}) =>
       _MergeConsumableAsyncJoining3<A, B, C>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
       );
   ConsumableAsync<Tuple4<A, B, C, D>> merge4<B, C, D>(
@@ -3557,11 +3158,8 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
       );
   ConsumableAsync<Tuple4<A, B, C, D>> mergeJoining4<B, C, D>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth}) =>
       _MergeConsumableAsyncJoining4<A, B, C, D>(
         first: this,
         second: second,
@@ -3571,15 +3169,12 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
   ConsumableAsync<Tuple4<A, B, C, D>> mergeSyncJoining4<B, C, D>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth}) =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth}) =>
       _MergeConsumableAsyncJoining4<A, B, C, D>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
       );
   ConsumableAsync<Tuple5<A, B, C, D, E>> merge5<B, C, D, E>(
           {required FutureOr<ConsumableAsync<B>> Function() second,
@@ -3607,14 +3202,9 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
       );
   ConsumableAsync<Tuple5<A, B, C, D, E>> mergeJoining5<B, C, D, E>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth}) =>
       _MergeConsumableAsyncJoining5<A, B, C, D, E>(
         first: this,
         second: second,
@@ -3625,17 +3215,13 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
   ConsumableAsync<Tuple5<A, B, C, D, E>> mergeSyncJoining5<B, C, D, E>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth}) =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth}) =>
       _MergeConsumableAsyncJoining5<A, B, C, D, E>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
       );
   ConsumableAsync<Tuple6<A, B, C, D, E, F>> merge6<B, C, D, E, F>(
@@ -3668,17 +3254,10 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
       );
   ConsumableAsync<Tuple6<A, B, C, D, E, F>> mergeJoining6<B, C, D, E, F>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth}) =>
       _MergeConsumableAsyncJoining6<A, B, C, D, E, F>(
         first: this,
         second: second,
@@ -3690,20 +3269,14 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
   ConsumableAsync<Tuple6<A, B, C, D, E, F>> mergeSyncJoining6<B, C, D, E, F>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth}) =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth}) =>
       _MergeConsumableAsyncJoining6<A, B, C, D, E, F>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
       );
@@ -3741,20 +3314,11 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
       );
   ConsumableAsync<Tuple7<A, B, C, D, E, F, G>> mergeJoining7<B, C, D, E, F, G>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) =>
       _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>(
         first: this,
         second: second,
@@ -3764,31 +3328,21 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
         sixth: sixth,
         seventh: seventh,
       );
-  ConsumableAsync<Tuple7<A, B, C, D, E, F, G>> mergeSyncJoining7<B, C, D, E, F,
-              G>(
+  ConsumableAsync<Tuple7<A, B, C, D, E, F, G>> mergeSyncJoining7<B, C, D, E, F, G>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<Consumable<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh}) =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<Consumable<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh}) =>
       _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
-        seventh: (previous) async =>
-            (await seventh(previous)).toConsumableAsync(),
+        seventh: (previous) async => (await seventh(previous)).toConsumableAsync(),
       );
   ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> merge8<B, C, D, E, F, G, H>(
           {required FutureOr<ConsumableAsync<B>> Function() second,
@@ -3808,45 +3362,32 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
         seventh: seventh,
         eighth: eighth,
       );
-  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>
-      mergeSync8<B, C, D, E, F, G, H>(
-              {required FutureOr<Consumable<B>> Function() second,
-              required FutureOr<Consumable<C>> Function() third,
-              required FutureOr<Consumable<D>> Function() fourth,
-              required FutureOr<Consumable<E>> Function() fifth,
-              required FutureOr<Consumable<F>> Function() sixth,
-              required FutureOr<Consumable<G>> Function() seventh,
-              required FutureOr<Consumable<H>> Function() eighth}) =>
-          _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
-            first: this,
-            second: () async => (await second()).toConsumableAsync(),
-            third: () async => (await third()).toConsumableAsync(),
-            fourth: () async => (await fourth()).toConsumableAsync(),
-            fifth: () async => (await fifth()).toConsumableAsync(),
-            sixth: () async => (await sixth()).toConsumableAsync(),
-            seventh: () async => (await seventh()).toConsumableAsync(),
-            eighth: () async => (await eighth()).toConsumableAsync(),
-          );
-  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeJoining8<B, C, D, E, F,
-              G, H>(
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeSync8<B, C, D, E, F, G, H>(
+          {required FutureOr<Consumable<B>> Function() second,
+          required FutureOr<Consumable<C>> Function() third,
+          required FutureOr<Consumable<D>> Function() fourth,
+          required FutureOr<Consumable<E>> Function() fifth,
+          required FutureOr<Consumable<F>> Function() sixth,
+          required FutureOr<Consumable<G>> Function() seventh,
+          required FutureOr<Consumable<H>> Function() eighth}) =>
+      _MergeConsumableAsync8<A, B, C, D, E, F, G, H>(
+        first: this,
+        second: () async => (await second()).toConsumableAsync(),
+        third: () async => (await third()).toConsumableAsync(),
+        fourth: () async => (await fourth()).toConsumableAsync(),
+        fifth: () async => (await fifth()).toConsumableAsync(),
+        sixth: () async => (await sixth()).toConsumableAsync(),
+        seventh: () async => (await seventh()).toConsumableAsync(),
+        eighth: () async => (await eighth()).toConsumableAsync(),
+      );
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeJoining8<B, C, D, E, F, G, H>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) =>
       _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>(
         first: this,
         second: second,
@@ -3857,102 +3398,73 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
         seventh: seventh,
         eighth: eighth,
       );
-  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeSyncJoining8<B, C, D, E,
-              F, G, H>(
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>> mergeSyncJoining8<B, C, D, E, F, G, H>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<Consumable<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<Consumable<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth}) =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<Consumable<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<Consumable<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth}) =>
       _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
-        seventh: (previous) async =>
-            (await seventh(previous)).toConsumableAsync(),
-        eighth: (previous) async =>
-            (await eighth(previous)).toConsumableAsync(),
+        seventh: (previous) async => (await seventh(previous)).toConsumableAsync(),
+        eighth: (previous) async => (await eighth(previous)).toConsumableAsync(),
       );
-  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>
-      merge9<B, C, D, E, F, G, H, I>(
-              {required FutureOr<ConsumableAsync<B>> Function() second,
-              required FutureOr<ConsumableAsync<C>> Function() third,
-              required FutureOr<ConsumableAsync<D>> Function() fourth,
-              required FutureOr<ConsumableAsync<E>> Function() fifth,
-              required FutureOr<ConsumableAsync<F>> Function() sixth,
-              required FutureOr<ConsumableAsync<G>> Function() seventh,
-              required FutureOr<ConsumableAsync<H>> Function() eighth,
-              required FutureOr<ConsumableAsync<I>> Function() ninth}) =>
-          _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
-            first: this,
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
-            sixth: sixth,
-            seventh: seventh,
-            eighth: eighth,
-            ninth: ninth,
-          );
-  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>
-      mergeSync9<B, C, D, E, F, G, H, I>(
-              {required FutureOr<Consumable<B>> Function() second,
-              required FutureOr<Consumable<C>> Function() third,
-              required FutureOr<Consumable<D>> Function() fourth,
-              required FutureOr<Consumable<E>> Function() fifth,
-              required FutureOr<Consumable<F>> Function() sixth,
-              required FutureOr<Consumable<G>> Function() seventh,
-              required FutureOr<Consumable<H>> Function() eighth,
-              required FutureOr<Consumable<I>> Function() ninth}) =>
-          _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
-            first: this,
-            second: () async => (await second()).toConsumableAsync(),
-            third: () async => (await third()).toConsumableAsync(),
-            fourth: () async => (await fourth()).toConsumableAsync(),
-            fifth: () async => (await fifth()).toConsumableAsync(),
-            sixth: () async => (await sixth()).toConsumableAsync(),
-            seventh: () async => (await seventh()).toConsumableAsync(),
-            eighth: () async => (await eighth()).toConsumableAsync(),
-            ninth: () async => (await ninth()).toConsumableAsync(),
-          );
-  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeJoining9<B, C, D, E,
-              F, G, H, I>(
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> merge9<B, C, D, E, F, G, H, I>(
+          {required FutureOr<ConsumableAsync<B>> Function() second,
+          required FutureOr<ConsumableAsync<C>> Function() third,
+          required FutureOr<ConsumableAsync<D>> Function() fourth,
+          required FutureOr<ConsumableAsync<E>> Function() fifth,
+          required FutureOr<ConsumableAsync<F>> Function() sixth,
+          required FutureOr<ConsumableAsync<G>> Function() seventh,
+          required FutureOr<ConsumableAsync<H>> Function() eighth,
+          required FutureOr<ConsumableAsync<I>> Function() ninth}) =>
+      _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
+        first: this,
+        second: second,
+        third: third,
+        fourth: fourth,
+        fifth: fifth,
+        sixth: sixth,
+        seventh: seventh,
+        eighth: eighth,
+        ninth: ninth,
+      );
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeSync9<B, C, D, E, F, G, H, I>(
+          {required FutureOr<Consumable<B>> Function() second,
+          required FutureOr<Consumable<C>> Function() third,
+          required FutureOr<Consumable<D>> Function() fourth,
+          required FutureOr<Consumable<E>> Function() fifth,
+          required FutureOr<Consumable<F>> Function() sixth,
+          required FutureOr<Consumable<G>> Function() seventh,
+          required FutureOr<Consumable<H>> Function() eighth,
+          required FutureOr<Consumable<I>> Function() ninth}) =>
+      _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I>(
+        first: this,
+        second: () async => (await second()).toConsumableAsync(),
+        third: () async => (await third()).toConsumableAsync(),
+        fourth: () async => (await fourth()).toConsumableAsync(),
+        fifth: () async => (await fifth()).toConsumableAsync(),
+        sixth: () async => (await sixth()).toConsumableAsync(),
+        seventh: () async => (await seventh()).toConsumableAsync(),
+        eighth: () async => (await eighth()).toConsumableAsync(),
+        ninth: () async => (await ninth()).toConsumableAsync(),
+      );
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeJoining9<B, C, D, E, F, G, H, I>(
           {required FutureOr<ConsumableAsync<B>> Function(A previous) second,
-          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous)
-              third,
-          required FutureOr<ConsumableAsync<D>> Function(
-                  Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<ConsumableAsync<E>> Function(
-                  Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<ConsumableAsync<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<ConsumableAsync<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<ConsumableAsync<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required FutureOr<ConsumableAsync<I>> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) =>
+          required FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third,
+          required FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required FutureOr<ConsumableAsync<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) =>
       _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>(
         first: this,
         second: second,
@@ -3964,39 +3476,24 @@ extension MergeConsumableAsyncExtension<A> on ConsumableAsync<A> {
         eighth: eighth,
         ninth: ninth,
       );
-  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeSyncJoining9<B, C, D,
-              E, F, G, H, I>(
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>> mergeSyncJoining9<B, C, D, E, F, G, H, I>(
           {required FutureOr<Consumable<B>> Function(A previous) second,
           required FutureOr<Consumable<C>> Function(Tuple<A, B> previous) third,
-          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous)
-              fourth,
-          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous)
-              fifth,
-          required FutureOr<Consumable<F>> Function(
-                  Tuple5<A, B, C, D, E> previous)
-              sixth,
-          required FutureOr<Consumable<G>> Function(
-                  Tuple6<A, B, C, D, E, F> previous)
-              seventh,
-          required FutureOr<Consumable<H>> Function(
-                  Tuple7<A, B, C, D, E, F, G> previous)
-              eighth,
-          required FutureOr<Consumable<I>> Function(
-                  Tuple8<A, B, C, D, E, F, G, H> previous)
-              ninth}) =>
+          required FutureOr<Consumable<D>> Function(Tuple3<A, B, C> previous) fourth,
+          required FutureOr<Consumable<E>> Function(Tuple4<A, B, C, D> previous) fifth,
+          required FutureOr<Consumable<F>> Function(Tuple5<A, B, C, D, E> previous) sixth,
+          required FutureOr<Consumable<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh,
+          required FutureOr<Consumable<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth,
+          required FutureOr<Consumable<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth}) =>
       _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>(
         first: this,
-        second: (previous) async =>
-            (await second(previous)).toConsumableAsync(),
+        second: (previous) async => (await second(previous)).toConsumableAsync(),
         third: (previous) async => (await third(previous)).toConsumableAsync(),
-        fourth: (previous) async =>
-            (await fourth(previous)).toConsumableAsync(),
+        fourth: (previous) async => (await fourth(previous)).toConsumableAsync(),
         fifth: (previous) async => (await fifth(previous)).toConsumableAsync(),
         sixth: (previous) async => (await sixth(previous)).toConsumableAsync(),
-        seventh: (previous) async =>
-            (await seventh(previous)).toConsumableAsync(),
-        eighth: (previous) async =>
-            (await eighth(previous)).toConsumableAsync(),
+        seventh: (previous) async => (await seventh(previous)).toConsumableAsync(),
+        eighth: (previous) async => (await eighth(previous)).toConsumableAsync(),
         ninth: (previous) async => (await ninth(previous)).toConsumableAsync(),
       );
 }

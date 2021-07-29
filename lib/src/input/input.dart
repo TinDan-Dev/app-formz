@@ -3,14 +3,14 @@ import 'package:meta/meta.dart';
 
 import '../utils/lazy.dart';
 
-// using lazy validation for performance, thus this class is still immutable but the validation function is only called
-// once. The mixin is used to avoid immutable warnings
+// Using lazy validation to improve performance, thus this class is still immutable but the validation function is only called
+// once. The mixin is used to avoid immutable warnings.
 abstract class Input<T, E> with EquatableMixin {
   final bool _pure;
   final T? value;
   final String name;
 
-  late Lazy<E?> _validate;
+  late final Lazy<E?> _validate;
 
   Input._({
     required this.value,

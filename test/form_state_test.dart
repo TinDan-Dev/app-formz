@@ -117,9 +117,6 @@ void main() {
   });
 
   group('status', () {
-    const pure = 1 << 0;
-    const valid = 1 << 1;
-
     const list = [
       // pure, pure, not optional
       [
