@@ -106,7 +106,19 @@ const functions = [
 
 const syncFunctions = [
   '''
-  Future<ConsumableAsync<S>> flatMapAsync<S>(Future<ConsumableAsync<S>> mapper(T value)) async => @this.consume(
+  Future<void> onSuccessAsync(FutureOr<void> callback(T value)) => @this.consume(
+    onSuccess: (value) async => callback(value),
+    onError: (_) async {},
+  );
+  ''',
+  '''
+  Future<ConsumableAsync<S>> mapAsync<S>(FutureOr<S> mapper(T value)) => @this.consume(
+    onSuccess: (value) async => ValueActionResultAsync.success(await mapper(value)),
+    onError: (failure) async => ValueActionResultAsync.fail(failure),
+  );
+  ''',
+  '''
+  Future<ConsumableAsync<S>> flatMapAsync<S>(FutureOr<ConsumableAsync<S>> mapper(T value)) => @this.consume(
     onSuccess: (value) async => mapper(value),
     onError: (failure) async => ValueActionResultAsync.fail(failure),
   );
@@ -243,7 +255,7 @@ import 'formz.dart';
       buf.writeln(convert(function, consumable));
     }
 
-    if (consumable == Consumables.consumable || consumable == Consumables.consumableFuture) {
+    if (consumable == Consumables.consumable) {
       for (final function in syncFunctions) {
         buf.writeln(convert(function, consumable));
       }
