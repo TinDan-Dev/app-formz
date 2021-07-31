@@ -8,7 +8,7 @@ export 'src/attachments.dart';
 export 'src/form_cubit.dart';
 export 'src/form_memory.dart';
 export 'src/form_state.dart';
-export 'src/input/check_box_group_input.dart';
+export 'src/input/check_box_input.dart';
 export 'src/input/date_input.dart';
 export 'src/input/generic/generic_input.dart';
 export 'src/input/input.dart';

@@ -232,11 +232,11 @@ packages:
     dependency: "direct dev"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: ac88bb3861539e8091c5ce41371c0dbb0b2db0a1
+      ref: dev
+      resolved-ref: "0975175a2768a9db4ac48ac88023f283f0bc21ef"
       url: "ssh://git@github.com/TinDan-Dev/app-formz-test.git"
     source: git
-    version: "1.0.1"
+    version: "1.0.1+2"
   freezed:
     dependency: "direct dev"
     description:
