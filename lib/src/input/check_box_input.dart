@@ -109,3 +109,7 @@ class CheckBoxInput extends Input<CheckBoxInputData, CheckBoxInputError> {
 
   bool operator [](Object key) => value?[key] ?? false;
 }
+
+extension NullableCheckboxInputData on CheckBoxInputData? {
+  bool operator [](Object key) => this?[key] ?? false;
+}

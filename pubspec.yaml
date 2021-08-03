@@ -35,6 +35,5 @@ dev_dependencies:
   mockito: ^5.0.10
 
   formz_test:
-    git: 
-      url: ssh://git@github.com/TinDan-Dev/app-formz-test.git
-      ref: dev
+    path: ../app-formz-test
+#    git: ssh://git@github.com/TinDan-Dev/app-formz-test.git

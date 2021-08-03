@@ -13,6 +13,8 @@ class Lazy<T> {
     }
     return _value;
   }
+
+  bool get evaluated => _evaluated;
 }
 
 class AsyncLazy<T> {
@@ -30,4 +32,6 @@ class AsyncLazy<T> {
     }
     return _value;
   }
+
+  bool get evaluated => _evaluated;
 }
