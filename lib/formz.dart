@@ -27,6 +27,7 @@ export 'src/utils/resolvable.dart';
 export 'src/utils/retries.dart';
 export 'src/utils/retry.dart';
 export 'src/utils/types.dart';
+export 'src/widgets/consumable_async_builder.dart';
 export 'src/widgets/consumable_builder.dart';
 export 'src/widgets/form_error_builder.dart';
 export 'src/widgets/form_input_builder.dart';
