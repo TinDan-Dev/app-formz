@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'failure.dart';
 import 'retry.dart';
 
 /// Global configuration for all [Retry] objects
@@ -9,6 +10,9 @@ abstract class Retries {
 
   /// The maximum delay between each retry.
   static Duration maxDelay = const Duration(seconds: 3);
+
+  /// This function is invoked if a try is attempted.
+  static void Function(String msg, Failure cause)? logFunction;
 
   /// Determines the duration to wait till the next attempt.
   static Duration timeInterpolation(int attempt) {
