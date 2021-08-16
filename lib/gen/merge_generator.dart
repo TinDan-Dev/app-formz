@@ -35,6 +35,9 @@ import 'dart:async';
 
 import 'formz.tuple.dart';
 import 'src/utils/consumable.dart';
+import 'src/utils/extensions.dart';
+import 'src/utils/impl/value_action_result.dart';
+import 'src/utils/impl/value_action_result_async.dart';
 import 'src/utils/failure.dart';
 
 ${buf.toString()}
@@ -108,6 +111,9 @@ ${buf.toString()}
     final fieldName = '${TupleGenerator.fields[count - 1]}';
     final field = buildFiledAccess(count, async, joining);
 
+    final asyncName = async ? 'Async' : '';
+    final resultType = 'Consumable$asyncName<${TupleGenerator.getTupleName(max)}>';
+
     if (count == max) {
       final tupleBuf = StringBuffer();
       tupleBuf.write('${TupleGenerator.getTupleName(count)}(');
@@ -120,16 +126,16 @@ ${buf.toString()}
       tupleBuf.write(')');
 
       return '''
-$field.consume(
-  onSuccess: (${fieldName}Value) => onSuccess(${tupleBuf.toString()}),
-  onError: onError,
+$field.consume<$resultType>(
+  onSuccess: (${fieldName}Value) => ValueActionResult$asyncName.success(${tupleBuf.toString()}),
+  onError: (failure) => ValueActionResult$asyncName.fail(failure),
 )
       ''';
     } else {
       return '''
-$field.consume(
+$field.consume<$resultType>(
   onSuccess: (${fieldName}Value) ${async ? 'async' : ''} => ${buildConsumeBody(count + 1, max, async, joining)},
-  onError: onError,
+  onError: (failure) => ValueActionResult$asyncName.fail(failure),
 )
       ''';
     }
@@ -158,6 +164,10 @@ $field.consume(
           ..type = refer(type)));
       }
 
+      builder.fields.add(Field((fBuilder) => fBuilder
+        ..name = '_result'
+        ..type = refer('Consumable${asyncName}<${TupleGenerator.getTupleName(count)}>?')));
+
       builder.constructors.add(Constructor((cBuilder) {
         for (int k = 0; k < count; k++) {
           cBuilder.optionalParameters.add(Parameter((pBuilder) => pBuilder
@@ -185,10 +195,21 @@ $field.consume(
           ..type = refer('$type Function(Failure failure)')
           ..required = true
           ..named = true));
-        mBuilder.lambda = true;
         if (async) mBuilder.modifier = MethodModifier.async;
 
-        mBuilder.body = Code(buildConsumeBody(1, count, async, joining));
+        mBuilder.body = Code('''
+return _result.fold(
+  () ${async ? 'async' : ''}{
+    final result = ${buildConsumeBody(1, count, async, joining)};
+
+    _result = ${async ? 'await' : ''} result;
+    return _result!.consume(onSuccess: onSuccess, onError: onError);
+  },
+  (some) {
+    return some.consume(onSuccess: onSuccess, onError: onError);
+  },
+);
+''');
       }));
     });
 
