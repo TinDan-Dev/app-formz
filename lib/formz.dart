@@ -23,7 +23,6 @@ export 'src/utils/impl/action_result_async.dart';
 export 'src/utils/impl/value_action_result.dart';
 export 'src/utils/impl/value_action_result_async.dart';
 export 'src/utils/lazy.dart';
-export 'src/utils/resolvable.dart';
 export 'src/utils/retries.dart';
 export 'src/utils/retry.dart';
 export 'src/utils/types.dart';

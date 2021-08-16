@@ -1,29 +1,12 @@
 part of 'consumable.dart';
 
-abstract class ConsumableAsync<T> implements IResolvableAsync<Failure> {
+abstract class ConsumableAsync<T> {
   const ConsumableAsync();
 
   Future<S> consume<S>({
     required FutureOr<S> onSuccess(T value),
     required FutureOr<S> onError(Failure failure),
   });
-
-  @override
-  Future<S?> resolve<S>({
-    required bool condition(Failure value),
-    required FutureOr<S> match(Failure value),
-    required FutureOr<S?> noMatch(),
-  }) {
-    return consume(
-      onSuccess: (_) => noMatch(),
-      onError: (failure) {
-        if (condition(failure))
-          return match(failure);
-        else
-          return noMatch();
-      },
-    );
-  }
 
   Future<Consumable<T>> toSync() async {
     return consume(
@@ -34,23 +17,6 @@ abstract class ConsumableAsync<T> implements IResolvableAsync<Failure> {
 }
 
 mixin ConsumableAsyncMixin<T> implements ConsumableAsync<T> {
-  @override
-  Future<S?> resolve<S>({
-    required bool condition(Failure value),
-    required FutureOr<S> match(Failure value),
-    required FutureOr<S?> noMatch(),
-  }) {
-    return consume(
-      onSuccess: (_) => noMatch(),
-      onError: (failure) {
-        if (condition(failure))
-          return match(failure);
-        else
-          return noMatch();
-      },
-    );
-  }
-
   @override
   Future<Consumable<T>> toSync() async {
     return consume(

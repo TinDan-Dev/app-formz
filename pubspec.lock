@@ -231,9 +231,11 @@ packages:
   formz_test:
     dependency: "direct dev"
     description:
-      path: "../app-formz-test"
-      relative: true
-    source: path
+      path: "."
+      ref: dev
+      resolved-ref: "0975175a2768a9db4ac48ac88023f283f0bc21ef"
+      url: "ssh://git@github.com/TinDan-Dev/app-formz-test.git"
+    source: git
     version: "1.0.1+2"
   freezed:
     dependency: "direct dev"

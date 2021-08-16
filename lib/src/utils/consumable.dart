@@ -2,11 +2,10 @@ import 'dart:async';
 
 import '../../formz.dart';
 import 'failure.dart';
-import 'resolvable.dart';
 
 part 'consumable_async.dart';
 
-abstract class Consumable<T> implements IResolvable<Failure> {
+abstract class Consumable<T> {
   const Consumable();
 
   S consume<S>({
@@ -14,44 +13,10 @@ abstract class Consumable<T> implements IResolvable<Failure> {
     required S onError(Failure failure),
   });
 
-  @override
-  S? resolve<S>({
-    required bool condition(Failure value),
-    required S match(Failure value),
-    required S? noMatch(),
-  }) {
-    return consume(
-      onSuccess: (_) => noMatch(),
-      onError: (failure) {
-        if (condition(failure))
-          return match(failure);
-        else
-          return noMatch();
-      },
-    );
-  }
-
   ConsumableAsync<T> toConsumableAsync() => _ConsumableToAsyncWrapper<T>(this);
 }
 
 mixin ConsumableMixin<T> implements Consumable<T> {
-  @override
-  S? resolve<S>({
-    required bool condition(Failure value),
-    required S match(Failure value),
-    required S? noMatch(),
-  }) {
-    return consume(
-      onSuccess: (_) => noMatch(),
-      onError: (failure) {
-        if (condition(failure))
-          return match(failure);
-        else
-          return noMatch();
-      },
-    );
-  }
-
   @override
   ConsumableAsync<T> toConsumableAsync() => _ConsumableToAsyncWrapper(this);
 }
