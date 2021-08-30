@@ -76,6 +76,10 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
     );
   }
 
+  T getProperty<T extends Object>(String key) => state.getProperty<T>(key);
+
+  void setProperty(String key, {required Object value}) => emit(state.copyWith(properties: {key: value}));
+
   @override
   Future<void> close() async {
     await super.close();

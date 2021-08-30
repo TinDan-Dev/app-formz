@@ -23,3 +23,13 @@ extension IterableConsumableAsyncExtension<T> on Iterable<ConsumableAsync<T>> {
     }
   }
 }
+
+extension HelperConsumableAsyncFutureExtensions<T> on FutureOr<ConsumableAsync<T>> {
+  Future<Consumable<T>> toSync() async => (await this).toSync();
+
+  Future<S> consume<S>({
+    required FutureOr<S> onSuccess(T value),
+    required FutureOr<S> onError(Failure failure),
+  }) async =>
+      (await this).consume(onSuccess: onSuccess, onError: onError);
+}
