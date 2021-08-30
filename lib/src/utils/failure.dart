@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'extensions.dart';
-import 'resolvable.dart';
 
-class Failure implements IResolvable<Failure> {
+class Failure {
   static String Function(BuildContext context)? defaultLocalization;
 
   final String message;
@@ -27,16 +26,4 @@ class Failure implements IResolvable<Failure> {
   }
 
   String localize(BuildContext context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
-
-  @override
-  S? resolve<S>({
-    required bool condition(Failure value),
-    required S match(Failure value),
-    required S? noMatch(),
-  }) {
-    if (condition(this))
-      return match(this);
-    else
-      return noMatch();
-  }
 }

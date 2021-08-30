@@ -12,8 +12,6 @@ bool _defaultShouldContinue(_) => true;
 /// Wraps a function and applies retry logic to it. Thus the function is called multiple times if it throws a exception.
 /// Make sure there are no side effects when calling the function multiple times.
 class Retry<T> extends ConsumableAsync<T> {
-  static void Function(Failure failure)? logFailure;
-
   final _completer = Completer<Consumable<T>>();
 
   /// This function is tried.
@@ -74,7 +72,7 @@ class Retry<T> extends ConsumableAsync<T> {
         break;
       } catch (e, s) {
         result = errorToResult(e, s, cancellationToken);
-        result.onError((failure) => logFailure?.call(failure));
+        result.onError((failure) => Retries.logFunction?.call('Retry $i / $attempts failed', failure));
 
         final shouldCancel = !result.consume(
           onSuccess: (_) => false,

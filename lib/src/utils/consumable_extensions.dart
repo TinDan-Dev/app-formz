@@ -57,4 +57,10 @@ extension IterableConsumableExtension<T> on Iterable<Consumable<T>> {
 
 extension HelperFutureConsumableExtension<T> on FutureOr<Consumable<T>> {
   Future<ConsumableAsync<T>> toConsumableAsync() async => (await this).toConsumableAsync();
+
+  Future<S> consume<S>({
+    required FutureOr<S> onSuccess(T value),
+    required FutureOr<S> onError(Failure failure),
+  }) async =>
+      (await this).consume(onSuccess: onSuccess, onError: onError);
 }

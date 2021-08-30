@@ -16,6 +16,11 @@ extension ConsumableExtensions<T> on Consumable<T> {
 
   void invoke() => this.consume(onSuccess: (_) {}, onError: (_) {});
 
+  Consumable<void> discardValue() => this.consume(
+        onSuccess: (_) => const ActionResult.success(),
+        onError: (failure) => ActionResult.fail(failure),
+      );
+
   Consumable<T> discardError(T value) => this.consume(
         onSuccess: (_) => this,
         onError: (_) => ValueActionResult<T>.success(value),
@@ -72,6 +77,20 @@ extension ConsumableExtensions<T> on Consumable<T> {
     );
   }
 
+  Consumable<T> resolve({
+    required bool condition(Failure value),
+    required Consumable<T> match(Failure value),
+  }) =>
+      this.consume(
+        onSuccess: (_) => this,
+        onError: (failure) {
+          if (condition(failure))
+            return match(failure);
+          else
+            return this;
+        },
+      );
+
   Future<void> onSuccessAsync(FutureOr<void> callback(T value)) => this.consume(
         onSuccess: (value) async => callback(value),
         onError: (_) async {},
@@ -94,6 +113,11 @@ extension ConsumableFutureExtensions<T> on FutureOr<Consumable<T>> {
   Future<bool> get failure async => (await this).consume(onSuccess: (_) => false, onError: (_) => true);
 
   Future<void> invoke() async => (await this).consume(onSuccess: (_) {}, onError: (_) {});
+
+  Future<Consumable<void>> discardValue() async => (await this).consume(
+        onSuccess: (_) => const ActionResult.success(),
+        onError: (failure) => ActionResult.fail(failure),
+      );
 
   Future<Consumable<T>> discardError(T value) async => (await this).consume(
         onSuccess: (_) => this,
@@ -150,6 +174,20 @@ extension ConsumableFutureExtensions<T> on FutureOr<Consumable<T>> {
       onError: (failure) => ValueActionResult.fail(failure),
     );
   }
+
+  Future<Consumable<T>> resolve({
+    required bool condition(Failure value),
+    required Consumable<T> match(Failure value),
+  }) async =>
+      (await this).consume(
+        onSuccess: (_) => this,
+        onError: (failure) async {
+          if (await condition(failure))
+            return await match(failure);
+          else
+            return this;
+        },
+      );
 }
 
 extension ConsumableAsyncExtensions<T> on ConsumableAsync<T> {
@@ -158,6 +196,11 @@ extension ConsumableAsyncExtensions<T> on ConsumableAsync<T> {
   Future<bool> get failure async => this.consume(onSuccess: (_) => false, onError: (_) => true);
 
   Future<void> invoke() async => this.consume(onSuccess: (_) {}, onError: (_) {});
+
+  Future<ConsumableAsync<void>> discardValue() async => this.consume(
+        onSuccess: (_) => const ActionResultAsync.success(),
+        onError: (failure) => ActionResultAsync.fail(failure),
+      );
 
   Future<ConsumableAsync<T>> discardError(T value) async => this.consume(
         onSuccess: (_) => this,
@@ -214,6 +257,20 @@ extension ConsumableAsyncExtensions<T> on ConsumableAsync<T> {
       onError: (failure) => ValueActionResultAsync.fail(failure),
     );
   }
+
+  Future<ConsumableAsync<T>> resolve({
+    required FutureOr<bool> condition(Failure value),
+    required FutureOr<ConsumableAsync<T>> match(Failure value),
+  }) async =>
+      this.consume(
+        onSuccess: (_) => this,
+        onError: (failure) async {
+          if (await condition(failure))
+            return await match(failure);
+          else
+            return this;
+        },
+      );
 }
 
 extension ConsumableAsyncFutureExtensions<T> on FutureOr<ConsumableAsync<T>> {
@@ -222,6 +279,11 @@ extension ConsumableAsyncFutureExtensions<T> on FutureOr<ConsumableAsync<T>> {
   Future<bool> get failure async => (await this).consume(onSuccess: (_) => false, onError: (_) => true);
 
   Future<void> invoke() async => (await this).consume(onSuccess: (_) {}, onError: (_) {});
+
+  Future<ConsumableAsync<void>> discardValue() async => (await this).consume(
+        onSuccess: (_) => const ActionResultAsync.success(),
+        onError: (failure) => ActionResultAsync.fail(failure),
+      );
 
   Future<ConsumableAsync<T>> discardError(T value) async => (await this).consume(
         onSuccess: (_) => this,
@@ -278,4 +340,18 @@ extension ConsumableAsyncFutureExtensions<T> on FutureOr<ConsumableAsync<T>> {
       onError: (failure) => ValueActionResultAsync.fail(failure),
     );
   }
+
+  Future<ConsumableAsync<T>> resolve({
+    required FutureOr<bool> condition(Failure value),
+    required FutureOr<ConsumableAsync<T>> match(Failure value),
+  }) async =>
+      (await this).consume(
+        onSuccess: (_) => this,
+        onError: (failure) async {
+          if (await condition(failure))
+            return await match(failure);
+          else
+            return this;
+        },
+      );
 }

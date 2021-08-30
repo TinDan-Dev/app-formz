@@ -38,6 +38,12 @@ const functions = [
   @return{void} invoke() @async => @this.consume(onSuccess: (_) {}, onError: (_) {});
   ''',
   '''
+  @return{Consumable@Async<void>} discardValue() @async => @this.consume(
+    onSuccess: (_) => const ActionResult@Async.success(),
+    onError: (failure) => ActionResult@Async.fail(failure),
+  );
+  ''',
+  '''
   @return{Consumable@Async<T>} discardError(T value) @async => @this.consume(
     onSuccess: (_) => this,
     onError: (_) => ValueActionResult@Async<T>.success(value),
@@ -102,6 +108,20 @@ const functions = [
     );
   }
   ''',
+  '''
+  @return{Consumable@Async<T>} resolve({
+    required @futureOr{bool} condition(Failure value),
+    required @futureOr{Consumable@Async<T>} match(Failure value),
+  }) @async => @this.consume(
+    onSuccess: (_) => this,
+    onError: (failure) @async {
+      if (@await condition(failure))
+        return @await match(failure);
+      else
+        return this;
+    },
+  );
+  ''',
 ];
 
 const syncFunctions = [
@@ -131,6 +151,7 @@ class ConsumableFuncGenerator extends Generator {
 
   final futureOrRegex = RegExp(r'(?<=@futureOr{)[^}]*(?=})');
   final futureOrRegexReplace = RegExp(r'@futureOr{[^}]*}');
+
   @override
   String generate(LibraryReader _, BuildStep __) {
     final buf = StringBuffer();
@@ -210,15 +231,18 @@ import 'formz.dart';
   }
 
   String convertFutureOr(String function, bool async) {
-    final futureOrType = futureOrRegex.firstMatch(function)?.group(0) ?? 'void';
+    while (futureOrRegex.hasMatch(function)) {
+      final futureOrType = futureOrRegex.firstMatch(function)?.group(0) ?? 'void';
 
-    final wrappedFutureOrType;
-    if (!async)
-      wrappedFutureOrType = futureOrType;
-    else
-      wrappedFutureOrType = 'FutureOr<$futureOrType>';
+      final wrappedFutureOrType;
+      if (!async)
+        wrappedFutureOrType = futureOrType;
+      else
+        wrappedFutureOrType = 'FutureOr<$futureOrType>';
 
-    return function.replaceAll(futureOrRegexReplace, wrappedFutureOrType);
+      function = function.replaceFirst(futureOrRegexReplace, wrappedFutureOrType);
+    }
+    return function;
   }
 
   String convert(String function, Consumables consumable) {

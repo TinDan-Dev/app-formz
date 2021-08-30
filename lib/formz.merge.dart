@@ -8,6 +8,9 @@ import 'dart:async';
 
 import 'formz.tuple.dart';
 import 'src/utils/consumable.dart';
+import 'src/utils/extensions.dart';
+import 'src/utils/impl/value_action_result.dart';
+import 'src/utils/impl/value_action_result_async.dart';
 import 'src/utils/failure.dart';
 
 class _MergeConsumable<A, B> with ConsumableMixin<Tuple<A, B>> {
@@ -17,18 +20,31 @@ class _MergeConsumable<A, B> with ConsumableMixin<Tuple<A, B>> {
 
   final Consumable<B> Function() second;
 
+  Consumable<Tuple<A, B>>? _result;
+
   @override
-  T consume<T>({required T Function(Tuple<A, B> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => onSuccess(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+  T consume<T>({required T Function(Tuple<A, B> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple<A, B>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple<A, B>>>(
+            onSuccess: (secondValue) => ValueActionResult.success(Tuple<A, B>(
+              first: firstValue,
+              second: secondValue,
+            )),
+            onError: (failure) => ValueActionResult.fail(failure),
+          ),
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync<A, B> with ConsumableAsyncMixin<Tuple<A, B>> {
@@ -38,20 +54,33 @@ class _MergeConsumableAsync<A, B> with ConsumableAsyncMixin<Tuple<A, B>> {
 
   final FutureOr<ConsumableAsync<B>> Function() second;
 
+  ConsumableAsync<Tuple<A, B>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple<A, B> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) => onSuccess(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+      {required FutureOr<T> Function(Tuple<A, B> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple<A, B>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple<A, B>>>(
+            onSuccess: (secondValue) => ValueActionResultAsync.success(Tuple<A, B>(
+              first: firstValue,
+              second: secondValue,
+            )),
+            onError: (failure) => ValueActionResultAsync.fail(failure),
+          ),
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining<A, B> with ConsumableMixin<Tuple<A, B>> {
@@ -61,18 +90,31 @@ class _MergeConsumableJoining<A, B> with ConsumableMixin<Tuple<A, B>> {
 
   final Consumable<B> Function(A previous) second;
 
+  Consumable<Tuple<A, B>>? _result;
+
   @override
-  T consume<T>({required T Function(Tuple<A, B> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => onSuccess(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+  T consume<T>({required T Function(Tuple<A, B> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple<A, B>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple<A, B>>>(
+            onSuccess: (secondValue) => ValueActionResult.success(Tuple<A, B>(
+              first: firstValue,
+              second: secondValue,
+            )),
+            onError: (failure) => ValueActionResult.fail(failure),
+          ),
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining<A, B> with ConsumableAsyncMixin<Tuple<A, B>> {
@@ -82,20 +124,33 @@ class _MergeConsumableAsyncJoining<A, B> with ConsumableAsyncMixin<Tuple<A, B>> 
 
   final FutureOr<ConsumableAsync<B>> Function(A previous) second;
 
+  ConsumableAsync<Tuple<A, B>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple<A, B> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) => onSuccess(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+      {required FutureOr<T> Function(Tuple<A, B> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple<A, B>>>(
+          onSuccess: (firstValue) async => (await second(firstValue)).consume<ConsumableAsync<Tuple<A, B>>>(
+            onSuccess: (secondValue) => ValueActionResultAsync.success(Tuple<A, B>(
+              first: firstValue,
+              second: secondValue,
+            )),
+            onError: (failure) => ValueActionResultAsync.fail(failure),
+          ),
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
@@ -107,22 +162,35 @@ class _MergeConsumable3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
 
   final Consumable<C> Function() third;
 
+  Consumable<Tuple3<A, B, C>>? _result;
+
   @override
-  T consume<T>({required T Function(Tuple3<A, B, C> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => onSuccess(Tuple3<A, B, C>(
-              first: firstValue,
-              second: secondValue,
-              third: thirdValue,
-            )),
-            onError: onError,
+  T consume<T>({required T Function(Tuple3<A, B, C> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple3<A, B, C>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple3<A, B, C>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple3<A, B, C>>>(
+              onSuccess: (thirdValue) => ValueActionResult.success(Tuple3<A, B, C>(
+                first: firstValue,
+                second: secondValue,
+                third: thirdValue,
+              )),
+              onError: (failure) => ValueActionResult.fail(failure),
+            ),
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync3<A, B, C> with ConsumableAsyncMixin<Tuple3<A, B, C>> {
@@ -134,24 +202,37 @@ class _MergeConsumableAsync3<A, B, C> with ConsumableAsyncMixin<Tuple3<A, B, C>>
 
   final FutureOr<ConsumableAsync<C>> Function() third;
 
+  ConsumableAsync<Tuple3<A, B, C>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple3<A, B, C> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) => onSuccess(Tuple3<A, B, C>(
-              first: firstValue,
-              second: secondValue,
-              third: thirdValue,
-            )),
-            onError: onError,
+      {required FutureOr<T> Function(Tuple3<A, B, C> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple3<A, B, C>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple3<A, B, C>>>(
+            onSuccess: (secondValue) async => (await third()).consume<ConsumableAsync<Tuple3<A, B, C>>>(
+              onSuccess: (thirdValue) => ValueActionResultAsync.success(Tuple3<A, B, C>(
+                first: firstValue,
+                second: secondValue,
+                third: thirdValue,
+              )),
+              onError: (failure) => ValueActionResultAsync.fail(failure),
+            ),
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
@@ -163,25 +244,38 @@ class _MergeConsumableJoining3<A, B, C> with ConsumableMixin<Tuple3<A, B, C>> {
 
   final Consumable<C> Function(Tuple<A, B> previous) third;
 
+  Consumable<Tuple3<A, B, C>>? _result;
+
   @override
-  T consume<T>({required T Function(Tuple3<A, B, C> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => onSuccess(Tuple3<A, B, C>(
+  T consume<T>({required T Function(Tuple3<A, B, C> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple3<A, B, C>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple3<A, B, C>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )),
-            onError: onError,
+            )).consume<Consumable<Tuple3<A, B, C>>>(
+              onSuccess: (thirdValue) => ValueActionResult.success(Tuple3<A, B, C>(
+                first: firstValue,
+                second: secondValue,
+                third: thirdValue,
+              )),
+              onError: (failure) => ValueActionResult.fail(failure),
+            ),
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining3<A, B, C> with ConsumableAsyncMixin<Tuple3<A, B, C>> {
@@ -193,28 +287,41 @@ class _MergeConsumableAsyncJoining3<A, B, C> with ConsumableAsyncMixin<Tuple3<A,
 
   final FutureOr<ConsumableAsync<C>> Function(Tuple<A, B> previous) third;
 
+  ConsumableAsync<Tuple3<A, B, C>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple3<A, B, C> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) => onSuccess(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple3<A, B, C> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple3<A, B, C>>>(
+          onSuccess: (firstValue) async => (await second(firstValue)).consume<ConsumableAsync<Tuple3<A, B, C>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )),
-            onError: onError,
+            )))
+                .consume<ConsumableAsync<Tuple3<A, B, C>>>(
+              onSuccess: (thirdValue) => ValueActionResultAsync.success(Tuple3<A, B, C>(
+                first: firstValue,
+                second: secondValue,
+                third: thirdValue,
+              )),
+              onError: (failure) => ValueActionResultAsync.fail(failure),
+            ),
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
@@ -228,27 +335,40 @@ class _MergeConsumable4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
 
   final Consumable<D> Function() fourth;
 
+  Consumable<Tuple4<A, B, C, D>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple4<A, B, C, D> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => fourth().consume(
-              onSuccess: (fourthValue) => onSuccess(Tuple4<A, B, C, D>(
-                first: firstValue,
-                second: secondValue,
-                third: thirdValue,
-                fourth: fourthValue,
-              )),
-              onError: onError,
+      {required T Function(Tuple4<A, B, C, D> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple4<A, B, C, D>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple4<A, B, C, D>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple4<A, B, C, D>>>(
+              onSuccess: (thirdValue) => fourth().consume<Consumable<Tuple4<A, B, C, D>>>(
+                onSuccess: (fourthValue) => ValueActionResult.success(Tuple4<A, B, C, D>(
+                  first: firstValue,
+                  second: secondValue,
+                  third: thirdValue,
+                  fourth: fourthValue,
+                )),
+                onError: (failure) => ValueActionResult.fail(failure),
+              ),
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync4<A, B, C, D> with ConsumableAsyncMixin<Tuple4<A, B, C, D>> {
@@ -262,28 +382,41 @@ class _MergeConsumableAsync4<A, B, C, D> with ConsumableAsyncMixin<Tuple4<A, B, 
 
   final FutureOr<ConsumableAsync<D>> Function() fourth;
 
+  ConsumableAsync<Tuple4<A, B, C, D>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple4<A, B, C, D> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) async => (await fourth()).consume(
-              onSuccess: (fourthValue) => onSuccess(Tuple4<A, B, C, D>(
-                first: firstValue,
-                second: secondValue,
-                third: thirdValue,
-                fourth: fourthValue,
-              )),
-              onError: onError,
+      {required FutureOr<T> Function(Tuple4<A, B, C, D> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+            onSuccess: (secondValue) async => (await third()).consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+              onSuccess: (thirdValue) async => (await fourth()).consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+                onSuccess: (fourthValue) => ValueActionResultAsync.success(Tuple4<A, B, C, D>(
+                  first: firstValue,
+                  second: secondValue,
+                  third: thirdValue,
+                  fourth: fourthValue,
+                )),
+                onError: (failure) => ValueActionResultAsync.fail(failure),
+              ),
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, D>> {
@@ -297,34 +430,47 @@ class _MergeConsumableJoining4<A, B, C, D> with ConsumableMixin<Tuple4<A, B, C, 
 
   final Consumable<D> Function(Tuple3<A, B, C> previous) fourth;
 
+  Consumable<Tuple4<A, B, C, D>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple4<A, B, C, D> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
+      {required T Function(Tuple4<A, B, C, D> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple4<A, B, C, D>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple4<A, B, C, D>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )).consume(
-              onSuccess: (fourthValue) => onSuccess(Tuple4<A, B, C, D>(
+            )).consume<Consumable<Tuple4<A, B, C, D>>>(
+              onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )),
-              onError: onError,
+              )).consume<Consumable<Tuple4<A, B, C, D>>>(
+                onSuccess: (fourthValue) => ValueActionResult.success(Tuple4<A, B, C, D>(
+                  first: firstValue,
+                  second: secondValue,
+                  third: thirdValue,
+                  fourth: fourthValue,
+                )),
+                onError: (failure) => ValueActionResult.fail(failure),
+              ),
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining4<A, B, C, D> with ConsumableAsyncMixin<Tuple4<A, B, C, D>> {
@@ -338,37 +484,50 @@ class _MergeConsumableAsyncJoining4<A, B, C, D> with ConsumableAsyncMixin<Tuple4
 
   final FutureOr<ConsumableAsync<D>> Function(Tuple3<A, B, C> previous) fourth;
 
+  ConsumableAsync<Tuple4<A, B, C, D>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple4<A, B, C, D> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple4<A, B, C, D> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+          onSuccess: (firstValue) async => (await second(firstValue)).consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
             )))
-                .consume(
-              onSuccess: (fourthValue) => onSuccess(Tuple4<A, B, C, D>(
+                .consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+              onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )),
-              onError: onError,
+              )))
+                  .consume<ConsumableAsync<Tuple4<A, B, C, D>>>(
+                onSuccess: (fourthValue) => ValueActionResultAsync.success(Tuple4<A, B, C, D>(
+                  first: firstValue,
+                  second: secondValue,
+                  third: thirdValue,
+                  fourth: fourthValue,
+                )),
+                onError: (failure) => ValueActionResultAsync.fail(failure),
+              ),
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable5<A, B, C, D, E> with ConsumableMixin<Tuple5<A, B, C, D, E>> {
@@ -385,31 +544,44 @@ class _MergeConsumable5<A, B, C, D, E> with ConsumableMixin<Tuple5<A, B, C, D, E
 
   final Consumable<E> Function() fifth;
 
+  Consumable<Tuple5<A, B, C, D, E>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple5<A, B, C, D, E> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => fourth().consume(
-              onSuccess: (fourthValue) => fifth().consume(
-                onSuccess: (fifthValue) => onSuccess(Tuple5<A, B, C, D, E>(
-                  first: firstValue,
-                  second: secondValue,
-                  third: thirdValue,
-                  fourth: fourthValue,
-                  fifth: fifthValue,
-                )),
-                onError: onError,
+      {required T Function(Tuple5<A, B, C, D, E> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple5<A, B, C, D, E>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple5<A, B, C, D, E>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple5<A, B, C, D, E>>>(
+              onSuccess: (thirdValue) => fourth().consume<Consumable<Tuple5<A, B, C, D, E>>>(
+                onSuccess: (fourthValue) => fifth().consume<Consumable<Tuple5<A, B, C, D, E>>>(
+                  onSuccess: (fifthValue) => ValueActionResult.success(Tuple5<A, B, C, D, E>(
+                    first: firstValue,
+                    second: secondValue,
+                    third: thirdValue,
+                    fourth: fourthValue,
+                    fifth: fifthValue,
+                  )),
+                  onError: (failure) => ValueActionResult.fail(failure),
+                ),
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync5<A, B, C, D, E> with ConsumableAsyncMixin<Tuple5<A, B, C, D, E>> {
@@ -426,32 +598,45 @@ class _MergeConsumableAsync5<A, B, C, D, E> with ConsumableAsyncMixin<Tuple5<A, 
 
   final FutureOr<ConsumableAsync<E>> Function() fifth;
 
+  ConsumableAsync<Tuple5<A, B, C, D, E>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple5<A, B, C, D, E> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) async => (await fourth()).consume(
-              onSuccess: (fourthValue) async => (await fifth()).consume(
-                onSuccess: (fifthValue) => onSuccess(Tuple5<A, B, C, D, E>(
-                  first: firstValue,
-                  second: secondValue,
-                  third: thirdValue,
-                  fourth: fourthValue,
-                  fifth: fifthValue,
-                )),
-                onError: onError,
+      {required FutureOr<T> Function(Tuple5<A, B, C, D, E> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+            onSuccess: (secondValue) async => (await third()).consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+              onSuccess: (thirdValue) async => (await fourth()).consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+                onSuccess: (fourthValue) async => (await fifth()).consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+                  onSuccess: (fifthValue) => ValueActionResultAsync.success(Tuple5<A, B, C, D, E>(
+                    first: firstValue,
+                    second: secondValue,
+                    third: thirdValue,
+                    fourth: fourthValue,
+                    fifth: fifthValue,
+                  )),
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
+                ),
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining5<A, B, C, D, E> with ConsumableMixin<Tuple5<A, B, C, D, E>> {
@@ -468,43 +653,56 @@ class _MergeConsumableJoining5<A, B, C, D, E> with ConsumableMixin<Tuple5<A, B, 
 
   final Consumable<E> Function(Tuple4<A, B, C, D> previous) fifth;
 
+  Consumable<Tuple5<A, B, C, D, E>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple5<A, B, C, D, E> value) onSuccess, required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
+      {required T Function(Tuple5<A, B, C, D, E> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple5<A, B, C, D, E>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple5<A, B, C, D, E>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )).consume(
-              onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
+            )).consume<Consumable<Tuple5<A, B, C, D, E>>>(
+              onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )).consume(
-                onSuccess: (fifthValue) => onSuccess(Tuple5<A, B, C, D, E>(
+              )).consume<Consumable<Tuple5<A, B, C, D, E>>>(
+                onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
-                )),
-                onError: onError,
+                )).consume<Consumable<Tuple5<A, B, C, D, E>>>(
+                  onSuccess: (fifthValue) => ValueActionResult.success(Tuple5<A, B, C, D, E>(
+                    first: firstValue,
+                    second: secondValue,
+                    third: thirdValue,
+                    fourth: fourthValue,
+                    fifth: fifthValue,
+                  )),
+                  onError: (failure) => ValueActionResult.fail(failure),
+                ),
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining5<A, B, C, D, E> with ConsumableAsyncMixin<Tuple5<A, B, C, D, E>> {
@@ -521,47 +719,60 @@ class _MergeConsumableAsyncJoining5<A, B, C, D, E> with ConsumableAsyncMixin<Tup
 
   final FutureOr<ConsumableAsync<E>> Function(Tuple4<A, B, C, D> previous) fifth;
 
+  ConsumableAsync<Tuple5<A, B, C, D, E>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple5<A, B, C, D, E> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple5<A, B, C, D, E> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+          onSuccess: (firstValue) async => (await second(firstValue)).consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
             )))
-                .consume(
-              onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
+                .consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+              onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
               )))
-                  .consume(
-                onSuccess: (fifthValue) => onSuccess(Tuple5<A, B, C, D, E>(
+                  .consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+                onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
-                )),
-                onError: onError,
+                )))
+                    .consume<ConsumableAsync<Tuple5<A, B, C, D, E>>>(
+                  onSuccess: (fifthValue) => ValueActionResultAsync.success(Tuple5<A, B, C, D, E>(
+                    first: firstValue,
+                    second: secondValue,
+                    third: thirdValue,
+                    fourth: fourthValue,
+                    fifth: fifthValue,
+                  )),
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
+                ),
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable6<A, B, C, D, E, F> with ConsumableMixin<Tuple6<A, B, C, D, E, F>> {
@@ -585,36 +796,48 @@ class _MergeConsumable6<A, B, C, D, E, F> with ConsumableMixin<Tuple6<A, B, C, D
 
   final Consumable<F> Function() sixth;
 
+  Consumable<Tuple6<A, B, C, D, E, F>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => fourth().consume(
-              onSuccess: (fourthValue) => fifth().consume(
-                onSuccess: (fifthValue) => sixth().consume(
-                  onSuccess: (sixthValue) => onSuccess(Tuple6<A, B, C, D, E, F>(
-                    first: firstValue,
-                    second: secondValue,
-                    third: thirdValue,
-                    fourth: fourthValue,
-                    fifth: fifthValue,
-                    sixth: sixthValue,
-                  )),
-                  onError: onError,
+      {required T Function(Tuple6<A, B, C, D, E, F> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+              onSuccess: (thirdValue) => fourth().consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+                onSuccess: (fourthValue) => fifth().consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+                  onSuccess: (fifthValue) => sixth().consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+                    onSuccess: (sixthValue) => ValueActionResult.success(Tuple6<A, B, C, D, E, F>(
+                      first: firstValue,
+                      second: secondValue,
+                      third: thirdValue,
+                      fourth: fourthValue,
+                      fifth: fifthValue,
+                      sixth: sixthValue,
+                    )),
+                    onError: (failure) => ValueActionResult.fail(failure),
+                  ),
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync6<A, B, C, D, E, F> with ConsumableAsyncMixin<Tuple6<A, B, C, D, E, F>> {
@@ -638,36 +861,49 @@ class _MergeConsumableAsync6<A, B, C, D, E, F> with ConsumableAsyncMixin<Tuple6<
 
   final FutureOr<ConsumableAsync<F>> Function() sixth;
 
+  ConsumableAsync<Tuple6<A, B, C, D, E, F>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) async => (await fourth()).consume(
-              onSuccess: (fourthValue) async => (await fifth()).consume(
-                onSuccess: (fifthValue) async => (await sixth()).consume(
-                  onSuccess: (sixthValue) => onSuccess(Tuple6<A, B, C, D, E, F>(
-                    first: firstValue,
-                    second: secondValue,
-                    third: thirdValue,
-                    fourth: fourthValue,
-                    fifth: fifthValue,
-                    sixth: sixthValue,
-                  )),
-                  onError: onError,
+      {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+            onSuccess: (secondValue) async => (await third()).consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+              onSuccess: (thirdValue) async => (await fourth()).consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+                onSuccess: (fourthValue) async => (await fifth()).consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+                  onSuccess: (fifthValue) async => (await sixth()).consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+                    onSuccess: (sixthValue) => ValueActionResultAsync.success(Tuple6<A, B, C, D, E, F>(
+                      first: firstValue,
+                      second: secondValue,
+                      third: thirdValue,
+                      fourth: fourthValue,
+                      fifth: fifthValue,
+                      sixth: sixthValue,
+                    )),
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
+                  ),
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining6<A, B, C, D, E, F> with ConsumableMixin<Tuple6<A, B, C, D, E, F>> {
@@ -691,54 +927,66 @@ class _MergeConsumableJoining6<A, B, C, D, E, F> with ConsumableMixin<Tuple6<A, 
 
   final Consumable<F> Function(Tuple5<A, B, C, D, E> previous) sixth;
 
+  Consumable<Tuple6<A, B, C, D, E, F>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
+      {required T Function(Tuple6<A, B, C, D, E, F> value) onSuccess, required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )).consume(
-              onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
+            )).consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+              onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )).consume(
-                onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
+              )).consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+                onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
-                )).consume(
-                  onSuccess: (sixthValue) => onSuccess(Tuple6<A, B, C, D, E, F>(
+                )).consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+                  onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
-                  )),
-                  onError: onError,
+                  )).consume<Consumable<Tuple6<A, B, C, D, E, F>>>(
+                    onSuccess: (sixthValue) => ValueActionResult.success(Tuple6<A, B, C, D, E, F>(
+                      first: firstValue,
+                      second: secondValue,
+                      third: thirdValue,
+                      fourth: fourthValue,
+                      fifth: fifthValue,
+                      sixth: sixthValue,
+                    )),
+                    onError: (failure) => ValueActionResult.fail(failure),
+                  ),
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining6<A, B, C, D, E, F> with ConsumableAsyncMixin<Tuple6<A, B, C, D, E, F>> {
@@ -762,58 +1010,72 @@ class _MergeConsumableAsyncJoining6<A, B, C, D, E, F> with ConsumableAsyncMixin<
 
   final FutureOr<ConsumableAsync<F>> Function(Tuple5<A, B, C, D, E> previous) sixth;
 
+  ConsumableAsync<Tuple6<A, B, C, D, E, F>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple6<A, B, C, D, E, F> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+          onSuccess: (firstValue) async =>
+              (await second(firstValue)).consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
             )))
-                .consume(
-              onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
+                .consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+              onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
               )))
-                  .consume(
-                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
+                  .consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+                onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
                 )))
-                    .consume(
-                  onSuccess: (sixthValue) => onSuccess(Tuple6<A, B, C, D, E, F>(
+                    .consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+                  onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
-                  )),
-                  onError: onError,
+                  )))
+                      .consume<ConsumableAsync<Tuple6<A, B, C, D, E, F>>>(
+                    onSuccess: (sixthValue) => ValueActionResultAsync.success(Tuple6<A, B, C, D, E, F>(
+                      first: firstValue,
+                      second: secondValue,
+                      third: thirdValue,
+                      fourth: fourthValue,
+                      fifth: fifthValue,
+                      sixth: sixthValue,
+                    )),
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
+                  ),
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable7<A, B, C, D, E, F, G> with ConsumableMixin<Tuple7<A, B, C, D, E, F, G>> {
@@ -840,40 +1102,53 @@ class _MergeConsumable7<A, B, C, D, E, F, G> with ConsumableMixin<Tuple7<A, B, C
 
   final Consumable<G> Function() seventh;
 
+  Consumable<Tuple7<A, B, C, D, E, F, G>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => fourth().consume(
-              onSuccess: (fourthValue) => fifth().consume(
-                onSuccess: (fifthValue) => sixth().consume(
-                  onSuccess: (sixthValue) => seventh().consume(
-                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
-                      first: firstValue,
-                      second: secondValue,
-                      third: thirdValue,
-                      fourth: fourthValue,
-                      fifth: fifthValue,
-                      sixth: sixthValue,
-                      seventh: seventhValue,
-                    )),
-                    onError: onError,
+      {required T Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
+      required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+              onSuccess: (thirdValue) => fourth().consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                onSuccess: (fourthValue) => fifth().consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                  onSuccess: (fifthValue) => sixth().consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                    onSuccess: (sixthValue) => seventh().consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                      onSuccess: (seventhValue) => ValueActionResult.success(Tuple7<A, B, C, D, E, F, G>(
+                        first: firstValue,
+                        second: secondValue,
+                        third: thirdValue,
+                        fourth: fourthValue,
+                        fifth: fifthValue,
+                        sixth: sixthValue,
+                        seventh: seventhValue,
+                      )),
+                      onError: (failure) => ValueActionResult.fail(failure),
+                    ),
+                    onError: (failure) => ValueActionResult.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync7<A, B, C, D, E, F, G> with ConsumableAsyncMixin<Tuple7<A, B, C, D, E, F, G>> {
@@ -900,40 +1175,55 @@ class _MergeConsumableAsync7<A, B, C, D, E, F, G> with ConsumableAsyncMixin<Tupl
 
   final FutureOr<ConsumableAsync<G>> Function() seventh;
 
+  ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) async => (await fourth()).consume(
-              onSuccess: (fourthValue) async => (await fifth()).consume(
-                onSuccess: (fifthValue) async => (await sixth()).consume(
-                  onSuccess: (sixthValue) async => (await seventh()).consume(
-                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
-                      first: firstValue,
-                      second: secondValue,
-                      third: thirdValue,
-                      fourth: fourthValue,
-                      fifth: fifthValue,
-                      sixth: sixthValue,
-                      seventh: seventhValue,
-                    )),
-                    onError: onError,
+      {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+            onSuccess: (secondValue) async => (await third()).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+              onSuccess: (thirdValue) async => (await fourth()).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                onSuccess: (fourthValue) async => (await fifth()).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                  onSuccess: (fifthValue) async =>
+                      (await sixth()).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                    onSuccess: (sixthValue) async =>
+                        (await seventh()).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                      onSuccess: (seventhValue) => ValueActionResultAsync.success(Tuple7<A, B, C, D, E, F, G>(
+                        first: firstValue,
+                        second: secondValue,
+                        third: thirdValue,
+                        fourth: fourthValue,
+                        fifth: fifthValue,
+                        sixth: sixthValue,
+                        seventh: seventhValue,
+                      )),
+                      onError: (failure) => ValueActionResultAsync.fail(failure),
+                    ),
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining7<A, B, C, D, E, F, G> with ConsumableMixin<Tuple7<A, B, C, D, E, F, G>> {
@@ -960,65 +1250,78 @@ class _MergeConsumableJoining7<A, B, C, D, E, F, G> with ConsumableMixin<Tuple7<
 
   final Consumable<G> Function(Tuple6<A, B, C, D, E, F> previous) seventh;
 
+  Consumable<Tuple7<A, B, C, D, E, F, G>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
+      {required T Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
+      required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )).consume(
-              onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
+            )).consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+              onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )).consume(
-                onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
+              )).consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
-                )).consume(
-                  onSuccess: (sixthValue) => seventh(Tuple6<A, B, C, D, E, F>(
+                )).consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                  onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
-                  )).consume(
-                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
+                  )).consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                    onSuccess: (sixthValue) => seventh(Tuple6<A, B, C, D, E, F>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
                       fourth: fourthValue,
                       fifth: fifthValue,
                       sixth: sixthValue,
-                      seventh: seventhValue,
-                    )),
-                    onError: onError,
+                    )).consume<Consumable<Tuple7<A, B, C, D, E, F, G>>>(
+                      onSuccess: (seventhValue) => ValueActionResult.success(Tuple7<A, B, C, D, E, F, G>(
+                        first: firstValue,
+                        second: secondValue,
+                        third: thirdValue,
+                        fourth: fourthValue,
+                        fifth: fifthValue,
+                        sixth: sixthValue,
+                        seventh: seventhValue,
+                      )),
+                      onError: (failure) => ValueActionResult.fail(failure),
+                    ),
+                    onError: (failure) => ValueActionResult.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G> with ConsumableAsyncMixin<Tuple7<A, B, C, D, E, F, G>> {
@@ -1045,70 +1348,84 @@ class _MergeConsumableAsyncJoining7<A, B, C, D, E, F, G> with ConsumableAsyncMix
 
   final FutureOr<ConsumableAsync<G>> Function(Tuple6<A, B, C, D, E, F> previous) seventh;
 
+  ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple7<A, B, C, D, E, F, G> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+          onSuccess: (firstValue) async =>
+              (await second(firstValue)).consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
             )))
-                .consume(
-              onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
+                .consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+              onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
               )))
-                  .consume(
-                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
+                  .consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
                 )))
-                    .consume(
-                  onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
+                    .consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                  onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
                   )))
-                      .consume(
-                    onSuccess: (seventhValue) => onSuccess(Tuple7<A, B, C, D, E, F, G>(
+                      .consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                    onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
                       fourth: fourthValue,
                       fifth: fifthValue,
                       sixth: sixthValue,
-                      seventh: seventhValue,
-                    )),
-                    onError: onError,
+                    )))
+                        .consume<ConsumableAsync<Tuple7<A, B, C, D, E, F, G>>>(
+                      onSuccess: (seventhValue) => ValueActionResultAsync.success(Tuple7<A, B, C, D, E, F, G>(
+                        first: firstValue,
+                        second: secondValue,
+                        third: thirdValue,
+                        fourth: fourthValue,
+                        fifth: fifthValue,
+                        sixth: sixthValue,
+                        seventh: seventhValue,
+                      )),
+                      onError: (failure) => ValueActionResultAsync.fail(failure),
+                    ),
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tuple8<A, B, C, D, E, F, G, H>> {
@@ -1138,44 +1455,57 @@ class _MergeConsumable8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tuple8<A, B
 
   final Consumable<H> Function() eighth;
 
+  Consumable<Tuple8<A, B, C, D, E, F, G, H>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => fourth().consume(
-              onSuccess: (fourthValue) => fifth().consume(
-                onSuccess: (fifthValue) => sixth().consume(
-                  onSuccess: (sixthValue) => seventh().consume(
-                    onSuccess: (seventhValue) => eighth().consume(
-                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
-                        first: firstValue,
-                        second: secondValue,
-                        third: thirdValue,
-                        fourth: fourthValue,
-                        fifth: fifthValue,
-                        sixth: sixthValue,
-                        seventh: seventhValue,
-                        eighth: eighthValue,
-                      )),
-                      onError: onError,
+      {required T Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
+      required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+              onSuccess: (thirdValue) => fourth().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                onSuccess: (fourthValue) => fifth().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                  onSuccess: (fifthValue) => sixth().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                    onSuccess: (sixthValue) => seventh().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                      onSuccess: (seventhValue) => eighth().consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                        onSuccess: (eighthValue) => ValueActionResult.success(Tuple8<A, B, C, D, E, F, G, H>(
+                          first: firstValue,
+                          second: secondValue,
+                          third: thirdValue,
+                          fourth: fourthValue,
+                          fifth: fifthValue,
+                          sixth: sixthValue,
+                          seventh: seventhValue,
+                          eighth: eighthValue,
+                        )),
+                        onError: (failure) => ValueActionResult.fail(failure),
+                      ),
+                      onError: (failure) => ValueActionResult.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResult.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync8<A, B, C, D, E, F, G, H> with ConsumableAsyncMixin<Tuple8<A, B, C, D, E, F, G, H>> {
@@ -1205,44 +1535,62 @@ class _MergeConsumableAsync8<A, B, C, D, E, F, G, H> with ConsumableAsyncMixin<T
 
   final FutureOr<ConsumableAsync<H>> Function() eighth;
 
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) async => (await fourth()).consume(
-              onSuccess: (fourthValue) async => (await fifth()).consume(
-                onSuccess: (fifthValue) async => (await sixth()).consume(
-                  onSuccess: (sixthValue) async => (await seventh()).consume(
-                    onSuccess: (seventhValue) async => (await eighth()).consume(
-                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
-                        first: firstValue,
-                        second: secondValue,
-                        third: thirdValue,
-                        fourth: fourthValue,
-                        fifth: fifthValue,
-                        sixth: sixthValue,
-                        seventh: seventhValue,
-                        eighth: eighthValue,
-                      )),
-                      onError: onError,
+      {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+            onSuccess: (secondValue) async => (await third()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+              onSuccess: (thirdValue) async =>
+                  (await fourth()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                onSuccess: (fourthValue) async =>
+                    (await fifth()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                  onSuccess: (fifthValue) async =>
+                      (await sixth()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                    onSuccess: (sixthValue) async =>
+                        (await seventh()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                      onSuccess: (seventhValue) async =>
+                          (await eighth()).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                        onSuccess: (eighthValue) => ValueActionResultAsync.success(Tuple8<A, B, C, D, E, F, G, H>(
+                          first: firstValue,
+                          second: secondValue,
+                          third: thirdValue,
+                          fourth: fourthValue,
+                          fifth: fifthValue,
+                          sixth: sixthValue,
+                          seventh: seventhValue,
+                          eighth: eighthValue,
+                        )),
+                        onError: (failure) => ValueActionResultAsync.fail(failure),
+                      ),
+                      onError: (failure) => ValueActionResultAsync.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tuple8<A, B, C, D, E, F, G, H>> {
@@ -1272,52 +1620,47 @@ class _MergeConsumableJoining8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tupl
 
   final Consumable<H> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth;
 
+  Consumable<Tuple8<A, B, C, D, E, F, G, H>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
+      {required T Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
+      required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )).consume(
-              onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
+            )).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+              onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )).consume(
-                onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
+              )).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
-                )).consume(
-                  onSuccess: (sixthValue) => seventh(Tuple6<A, B, C, D, E, F>(
+                )).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                  onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
-                  )).consume(
-                    onSuccess: (seventhValue) => eighth(Tuple7<A, B, C, D, E, F, G>(
+                  )).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                    onSuccess: (sixthValue) => seventh(Tuple6<A, B, C, D, E, F>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
                       fourth: fourthValue,
                       fifth: fifthValue,
                       sixth: sixthValue,
-                      seventh: seventhValue,
-                    )).consume(
-                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
+                    )).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                      onSuccess: (seventhValue) => eighth(Tuple7<A, B, C, D, E, F, G>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1325,24 +1668,42 @@ class _MergeConsumableJoining8<A, B, C, D, E, F, G, H> with ConsumableMixin<Tupl
                         fifth: fifthValue,
                         sixth: sixthValue,
                         seventh: seventhValue,
-                        eighth: eighthValue,
-                      )),
-                      onError: onError,
+                      )).consume<Consumable<Tuple8<A, B, C, D, E, F, G, H>>>(
+                        onSuccess: (eighthValue) => ValueActionResult.success(Tuple8<A, B, C, D, E, F, G, H>(
+                          first: firstValue,
+                          second: secondValue,
+                          third: thirdValue,
+                          fourth: fourthValue,
+                          fifth: fifthValue,
+                          sixth: sixthValue,
+                          seventh: seventhValue,
+                          eighth: eighthValue,
+                        )),
+                        onError: (failure) => ValueActionResult.fail(failure),
+                      ),
+                      onError: (failure) => ValueActionResult.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResult.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H> with ConsumableAsyncMixin<Tuple8<A, B, C, D, E, F, G, H>> {
@@ -1372,58 +1733,53 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H> with ConsumableAsync
 
   final FutureOr<ConsumableAsync<H>> Function(Tuple7<A, B, C, D, E, F, G> previous) eighth;
 
+  ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple8<A, B, C, D, E, F, G, H> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+          onSuccess: (firstValue) async =>
+              (await second(firstValue)).consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
             )))
-                .consume(
-              onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
+                .consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+              onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
               )))
-                  .consume(
-                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
+                  .consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
                 )))
-                    .consume(
-                  onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
+                    .consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                  onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
                   )))
-                      .consume(
-                    onSuccess: (seventhValue) async => (await eighth(Tuple7<A, B, C, D, E, F, G>(
+                      .consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                    onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
                       fourth: fourthValue,
                       fifth: fifthValue,
                       sixth: sixthValue,
-                      seventh: seventhValue,
                     )))
-                        .consume(
-                      onSuccess: (eighthValue) => onSuccess(Tuple8<A, B, C, D, E, F, G, H>(
+                        .consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                      onSuccess: (seventhValue) async => (await eighth(Tuple7<A, B, C, D, E, F, G>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1431,24 +1787,43 @@ class _MergeConsumableAsyncJoining8<A, B, C, D, E, F, G, H> with ConsumableAsync
                         fifth: fifthValue,
                         sixth: sixthValue,
                         seventh: seventhValue,
-                        eighth: eighthValue,
-                      )),
-                      onError: onError,
+                      )))
+                          .consume<ConsumableAsync<Tuple8<A, B, C, D, E, F, G, H>>>(
+                        onSuccess: (eighthValue) => ValueActionResultAsync.success(Tuple8<A, B, C, D, E, F, G, H>(
+                          first: firstValue,
+                          second: secondValue,
+                          third: thirdValue,
+                          fourth: fourthValue,
+                          fifth: fifthValue,
+                          sixth: sixthValue,
+                          seventh: seventhValue,
+                          eighth: eighthValue,
+                        )),
+                        onError: (failure) => ValueActionResultAsync.fail(failure),
+                      ),
+                      onError: (failure) => ValueActionResultAsync.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumable9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
@@ -1481,48 +1856,61 @@ class _MergeConsumable9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<Tuple9<A
 
   final Consumable<I> Function() ninth;
 
+  Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second().consume(
-          onSuccess: (secondValue) => third().consume(
-            onSuccess: (thirdValue) => fourth().consume(
-              onSuccess: (fourthValue) => fifth().consume(
-                onSuccess: (fifthValue) => sixth().consume(
-                  onSuccess: (sixthValue) => seventh().consume(
-                    onSuccess: (seventhValue) => eighth().consume(
-                      onSuccess: (eighthValue) => ninth().consume(
-                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
-                          first: firstValue,
-                          second: secondValue,
-                          third: thirdValue,
-                          fourth: fourthValue,
-                          fifth: fifthValue,
-                          sixth: sixthValue,
-                          seventh: seventhValue,
-                          eighth: eighthValue,
-                          ninth: ninthValue,
-                        )),
-                        onError: onError,
+      {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
+      required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+          onSuccess: (firstValue) => second().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+            onSuccess: (secondValue) => third().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+              onSuccess: (thirdValue) => fourth().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                onSuccess: (fourthValue) => fifth().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                  onSuccess: (fifthValue) => sixth().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                    onSuccess: (sixthValue) => seventh().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                      onSuccess: (seventhValue) => eighth().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                        onSuccess: (eighthValue) => ninth().consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                          onSuccess: (ninthValue) => ValueActionResult.success(Tuple9<A, B, C, D, E, F, G, H, I>(
+                            first: firstValue,
+                            second: secondValue,
+                            third: thirdValue,
+                            fourth: fourthValue,
+                            fifth: fifthValue,
+                            sixth: sixthValue,
+                            seventh: seventhValue,
+                            eighth: eighthValue,
+                            ninth: ninthValue,
+                          )),
+                          onError: (failure) => ValueActionResult.fail(failure),
+                        ),
+                        onError: (failure) => ValueActionResult.fail(failure),
                       ),
-                      onError: onError,
+                      onError: (failure) => ValueActionResult.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResult.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I> with ConsumableAsyncMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
@@ -1555,48 +1943,68 @@ class _MergeConsumableAsync9<A, B, C, D, E, F, G, H, I> with ConsumableAsyncMixi
 
   final FutureOr<ConsumableAsync<I>> Function() ninth;
 
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second()).consume(
-          onSuccess: (secondValue) async => (await third()).consume(
-            onSuccess: (thirdValue) async => (await fourth()).consume(
-              onSuccess: (fourthValue) async => (await fifth()).consume(
-                onSuccess: (fifthValue) async => (await sixth()).consume(
-                  onSuccess: (sixthValue) async => (await seventh()).consume(
-                    onSuccess: (seventhValue) async => (await eighth()).consume(
-                      onSuccess: (eighthValue) async => (await ninth()).consume(
-                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
-                          first: firstValue,
-                          second: secondValue,
-                          third: thirdValue,
-                          fourth: fourthValue,
-                          fifth: fifthValue,
-                          sixth: sixthValue,
-                          seventh: seventhValue,
-                          eighth: eighthValue,
-                          ninth: ninthValue,
-                        )),
-                        onError: onError,
+      {required FutureOr<T> Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+          onSuccess: (firstValue) async => (await second()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+            onSuccess: (secondValue) async =>
+                (await third()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+              onSuccess: (thirdValue) async =>
+                  (await fourth()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                onSuccess: (fourthValue) async =>
+                    (await fifth()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                  onSuccess: (fifthValue) async =>
+                      (await sixth()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                    onSuccess: (sixthValue) async =>
+                        (await seventh()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                      onSuccess: (seventhValue) async =>
+                          (await eighth()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                        onSuccess: (eighthValue) async =>
+                            (await ninth()).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                          onSuccess: (ninthValue) => ValueActionResultAsync.success(Tuple9<A, B, C, D, E, F, G, H, I>(
+                            first: firstValue,
+                            second: secondValue,
+                            third: thirdValue,
+                            fourth: fourthValue,
+                            fifth: fifthValue,
+                            sixth: sixthValue,
+                            seventh: seventhValue,
+                            eighth: eighthValue,
+                            ninth: ninthValue,
+                          )),
+                          onError: (failure) => ValueActionResultAsync.fail(failure),
+                        ),
+                        onError: (failure) => ValueActionResultAsync.fail(failure),
                       ),
-                      onError: onError,
+                      onError: (failure) => ValueActionResultAsync.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<Tuple9<A, B, C, D, E, F, G, H, I>> {
@@ -1629,52 +2037,47 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<T
 
   final Consumable<I> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth;
 
+  Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>? _result;
+
   @override
   T consume<T>(
-          {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
-          required T Function(Failure failure) onError}) =>
-      first.consume(
-        onSuccess: (firstValue) => second(firstValue).consume(
-          onSuccess: (secondValue) => third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )).consume(
-            onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
+      {required T Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
+      required T Function(Failure failure) onError}) {
+    return _result.fold(
+      () {
+        final result = first.consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+          onSuccess: (firstValue) => second(firstValue).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+            onSuccess: (secondValue) => third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
-            )).consume(
-              onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
+            )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+              onSuccess: (thirdValue) => fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
-              )).consume(
-                onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
+              )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                onSuccess: (fourthValue) => fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
-                )).consume(
-                  onSuccess: (sixthValue) => seventh(Tuple6<A, B, C, D, E, F>(
+                )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                  onSuccess: (fifthValue) => sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
-                  )).consume(
-                    onSuccess: (seventhValue) => eighth(Tuple7<A, B, C, D, E, F, G>(
+                  )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                    onSuccess: (sixthValue) => seventh(Tuple6<A, B, C, D, E, F>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
                       fourth: fourthValue,
                       fifth: fifthValue,
                       sixth: sixthValue,
-                      seventh: seventhValue,
-                    )).consume(
-                      onSuccess: (eighthValue) => ninth(Tuple8<A, B, C, D, E, F, G, H>(
+                    )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                      onSuccess: (seventhValue) => eighth(Tuple7<A, B, C, D, E, F, G>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1682,9 +2085,8 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<T
                         fifth: fifthValue,
                         sixth: sixthValue,
                         seventh: seventhValue,
-                        eighth: eighthValue,
-                      )).consume(
-                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
+                      )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                        onSuccess: (eighthValue) => ninth(Tuple8<A, B, C, D, E, F, G, H>(
                           first: firstValue,
                           second: secondValue,
                           third: thirdValue,
@@ -1693,26 +2095,45 @@ class _MergeConsumableJoining9<A, B, C, D, E, F, G, H, I> with ConsumableMixin<T
                           sixth: sixthValue,
                           seventh: seventhValue,
                           eighth: eighthValue,
-                          ninth: ninthValue,
-                        )),
-                        onError: onError,
+                        )).consume<Consumable<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                          onSuccess: (ninthValue) => ValueActionResult.success(Tuple9<A, B, C, D, E, F, G, H, I>(
+                            first: firstValue,
+                            second: secondValue,
+                            third: thirdValue,
+                            fourth: fourthValue,
+                            fifth: fifthValue,
+                            sixth: sixthValue,
+                            seventh: seventhValue,
+                            eighth: eighthValue,
+                            ninth: ninthValue,
+                          )),
+                          onError: (failure) => ValueActionResult.fail(failure),
+                        ),
+                        onError: (failure) => ValueActionResult.fail(failure),
                       ),
-                      onError: onError,
+                      onError: (failure) => ValueActionResult.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResult.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResult.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResult.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResult.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResult.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResult.fail(failure),
+        );
+
+        _result = result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
@@ -1746,58 +2167,53 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
 
   final FutureOr<ConsumableAsync<I>> Function(Tuple8<A, B, C, D, E, F, G, H> previous) ninth;
 
+  ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>? _result;
+
   @override
   Future<T> consume<T>(
-          {required FutureOr<T> Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
-          required FutureOr<T> Function(Failure failure) onError}) async =>
-      first.consume(
-        onSuccess: (firstValue) async => (await second(firstValue)).consume(
-          onSuccess: (secondValue) async => (await third(Tuple<A, B>(
-            first: firstValue,
-            second: secondValue,
-          )))
-              .consume(
-            onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
+      {required FutureOr<T> Function(Tuple9<A, B, C, D, E, F, G, H, I> value) onSuccess,
+      required FutureOr<T> Function(Failure failure) onError}) async {
+    return _result.fold(
+      () async {
+        final result = first.consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+          onSuccess: (firstValue) async =>
+              (await second(firstValue)).consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+            onSuccess: (secondValue) async => (await third(Tuple<A, B>(
               first: firstValue,
               second: secondValue,
-              third: thirdValue,
             )))
-                .consume(
-              onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
+                .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+              onSuccess: (thirdValue) async => (await fourth(Tuple3<A, B, C>(
                 first: firstValue,
                 second: secondValue,
                 third: thirdValue,
-                fourth: fourthValue,
               )))
-                  .consume(
-                onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
+                  .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                onSuccess: (fourthValue) async => (await fifth(Tuple4<A, B, C, D>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
                   fourth: fourthValue,
-                  fifth: fifthValue,
                 )))
-                    .consume(
-                  onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
+                    .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                  onSuccess: (fifthValue) async => (await sixth(Tuple5<A, B, C, D, E>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
                     fourth: fourthValue,
                     fifth: fifthValue,
-                    sixth: sixthValue,
                   )))
-                      .consume(
-                    onSuccess: (seventhValue) async => (await eighth(Tuple7<A, B, C, D, E, F, G>(
+                      .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                    onSuccess: (sixthValue) async => (await seventh(Tuple6<A, B, C, D, E, F>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
                       fourth: fourthValue,
                       fifth: fifthValue,
                       sixth: sixthValue,
-                      seventh: seventhValue,
                     )))
-                        .consume(
-                      onSuccess: (eighthValue) async => (await ninth(Tuple8<A, B, C, D, E, F, G, H>(
+                        .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                      onSuccess: (seventhValue) async => (await eighth(Tuple7<A, B, C, D, E, F, G>(
                         first: firstValue,
                         second: secondValue,
                         third: thirdValue,
@@ -1805,10 +2221,9 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
                         fifth: fifthValue,
                         sixth: sixthValue,
                         seventh: seventhValue,
-                        eighth: eighthValue,
                       )))
-                          .consume(
-                        onSuccess: (ninthValue) => onSuccess(Tuple9<A, B, C, D, E, F, G, H, I>(
+                          .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                        onSuccess: (eighthValue) async => (await ninth(Tuple8<A, B, C, D, E, F, G, H>(
                           first: firstValue,
                           second: secondValue,
                           third: thirdValue,
@@ -1817,26 +2232,46 @@ class _MergeConsumableAsyncJoining9<A, B, C, D, E, F, G, H, I>
                           sixth: sixthValue,
                           seventh: seventhValue,
                           eighth: eighthValue,
-                          ninth: ninthValue,
-                        )),
-                        onError: onError,
+                        )))
+                            .consume<ConsumableAsync<Tuple9<A, B, C, D, E, F, G, H, I>>>(
+                          onSuccess: (ninthValue) => ValueActionResultAsync.success(Tuple9<A, B, C, D, E, F, G, H, I>(
+                            first: firstValue,
+                            second: secondValue,
+                            third: thirdValue,
+                            fourth: fourthValue,
+                            fifth: fifthValue,
+                            sixth: sixthValue,
+                            seventh: seventhValue,
+                            eighth: eighthValue,
+                            ninth: ninthValue,
+                          )),
+                          onError: (failure) => ValueActionResultAsync.fail(failure),
+                        ),
+                        onError: (failure) => ValueActionResultAsync.fail(failure),
                       ),
-                      onError: onError,
+                      onError: (failure) => ValueActionResultAsync.fail(failure),
                     ),
-                    onError: onError,
+                    onError: (failure) => ValueActionResultAsync.fail(failure),
                   ),
-                  onError: onError,
+                  onError: (failure) => ValueActionResultAsync.fail(failure),
                 ),
-                onError: onError,
+                onError: (failure) => ValueActionResultAsync.fail(failure),
               ),
-              onError: onError,
+              onError: (failure) => ValueActionResultAsync.fail(failure),
             ),
-            onError: onError,
+            onError: (failure) => ValueActionResultAsync.fail(failure),
           ),
-          onError: onError,
-        ),
-        onError: onError,
-      );
+          onError: (failure) => ValueActionResultAsync.fail(failure),
+        );
+
+        _result = await result;
+        return _result!.consume(onSuccess: onSuccess, onError: onError);
+      },
+      (some) {
+        return some.consume(onSuccess: onSuccess, onError: onError);
+      },
+    );
+  }
 }
 
 extension FutureMergeConsumableExtension<A> on Future<Consumable<A>> {

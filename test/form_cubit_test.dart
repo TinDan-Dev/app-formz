@@ -119,8 +119,8 @@ void main() {
 
     test('should throw an error when the generic type does not match', () {
       expect(
-        () => cubit.updateInput<CheckBoxGroupInput>(
-          update: (input) => input.copyWith(value: 2),
+        () => cubit.updateInput<CheckBoxInput>(
+          update: (input) => input.copyWith(value: CheckBoxInputData([])),
           name: 'unknown',
         ),
         throwsA(isAssertionError),
@@ -130,10 +130,10 @@ void main() {
     test('should throw an error when return type is different', () {
       expect(
         () => cubit.updateInput<Input>(
-          update: (input) => CheckBoxGroupInput.dirty(
-            2,
+          update: (input) => CheckBoxInput.dirty(
+            CheckBoxInputData(['key']),
             name: 'test',
-            pattern: const CheckBoxGroupValidationPattern.exactlyOne(inputCount: 3),
+            pattern: CheckBoxValidationPatter.atLeastOne,
           ),
           name: 'test',
         ),
