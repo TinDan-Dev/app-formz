@@ -30,9 +30,10 @@ mixin MutableInputContainer on InputContainer {
   void setInput<T extends Input>(
     dynamic value, {
     required String name,
+    bool pure = false,
   }) {
     final input = getInput<T>(name);
-    final result = input.copyWith(value: value);
+    final result = input.copyWith(value: value, pure: pure);
 
     assert(
       result.runtimeType == input.runtimeType,
