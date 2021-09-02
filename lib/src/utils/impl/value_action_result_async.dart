@@ -8,12 +8,12 @@ import '../failure.dart';
 abstract class ValueActionResultAsync<T> extends ConsumableAsync<T> with EquatableMixin {
   const ValueActionResultAsync();
 
-  const factory ValueActionResultAsync.success(T value) = _ValueActionResultAsyncSuccess;
-  const factory ValueActionResultAsync.fail(Failure failure) = _ValueActionResultAsyncFailure;
+  const factory ValueActionResultAsync.success(FutureOr<T> value) = _ValueActionResultAsyncSuccess;
+  const factory ValueActionResultAsync.fail(FutureOr<Failure> failure) = _ValueActionResultAsyncFailure;
 }
 
 class _ValueActionResultAsyncSuccess<T> extends ValueActionResultAsync<T> {
-  final T value;
+  final FutureOr<T> value;
 
   const _ValueActionResultAsyncSuccess(this.value);
 
@@ -25,11 +25,11 @@ class _ValueActionResultAsyncSuccess<T> extends ValueActionResultAsync<T> {
     required FutureOr<S> onSuccess(T value),
     required FutureOr<S> onError(Failure failure),
   }) async =>
-      onSuccess(value);
+      onSuccess(await value);
 }
 
 class _ValueActionResultAsyncFailure<T> extends ValueActionResultAsync<T> {
-  final Failure failure;
+  final FutureOr<Failure> failure;
 
   const _ValueActionResultAsyncFailure(this.failure);
 
@@ -38,7 +38,7 @@ class _ValueActionResultAsyncFailure<T> extends ValueActionResultAsync<T> {
     required FutureOr<S> onSuccess(T value),
     required FutureOr<S> onError(Failure failure),
   }) async =>
-      onError(failure);
+      onError(await failure);
 
   @override
   List<Object?> get props => [failure];

@@ -145,6 +145,15 @@ const syncFunctions = [
   ''',
 ];
 
+const asyncFunctions = [
+  '''
+  Future<Consumable<S>> flatMapSync<S>(FutureOr<Consumable<S>> mapper(T value)) @async => @this.consume(
+    onSuccess: (value) async => mapper(value),
+    onError: (failure) async => ValueActionResult.fail(failure),
+  );
+  '''
+];
+
 class ConsumableFuncGenerator extends Generator {
   final returnRegex = RegExp(r'(?<=@return{)[^}]*(?=})');
   final returnRegexReplace = RegExp(r'@return{[^}]*}');
@@ -281,6 +290,12 @@ import 'formz.dart';
 
     if (consumable == Consumables.consumable) {
       for (final function in syncFunctions) {
+        buf.writeln(convert(function, consumable));
+      }
+    }
+
+    if (consumable == Consumables.consumableAsync || consumable == Consumables.consumableAsyncFuture) {
+      for (final function in asyncFunctions) {
         buf.writeln(convert(function, consumable));
       }
     }

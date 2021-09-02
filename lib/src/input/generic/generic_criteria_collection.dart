@@ -13,11 +13,11 @@ abstract class GenericCriteriaCollection<T> {
 
   GenericBuilder<T> createCriteria();
 
-  T? transform(T? value) => value;
-
   bool isPure(T? value) => false;
 
   bool validate(T value) => _criteria._validateCriteria(value).success;
+
+  T? transform(T? input) => input;
 
   @protected
   GenericBuilder<S> add<S>(BuildGenericCriteriaFunc<S> func) {

@@ -39,6 +39,7 @@ class FormInputBuilder<Cubit extends FormCubit, T, E> extends StatelessWidget {
           previous.getInput(name) != current.getInput(name) || previous.submission != current.submission,
       builder: (context, state) {
         final input = state.getInput<Input<T, E>>(name);
+
         final inputState = FormInputState._(
           value: input.value,
           enabled: !state.submission,
