@@ -9,7 +9,7 @@ abstract class EitherFuture<L, R> {
 
   const factory EitherFuture.right(FutureOr<R> value) = _Right;
 
-  Future<T> consume<T>({required FutureOr<T> onLeft(L value), required FutureOr<T> onRight(R value)});
+  Future<T> consume<T>({required FutureOr<T> onRight(R value), required FutureOr<T> onLeft(L value)});
 }
 
 class _Left<L, R> extends Equatable implements EitherFuture<L, R> {
@@ -19,8 +19,8 @@ class _Left<L, R> extends Equatable implements EitherFuture<L, R> {
 
   @override
   Future<T> consume<T>({
-    required FutureOr<T> onLeft(L value),
     required FutureOr<T> onRight(R value),
+    required FutureOr<T> onLeft(L value),
   }) async =>
       onLeft(await value);
 
@@ -35,8 +35,8 @@ class _Right<L, R> extends Equatable implements EitherFuture<L, R> {
 
   @override
   Future<T> consume<T>({
-    required FutureOr<T> onLeft(L value),
     required FutureOr<T> onRight(R value),
+    required FutureOr<T> onLeft(L value),
   }) async =>
       onRight(await value);
 
@@ -73,7 +73,7 @@ extension EitherFutureExtension<L, R> on EitherFuture<L, R> {
   Future<R?> rightOrNull() => consume(onLeft: (_) => null, onRight: (value) => value);
 }
 
-extension FutureOfEitherFutureExtension<L, R> on Future<EitherFuture<L, R>> {
+extension FutureOfEitherFutureExtension<L, R> on FutureOr<EitherFuture<L, R>> {
   Future<T> consume<T>({required FutureOr<T> onLeft(L value), required FutureOr<T> onRight(R value)}) async =>
       (await this).consume(
         onLeft: onLeft,

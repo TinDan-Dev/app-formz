@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../utils/extensions.dart';
@@ -31,4 +33,26 @@ class Failure {
   }
 
   String localize(BuildContext context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
+}
+
+Result<T> runCatching<T>({
+  required T action(),
+  required Failure onError(Object? cause, StackTrace? trace),
+}) {
+  try {
+    return Result.right(action());
+  } catch (e, s) {
+    return Result.left(onError(e, s));
+  }
+}
+
+Future<Result<T>> runCatchingAsync<T>({
+  required FutureOr<T> action(),
+  required Failure onError(Object? cause, StackTrace? trace),
+}) async {
+  try {
+    return Result.right(await action());
+  } catch (e, s) {
+    return Result.left(onError(e, s));
+  }
 }

@@ -61,11 +61,11 @@ class _JoinRightEither<S, L, R> extends Equatable implements Either<L, Tuple<R, 
 
 /// Joins the left side of one [Either] (L) with the left side of another
 /// [Future<Either>] (S). The other Either is only invoked if the first one is left.
-class _JoinLeftEitherFuture<S, L, R> implements EitherFuture<Tuple<L, S>, R> {
+class _JoinAsyncLeftEither<S, L, R> implements EitherFuture<Tuple<L, S>, R> {
   final Either<L, R> source;
   final LazyFuture<EitherFuture<S, R>> _joiningLazy;
 
-  _JoinLeftEitherFuture({
+  _JoinAsyncLeftEither({
     required this.source,
     required FutureOr<EitherFuture<S, R>> joining(),
   }) : _joiningLazy = LazyFuture(joining);
@@ -87,11 +87,11 @@ class _JoinLeftEitherFuture<S, L, R> implements EitherFuture<Tuple<L, S>, R> {
 
 /// Joins the right side of one [Either] (R) with the right side of another
 /// [Future<Either>] (S). The other Either is only invoked if the first one is right.
-class _JoinRightEitherFuture<S, L, R> implements EitherFuture<L, Tuple<R, S>> {
+class _JoinAsyncRightEither<S, L, R> implements EitherFuture<L, Tuple<R, S>> {
   final Either<L, R> source;
   final LazyFuture<EitherFuture<L, S>> _joiningLazy;
 
-  _JoinRightEitherFuture({
+  _JoinAsyncRightEither({
     required this.source,
     required FutureOr<EitherFuture<L, S>> joining(),
   }) : _joiningLazy = LazyFuture(joining);
@@ -135,7 +135,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
   EitherFuture<Tuple<L, S>, R> joinLeftAsync<S>(FutureOr<EitherFuture<S, R>> other()) =>
-      _JoinLeftEitherFuture(source: this, joining: other);
+      _JoinAsyncLeftEither(source: this, joining: other);
 
   /// Joins the right side of one [Either] (R) with the right side of another
   /// [Future<Either>] (S). The other Either is only invoked if the first one is right.
@@ -144,10 +144,10 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
   EitherFuture<L, Tuple<R, S>> joinRightAsync<S>(FutureOr<EitherFuture<L, S>> other()) =>
-      _JoinRightEitherFuture(source: this, joining: other);
+      _JoinAsyncRightEither(source: this, joining: other);
 }
 
-extension FutureOfEitherJoiningExtension<L, R> on Future<Either<L, R>> {
+extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// Joins the left side of one [Either] (L) with the left side of another
   /// [Either] (S). The other Either is only invoked if the first one is left.
   ///

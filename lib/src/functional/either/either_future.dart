@@ -23,6 +23,6 @@ extension EitherToEitherFutureExtension<L, R> on Either<L, R> {
   EitherFuture<L, R> get future => _EitherToEitherFuture(source: this);
 }
 
-extension FutureOfEitherToEitherFutureExtension<L, R> on Future<Either<L, R>> {
+extension FutureOfEitherToEitherFutureExtension<L, R> on FutureOr<Either<L, R>> {
   EitherFuture<L, R> get future => _EitherToEitherFuture(source: this);
 }
