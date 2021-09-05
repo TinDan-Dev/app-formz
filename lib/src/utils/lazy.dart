@@ -1,3 +1,5 @@
+import 'dart:async';
+
 class Lazy<T> {
   final T Function() _provider;
 
@@ -17,13 +19,13 @@ class Lazy<T> {
   bool get evaluated => _evaluated;
 }
 
-class AsyncLazy<T> {
-  final Future<T> Function() _provider;
+class LazyFuture<T> {
+  final FutureOr<T> Function() _provider;
 
   late bool _evaluated;
   late T _value;
 
-  AsyncLazy(this._provider) : _evaluated = false;
+  LazyFuture(this._provider) : _evaluated = false;
 
   Future<T> get value async {
     if (!_evaluated) {

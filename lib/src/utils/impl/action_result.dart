@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../functional/result.dart';
 import '../consumable.dart';
-import '../failure.dart';
 
 abstract class ActionResult extends Consumable<void> with EquatableMixin {
   const ActionResult();

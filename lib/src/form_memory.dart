@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 import 'form_cubit.dart';
+import 'functional/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
-import 'utils/failure.dart';
 
 class FormMemory with InputContainer {
   final _inputs = <Input>[];

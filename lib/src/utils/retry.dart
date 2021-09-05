@@ -1,18 +1,16 @@
 import 'dart:async';
 
-import '../../formz.con.dart';
+import '../functional/either/either.dart';
+import '../functional/result.dart';
 import 'cancellation_token.dart';
-import 'consumable.dart';
-import 'failure.dart';
-import 'impl/value_action_result.dart';
 import 'retries.dart';
 
 bool _defaultShouldContinue(_) => true;
 
 /// Wraps a function and applies retry logic to it. Thus the function is called multiple times if it throws a exception.
 /// Make sure there are no side effects when calling the function multiple times.
-class Retry<T> extends ConsumableAsync<T> {
-  final _completer = Completer<Consumable<T>>();
+class Retry<T> implements ResultFuture<T> {
+  final _completer = Completer<Result<T>>();
 
   /// This function is tried.
   ///
@@ -22,9 +20,9 @@ class Retry<T> extends ConsumableAsync<T> {
   /// Maps exception thrown by the [action] to a [Failure] or a valid value.
   ///
   /// If a value is returned, the invocation attempt is considered successful.
-  final Consumable<T> Function(Object? error, StackTrace? trace, CancellationToken token) errorToResult;
+  final Result<T> Function(Object? error, StackTrace? trace, CancellationToken token) errorToResult;
 
-  /// Thid function returns whether to continue retring after a failure was returened or not.
+  /// This function returns whether to continue retrying after a failure was returned or not.
   ///
   /// If this returns false no further retries will be issued.
   final bool Function(Failure failure) shouldContinue;
@@ -41,7 +39,7 @@ class Retry<T> extends ConsumableAsync<T> {
     bool shouldContinue(Failure failure) = _defaultShouldContinue,
   }) : this.explicit(
           action: action,
-          errorToResult: (error, trace, _) => ValueActionResult<T>.fail(errorToFailure(error, trace)),
+          errorToResult: (error, trace, _) => Result<T>.left(errorToFailure(error, trace)),
           shouldContinue: shouldContinue,
         );
 
@@ -51,7 +49,7 @@ class Retry<T> extends ConsumableAsync<T> {
     bool shouldContinue(Failure failure) = _defaultShouldContinue,
   }) : this.explicit(
           action: action,
-          errorToResult: (error, trace, token) => ValueActionResult<T>.fail(errorToFailure(error, trace, token)),
+          errorToResult: (error, trace, token) => Result<T>.left(errorToFailure(error, trace, token)),
           shouldContinue: shouldContinue,
         );
 
@@ -60,23 +58,23 @@ class Retry<T> extends ConsumableAsync<T> {
   /// Starts the retry cycle.
   ///
   /// Returns whether the [action] could be executed successfully or not.
-  Future<Consumable<T>> invoke() async {
+  Future<Result<T>> invoke() async {
     // make sure the count does not change during one request
     final attempts = Retries.retryAttempts;
     final cancellationToken = CancellationToken();
 
-    late Consumable<T> result;
+    late final Result<T> result;
     for (var i = 0; i <= attempts; i++) {
       try {
-        result = ValueActionResult.success(await action());
+        result = Result.right(await action());
         break;
       } catch (e, s) {
         result = errorToResult(e, s, cancellationToken);
-        result.onError((failure) => Retries.logFunction?.call('Retry $i / $attempts failed', failure));
+        result.onLeft((failure) => Retries.logFunction?.call('Retry $i / $attempts failed', failure));
 
         final shouldCancel = !result.consume(
-          onSuccess: (_) => false,
-          onError: shouldContinue,
+          onLeft: shouldContinue,
+          onRight: (_) => false,
         );
 
         if (cancellationToken.canceled || shouldCancel) break;
@@ -91,11 +89,12 @@ class Retry<T> extends ConsumableAsync<T> {
 
   @override
   Future<S> consume<S>({
-    required FutureOr<S> onSuccess(T value),
-    required FutureOr<S> onError(Failure failure),
-  }) async =>
-      (await _completer.future).consume(
-        onSuccess: (value) async => onSuccess(value),
-        onError: (failure) async => onError(failure),
-      );
+    required FutureOr<S> onLeft(Failure value),
+    required FutureOr<S> onRight(T value),
+  }) async {
+    return (await _completer.future).consume(
+      onLeft: (value) async => onLeft(value),
+      onRight: (value) async => onRight(value),
+    );
+  }
 }

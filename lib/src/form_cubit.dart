@@ -4,10 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'attachments.dart';
 import 'form_state.dart';
+import 'functional/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
-import 'utils/consumable.dart';
-import 'utils/failure.dart';
 
 class _InputAttachment<T> {
   final T value;
@@ -57,7 +56,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
 
   void setFailure(Failure? failure) => emit(state.copyWith(failure: () => failure));
 
-  Future<bool> submit(FutureOr<ConsumableAsync> action()) async {
+  Future<bool> submit(FutureOr<ResultFuture<void>> action()) async {
     assert(!state.submission, 'Another submission is currently in progress');
     unfocusAll();
 
@@ -65,11 +64,11 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
     final result = await action();
 
     return result.consume(
-      onSuccess: (_) {
+      onRight: (_) {
         emit(state.copyWith(submission: false, failure: () => null));
         return true;
       },
-      onError: (failure) {
+      onLeft: (failure) {
         emit(state.copyWith(submission: false, failure: () => failure));
         return false;
       },

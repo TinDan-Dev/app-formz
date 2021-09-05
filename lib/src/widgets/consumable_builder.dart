@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../functional/result.dart';
 import '../utils/consumable.dart';
-import '../utils/failure.dart';
 
 class ConsumableBuilder<T> extends StatelessWidget {
   final Consumable<T> consumable;

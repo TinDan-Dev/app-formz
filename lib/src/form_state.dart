@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
+import 'functional/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
 import 'utils/extensions.dart';
-import 'utils/failure.dart';
 import 'utils/lazy.dart';
 
 // TODO: test cirteria

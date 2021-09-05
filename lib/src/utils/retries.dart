@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'failure.dart';
+import '../functional/result.dart';
 import 'retry.dart';
 
 /// Global configuration for all [Retry] objects

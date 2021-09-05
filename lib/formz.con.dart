@@ -43,13 +43,13 @@ extension ConsumableExtensions<T> on Consumable<T> {
         onError: (_) => value,
       );
 
-  void onSuccess(void callback(T value)) => this.consume(
+  S? onSuccess<S>(S? callback(T value)) => this.consume(
         onSuccess: callback,
-        onError: (_) {},
+        onError: (_) => null,
       );
 
-  void onError(void callback(Failure failure)) => this.consume(
-        onSuccess: (_) {},
+  S? onError<S>(S? callback(Failure failure)) => this.consume(
+        onSuccess: (_) => null,
         onError: callback,
       );
 
@@ -150,14 +150,14 @@ extension ConsumableFutureExtensions<T> on FutureOr<Consumable<T>> {
         onError: (_) => value,
       );
 
-  Future<void> onSuccess(void callback(T value)) async => (await this).consume(
+  Future<S?> onSuccess<S>(S? callback(T value)) async => (await this).consume(
         onSuccess: callback,
-        onError: (_) {},
+        onError: (_) => null,
       );
 
-  Future<void> onError(void callback(Failure failure)) async =>
+  Future<S?> onError<S>(S? callback(Failure failure)) async =>
       (await this).consume(
-        onSuccess: (_) {},
+        onSuccess: (_) => null,
         onError: callback,
       );
 
@@ -241,14 +241,14 @@ extension ConsumableAsyncExtensions<T> on ConsumableAsync<T> {
         onError: (_) => value,
       );
 
-  Future<void> onSuccess(FutureOr<void> callback(T value)) async =>
-      this.consume(
+  Future<S?> onSuccess<S>(FutureOr<S?> callback(T value)) async => this.consume(
         onSuccess: callback,
-        onError: (_) {},
+        onError: (_) => null,
       );
 
-  Future<void> onError(void callback(Failure failure)) async => this.consume(
-        onSuccess: (_) {},
+  Future<S?> onError<S>(FutureOr<S?> callback(Failure failure)) async =>
+      this.consume(
+        onSuccess: (_) => null,
         onError: callback,
       );
 
@@ -343,15 +343,15 @@ extension ConsumableAsyncFutureExtensions<T> on FutureOr<ConsumableAsync<T>> {
         onError: (_) => value,
       );
 
-  Future<void> onSuccess(FutureOr<void> callback(T value)) async =>
+  Future<S?> onSuccess<S>(FutureOr<S?> callback(T value)) async =>
       (await this).consume(
         onSuccess: callback,
-        onError: (_) {},
+        onError: (_) => null,
       );
 
-  Future<void> onError(void callback(Failure failure)) async =>
+  Future<S?> onError<S>(FutureOr<S?> callback(Failure failure)) async =>
       (await this).consume(
-        onSuccess: (_) {},
+        onSuccess: (_) => null,
         onError: callback,
       );
 

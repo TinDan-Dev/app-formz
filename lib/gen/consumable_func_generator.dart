@@ -68,14 +68,14 @@ const functions = [
   );
   ''',
   '''
-  @return{void} onSuccess(@futureOr{void} callback(T value)) @async => @this.consume(
+  @return{S?} onSuccess<S>(@futureOr{S?} callback(T value)) @async => @this.consume(
     onSuccess: callback,
-    onError: (_) {},
+    onError: (_) => null,
   );
   ''',
   '''
-  @return{void} onError(void callback(Failure failure)) @async => @this.consume(
-    onSuccess: (_) {},
+  @return{S?} onError<S>(@futureOr{S?} callback(Failure failure)) @async => @this.consume(
+    onSuccess: (_) => null,
     onError: callback,
   );
   ''',

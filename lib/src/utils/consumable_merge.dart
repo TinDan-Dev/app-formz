@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import '../../formz.tuple.dart';
+import '../functional/result.dart';
 import 'consumable.dart';
-import 'failure.dart';
 
 part 'consumable_merge_async.dart';
 

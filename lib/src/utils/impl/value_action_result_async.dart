@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 
+import '../../functional/result.dart';
 import '../consumable.dart';
-import '../failure.dart';
 
 abstract class ValueActionResultAsync<T> extends ConsumableAsync<T> with EquatableMixin {
   const ValueActionResultAsync();

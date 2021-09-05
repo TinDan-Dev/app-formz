@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../form_cubit.dart';
 import '../form_state.dart';
+import '../functional/result.dart';
 import '../utils/extensions.dart';
-import '../utils/failure.dart';
 
 class FormErrorBuilder<Cubit extends FormCubit> extends StatelessWidget {
   final Widget Function(BuildContext context, Failure failure) builder;

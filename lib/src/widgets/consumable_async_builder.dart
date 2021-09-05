@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../functional/result.dart';
 import '../utils/consumable.dart';
 import '../utils/extensions.dart';
-import '../utils/failure.dart';
 
 class ConsumableAsyncBuilder<T> extends StatelessWidget {
   final FutureOr<ConsumableAsync<T>> consumable;

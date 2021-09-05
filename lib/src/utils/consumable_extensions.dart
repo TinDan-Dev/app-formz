@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import '../../formz.dart';
+import '../functional/result.dart';
 import 'consumable.dart';
-import 'failure.dart';
 
 part 'consumable_extensions_async.dart';
 
