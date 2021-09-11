@@ -1,9 +1,5 @@
 part of 'generic_input.dart';
 
-typedef BuildGenericCriteriaFunc<T> = void Function(GenericCriteriaBuilder<T> builder);
-typedef BuildGenericCastCriteriaFunc<T, S> = void Function(GenericCastCriteriaBuilder<T, S> builder);
-typedef BuildGenericBinaryCriteriaFunc<T> = void Function(GenericBinaryCriteriaBuilder<T> builder);
-
 abstract class GenericCriteriaCollection<T> {
   late final GenericCriteria<T> _criteria;
 
@@ -20,7 +16,7 @@ abstract class GenericCriteriaCollection<T> {
   T? transform(T? input) => input;
 
   @protected
-  GenericBuilder<S> add<S>(BuildGenericCriteriaFunc<S> func) {
+  GenericBuilder<S> add<S>(void func(GenericCriteriaBuilder<S> builder)) {
     final builder = GenericCriteriaBuilder<S>._();
     func(builder);
 
@@ -28,7 +24,7 @@ abstract class GenericCriteriaCollection<T> {
   }
 
   @protected
-  GenericBuilder<S> addCast<S, K>(BuildGenericCastCriteriaFunc<S, K> func) {
+  GenericBuilder<S> addCast<S, K>(void func(GenericCastCriteriaBuilder<S, K> builder)) {
     final builder = GenericCastCriteriaBuilder<S, K>._();
     func(builder);
 
@@ -36,7 +32,7 @@ abstract class GenericCriteriaCollection<T> {
   }
 
   @protected
-  GenericBuilder<S> addBinary<S>(BuildGenericBinaryCriteriaFunc<S> func) {
+  GenericBuilder<S> addBinary<S>(void func(GenericBinaryCriteriaBuilder<S> builder)) {
     final builder = GenericBinaryCriteriaBuilder<S>._();
     func(builder);
 

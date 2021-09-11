@@ -63,7 +63,7 @@ class Retry<T> implements ResultFuture<T> {
     final attempts = Retries.retryAttempts;
     final cancellationToken = CancellationToken();
 
-    late final Result<T> result;
+    Result<T>? result;
     for (var i = 0; i <= attempts; i++) {
       try {
         result = Result.right(await action());
@@ -83,7 +83,10 @@ class Retry<T> implements ResultFuture<T> {
       await Future.delayed(Retries.timeInterpolation(i));
     }
 
-    _completer.complete(result);
+    // the attempts need to be greater then 0, therefor [result] cannot be null
+    // here and the bang operator is safe
+
+    _completer.complete(result!);
     return result;
   }
 
