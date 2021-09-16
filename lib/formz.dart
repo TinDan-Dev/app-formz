@@ -1,6 +1,7 @@
 library formz;
 
 export 'annotation.dart';
+export 'formz.merge.dart';
 export 'formz.tuple.dart';
 export 'src/attachments.dart';
 export 'src/form_cubit.dart';

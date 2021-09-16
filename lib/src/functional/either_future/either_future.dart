@@ -71,6 +71,16 @@ extension EitherFutureExtension<L, R> on EitherFuture<L, R> {
   Future<L?> leftOrNull() => consume(onLeft: (value) => value, onRight: (_) => null);
 
   Future<R?> rightOrNull() => consume(onLeft: (_) => null, onRight: (value) => value);
+
+  Future<L> leftOrThrow() => consume(
+        onLeft: (value) => value,
+        onRight: (value) => throw EitherException(side: 'left', otherSide: value),
+      );
+
+  Future<R> rightOrThrow() => consume(
+        onLeft: (value) => throw EitherException(side: 'right', otherSide: value),
+        onRight: (value) => value,
+      );
 }
 
 extension FutureOfEitherFutureExtension<L, R> on FutureOr<EitherFuture<L, R>> {
@@ -103,4 +113,8 @@ extension FutureOfEitherFutureExtension<L, R> on FutureOr<EitherFuture<L, R>> {
   Future<L?> leftOrNull() async => (await this).leftOrNull();
 
   Future<R?> rightOrNull() async => (await this).rightOrNull();
+
+  Future<L> leftOrThrow() async => (await this).leftOrThrow();
+
+  Future<R> rightOrThrow() async => (await this).rightOrThrow();
 }

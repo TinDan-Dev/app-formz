@@ -5,11 +5,21 @@ builders:
     build_extensions: {".dart": [".tuple.dart"]}
     auto_apply: none
     build_to: source
+  mergeGeneratorBuilder:
+    import: "package:formz/gen/merge_generator.dart"
+    builder_factories: ["mergeGeneratorBuilder"]
+    build_extensions: {".dart": [".merge.dart"]}
+    auto_apply: none
+    build_to: source
 
 targets:
   $default:
     builders:
       formz|tupleGeneratorBuilder:
+        enabled: true
+        generate_for:
+          - lib/formz.dart
+      formz|mergeGeneratorBuilder:
         enabled: true
         generate_for:
           - lib/formz.dart
