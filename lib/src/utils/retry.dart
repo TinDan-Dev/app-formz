@@ -53,8 +53,6 @@ class Retry<T> implements ResultFuture<T> {
           shouldContinue: shouldContinue,
         );
 
-  // TODO: add test for shouldContinue
-
   /// Starts the retry cycle.
   ///
   /// Returns whether the [action] could be executed successfully or not.
