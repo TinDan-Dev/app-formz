@@ -1,11 +1,26 @@
 import 'dart:async';
+import 'dart:math';
 
-import '../functional/either/either.dart';
 import '../functional/result.dart';
 import 'cancellation_token.dart';
-import 'retries.dart';
 
 bool _defaultShouldContinue(_) => true;
+
+/// Global configuration for all [Retry] objects
+abstract class Retries {
+  /// The maximum amount of attempts the action is tried by the retry object.
+  static int retryAttempts = 2;
+
+  /// The maximum delay between each retry.
+  static Duration maxDelay = const Duration(seconds: 3);
+
+  /// Determines the duration to wait till the next attempt.
+  static Duration timeInterpolation(int attempt) {
+    final fraction = (1.0 / (1 + exp(-((attempt * 5.5) / (retryAttempts)) + 1.5)));
+
+    return Duration(milliseconds: (maxDelay.inMilliseconds * fraction).toInt());
+  }
+}
 
 /// Wraps a function and applies retry logic to it. Thus the function is called multiple times if it throws a exception.
 /// Make sure there are no side effects when calling the function multiple times.
@@ -68,7 +83,6 @@ class Retry<T> implements ResultFuture<T> {
         break;
       } catch (e, s) {
         result = errorToResult(e, s, cancellationToken);
-        result.onLeft((failure) => Retries.logFunction?.call('Retry $i / $attempts failed', failure));
 
         final shouldCancel = !result.consume(
           onLeft: shouldContinue,

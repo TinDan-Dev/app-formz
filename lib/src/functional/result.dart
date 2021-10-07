@@ -33,6 +33,18 @@ class Failure {
   }
 
   String localize(BuildContext context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
+
+  Failure copyWith({
+    String message()?,
+    Object? cause()?,
+    StackTrace? trace()?,
+  }) {
+    return Failure(
+      message: message.fold(() => this.message, (some) => some()),
+      cause: cause.fold(() => this.cause, (some) => some()),
+      trace: trace.fold(() => this.trace, (some) => some()),
+    );
+  }
 }
 
 Result<T> runCatching<T>({
@@ -54,5 +66,17 @@ Future<Result<T>> runCatchingAsync<T>({
     return Result.right(await action());
   } catch (e, s) {
     return Result.left(onError(e, s));
+  }
+}
+
+extension ResultIterableHelper<T> on Iterable<T> {
+  Result<T> firstWhereOrResult(bool test(T element), {required Result<T> orElse()}) {
+    for (final element in this) {
+      if (test(element)) {
+        return Result.right(element);
+      }
+    }
+
+    return orElse();
   }
 }

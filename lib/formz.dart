@@ -26,7 +26,7 @@ export 'src/input/select_input.dart';
 export 'src/utils/after_init.dart';
 export 'src/utils/cancellation_token.dart';
 export 'src/utils/lazy.dart';
-export 'src/utils/retries.dart';
+export 'src/utils/mutex.dart';
 export 'src/utils/retry.dart';
 export 'src/utils/types.dart';
 export 'src/widgets/form_error_builder.dart';
