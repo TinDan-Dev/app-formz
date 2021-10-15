@@ -6,6 +6,9 @@ class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
   @override
   final FormMemory memory;
 
+  @override
+  final String identifier = 'cubit';
+
   TestMemoryFormCubit({required this.memory, required FormState state}) : super(state) {
     initMemory();
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import 'form_cubit.dart';
@@ -9,8 +10,8 @@ import 'input_container.dart';
 
 class FormMemory with InputContainer {
   final _inputs = <Input>[];
-  final _failures = <Type, Failure?>{};
-  final _listeners = <Type, void Function()>{};
+  final _failures = <Object, Failure?>{};
+  final _listeners = <Object, VoidCallback>{};
 
   @override
   Iterable<Input> get inputs => _inputs;
@@ -21,36 +22,43 @@ class FormMemory with InputContainer {
   }
 
   @visibleForTesting
-  void saveAndNotify(Type type, Iterable<Input> inputs, Failure? failure) {
+  void saveAndNotify(Object identifier, Iterable<Input> inputs, Failure? failure) {
     for (final input in inputs) save(input);
-    _failures[type] = failure;
+    _failures[identifier] = failure;
 
-    _listeners.entries.where((e) => e.key != type).forEach((e) => e.value());
+    _listeners.entries.where((e) => e.key != identifier).forEach((e) => e.value());
   }
+
+  void _addListener(Object identifier, VoidCallback callback) => _listeners[identifier] = callback;
+
+  void _removeListener(Object identifier) => _listeners.remove(identifier);
 
   Iterable<Input> _loadInputs(Iterable<String> targets) => _inputs.where((e) => targets.contains(e.name));
 
-  Failure? _loadFailure(Type type) => _failures[type];
+  Failure? _loadFailure(Object identifier) => _failures[identifier];
 }
 
-mixin FormMemoryMixin on FormCubit {
+mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
   @protected
   FormMemory get memory;
 
   @protected
+  Object get identifier;
+
+  @protected
   void initMemory() {
-    memory._listeners[runtimeType] = _load;
+    memory._addListener(identifier, _load);
     _load();
 
-    memory.saveAndNotify(runtimeType, state.inputs, null);
-    stream.listen((e) => memory.saveAndNotify(runtimeType, e.inputs, e.failure));
+    memory.saveAndNotify(identifier, state.inputs, state.failure);
+    stream.listen((e) => memory.saveAndNotify(identifier, e.inputs, e.failure));
   }
 
   @protected
   void _load() {
     emit(state.copyWith(
       inputs: memory._loadInputs(state.inputs.map((e) => e.name)),
-      failure: () => memory._loadFailure(runtimeType),
+      failure: () => memory._loadFailure(identifier),
     ));
   }
 
@@ -58,7 +66,7 @@ mixin FormMemoryMixin on FormCubit {
   Future<void> close() async {
     super.close();
 
-    memory._listeners.remove(runtimeType);
+    memory._removeListener(identifier);
   }
 
   @override
@@ -72,13 +80,7 @@ mixin FormMemoryMixin on FormCubit {
 
       return input as T;
     } else {
-      final memoryCandidates = memory._inputs.where((e) => e.name == name);
-      assert(memoryCandidates.length == 1, '${memoryCandidates.length} inputs found with name $name in memory');
-
-      final input = memoryCandidates.first;
-      assert(input is T, 'Input found in memory of type ${input.runtimeType} but $T was requested');
-
-      return input as T;
+      return memory.getInput<T>(name);
     }
   }
 }

@@ -16,6 +16,13 @@ extension TextEditingAttachment on FormCubit {
   TextEditingController getTextEditingAttachment(String name) => getAttachment<TextEditingController>(
         name,
         create: () => TextEditingController(),
-        dispose: (node) => node.dispose(),
+        dispose: (controller) => controller.dispose(),
+      );
+}
+
+extension GlobalKeyAttachment on FormCubit {
+  GlobalKey getGlobalKeyAttachment(String name) => getAttachment<GlobalKey>(
+        name,
+        create: () => GlobalKey(debugLabel: name),
       );
 }

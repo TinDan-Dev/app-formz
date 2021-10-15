@@ -5,6 +5,9 @@ class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
   @override
   final FormMemory memory;
 
+  @override
+  final String identifier = 'cubit';
+
   TestMemoryFormCubit({
     required this.memory,
     required FormState state,
@@ -40,7 +43,7 @@ void main() {
   });
 
   group('saveAndNotify', () {
-    late FormCubit cubit;
+    late TestMemoryFormCubit cubit;
 
     setUp(() {
       cubit = TestMemoryFormCubit(
@@ -49,10 +52,10 @@ void main() {
       );
     });
 
-    test('should not update the cubit when the cubit matches the input type', () {
+    test('should not update the cubit when the cubit matches the identifier', () {
       final expectation = expectNoEmits(cubit.stream);
 
-      memory.saveAndNotify(TestMemoryFormCubit, [dirtyInput], null);
+      memory.saveAndNotify(cubit.identifier, [dirtyInput], null);
 
       return expectation;
     });
@@ -64,6 +67,14 @@ void main() {
       );
 
       memory.saveAndNotify(String, [dirtyInput], null);
+
+      return expectation;
+    });
+
+    test('should update the cubit when the cubit does not match the identifier', () {
+      final expectation = expectLater(cubit.stream, emits(anything));
+
+      memory.saveAndNotify('x', [dirtyInput], null);
 
       return expectation;
     });

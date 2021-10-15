@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:formz/src/utils/lazy.dart';
-
+import '../../utils/lazy.dart';
 import '../either/either.dart';
 import 'either_future.dart';
 
