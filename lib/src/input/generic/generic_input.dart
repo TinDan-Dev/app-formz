@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import '../../functional/validation_functions.dart';
 import '../../input_container.dart';
 import '../../utils/extensions.dart';
 import '../input.dart';

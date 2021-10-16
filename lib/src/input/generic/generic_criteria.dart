@@ -1,6 +1,5 @@
 part of 'generic_input.dart';
 
-typedef ValidationFunc<T> = bool Function(T? value);
 typedef LocalFunc = String Function(BuildContext context);
 typedef CastFunc<T, S> = S? Function(T? value);
 
