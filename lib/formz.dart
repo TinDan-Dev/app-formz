@@ -7,6 +7,7 @@ export 'src/attachments.dart';
 export 'src/form_cubit.dart';
 export 'src/form_memory.dart';
 export 'src/form_state.dart';
+export 'src/functional/correction_functions.dart';
 export 'src/functional/either/either.dart';
 export 'src/functional/either/either_future.dart';
 export 'src/functional/either/either_iterable.dart';
