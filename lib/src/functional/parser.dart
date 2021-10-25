@@ -89,12 +89,16 @@ class Parser<T> {
   }) =>
       _parseResult(result, validate: (value) => false, correction: correction);
 
-  void error(String message, {Object? cause}) {
+  Never error(String message, {Object? cause}) {
     throw ParserFailure<T>(message, cause: cause);
   }
 
-  void errorInvalidField(String fieldName, {Object? value}) {
+  Never errorInvalidField(String fieldName, {Object? value}) {
     throw ParserFailure<T>('Invalid field $fieldName: $value', cause: value);
+  }
+
+  Never errorInvalidState(String description) {
+    throw ParserFailure<T>('Invalid state of $T: $description');
   }
 }
 
