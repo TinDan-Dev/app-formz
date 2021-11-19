@@ -45,8 +45,8 @@ void main() {
   );
 
   _criteriaTest<String?>(
-    'notEmptyOrNull',
-    criteria: notEmptyOrNull(),
+    'stringNotEmpty',
+    criteria: stringNotEmpty(),
     valid: ['test'],
     invalid: [null, ''],
   );
@@ -67,7 +67,7 @@ void main() {
 
   _criteriaTest<double?>(
     'isBetween',
-    criteria: isBetween(min: 0, max: 5),
+    criteria: inRange(min: 0, max: 5),
     valid: [0, 0.2, 4, 5],
     invalid: [-0.2, 5.1, 6, null],
   );

@@ -1,17 +1,35 @@
 import 'package:equatable/equatable.dart';
 
+import 'functional/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
 import 'utils/extensions.dart';
-import 'utils/failure.dart';
+import 'utils/lazy.dart';
+
+// TODO: test cirteria
 
 class FormState extends Equatable with InputContainer {
   final List<Input> _inputs;
   final Map<String, Object> _properties;
+  final List<bool Function(FormState state)> _criteria;
+
   final Failure? failure;
   final bool submission;
 
-  const FormState(this._inputs, [this._properties = const {}, this.failure, this.submission = false]);
+  late final Lazy<bool> _pure;
+  late final Lazy<bool> _valid;
+
+  FormState(
+    this._inputs, {
+    this.failure,
+    this.submission = false,
+    Map<String, Object> properties = const {},
+    List<bool Function(FormState state)> criteria = const [],
+  })  : _properties = properties,
+        _criteria = criteria {
+    _pure = Lazy(_isPure);
+    _valid = Lazy(_isValid);
+  }
 
   T getProperty<T extends Object>(String key) {
     assert(_properties.containsKey(key), 'No property found for key: $key');
@@ -25,9 +43,22 @@ class FormState extends Equatable with InputContainer {
   @override
   Iterable<Input> get inputs => _inputs;
 
-  bool get pure => _inputs.every((e) => e.pure);
+  bool _isPure() {
+    return _inputs.every((e) => e.pure);
+  }
 
-  bool get valid => _inputs.every((e) => e.valid || (e.optional && e.pure));
+  bool _isValid() {
+    final inputsValid = _inputs.every((e) => e.valid || (e.optional && e.pure));
+
+    if (inputsValid)
+      return _criteria.every((e) => e(this));
+    else
+      return false;
+  }
+
+  bool get pure => _pure.value;
+
+  bool get valid => _valid.value;
 
   FormState copyWith({
     Iterable<Input> inputs = const [],
@@ -48,11 +79,12 @@ class FormState extends Equatable with InputContainer {
       [
         for (final input in _inputs) inputs.firstWhere((e) => e.name == input.name, orElse: () => input),
       ],
-      {
+      properties: {
         for (final key in _properties.keys) key: properties.containsKey(key) ? properties[key]! : _properties[key]!,
       },
-      failure.fold(() => this.failure, (some) => some()),
-      submission ?? this.submission,
+      criteria: _criteria,
+      failure: failure.fold(() => this.failure, (some) => some()),
+      submission: submission ?? this.submission,
     );
   }
 }

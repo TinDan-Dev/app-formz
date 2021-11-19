@@ -3,7 +3,7 @@ import 'package:formz_test/formz_test.dart';
 import 'package:rxdart/subjects.dart';
 
 void main() {
-  Retries.maxDelay = const Duration(milliseconds: 100);
+  Retries.maxDelay = const Duration(microseconds: 100);
   Retries.retryAttempts = 10;
 
   late PublishSubject subject;
@@ -16,8 +16,8 @@ void main() {
     subject.close();
   });
 
-  Consumable<T> errorToFailure<T>(Object? error, StackTrace? trace, CancellationToken token) {
-    return ValueActionResult<T>.fail(const FakeFailure());
+  Result<T> errorToFailure<T>(Object? error, StackTrace? trace, CancellationToken token) {
+    return Result.left(const FakeFailure());
   }
 
   test('should execute once when successful', () async {
@@ -29,7 +29,7 @@ void main() {
     final expectLate = expectLater(subject, emits('x'));
     final result = await obj.invoke();
 
-    expect(result, validConsumable);
+    expect(result, isRight);
     await expectLate;
   });
 
@@ -53,7 +53,7 @@ void main() {
     final expectLate = expectLater(subject, emitsInOrder(['x', 'x', 'x', 'x', 'x', 'success']));
     final result = await obj.invoke();
 
-    expect(result, validConsumable);
+    expect(result, isRight);
     await expectLate;
   });
 
@@ -69,7 +69,7 @@ void main() {
     final expectLate = expectLater(subject, emitsInOrder(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x']));
     final result = await obj.invoke();
 
-    expect(result, invalidConsumable);
+    expect(result, isLeft);
     await expectLate;
   });
 
@@ -81,7 +81,7 @@ void main() {
 
     final result = await obj.invoke();
 
-    expect(result, consumableHasValue(42));
+    expect(result, isRightWith(42));
   });
 
   test('should return the last failure when not successful', () async {
@@ -89,14 +89,14 @@ void main() {
 
     final obj = Retry.explicit(
       action: () => throw 'x',
-      errorToResult: (error, trace, token) => ValueActionResult.fail(FakeFailure(index: ++c)),
+      errorToResult: (error, trace, token) => Result.left(FakeFailure(index: ++c)),
     );
 
     final result = await obj.invoke();
 
     result.consume(
-      onSuccess: (_) => fail('expceted a failure'),
-      onError: (failure) => expect(failure is FakeFailure && failure.index == c, isTrue),
+      onRight: (_) => fail('expected a failure'),
+      onLeft: (failure) => expect(failure is FakeFailure && failure.index == c, isTrue),
     );
   });
 
@@ -111,7 +111,7 @@ void main() {
 
         if (c == 5) token.cancel();
 
-        return ValueActionResult.fail(FakeFailure(index: c));
+        return Result.left(FakeFailure(index: c));
       },
     );
 
@@ -119,8 +119,38 @@ void main() {
     final result = await obj.invoke();
 
     result.consume(
-      onSuccess: (_) => fail('expceted a failure'),
-      onError: (failure) => expect(failure is FakeFailure && failure.index == c, isTrue),
+      onRight: (_) => fail('expected a failure'),
+      onLeft: (failure) => expect(failure is FakeFailure && failure.index == c, isTrue),
+    );
+    await expectLate;
+  });
+
+  test('should stop attempts when shouldContinue returns false', () async {
+    int c = 0;
+
+    final obj = Retry.explicit(
+      action: () => throw 'x',
+      errorToResult: (error, trace, token) {
+        c++;
+        subject.add(error);
+
+        return Result.left(FakeFailure(index: c));
+      },
+      shouldContinue: (failure) {
+        if (failure is FakeFailure) {
+          return failure.index < 5;
+        } else {
+          return true;
+        }
+      },
+    );
+
+    final expectLate = expectLater(subject, emitsInOrder(['x', 'x', 'x', 'x', 'x']));
+    final result = await obj.invoke();
+
+    result.consume(
+      onRight: (_) => fail('expected a failure'),
+      onLeft: (failure) => expect(failure is FakeFailure && failure.index == c, isTrue),
     );
     await expectLate;
   });
