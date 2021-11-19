@@ -234,7 +234,7 @@ packages:
       path: "../app-formz-test"
       relative: true
     source: path
-    version: "1.0.2"
+    version: "1.0.3"
   freezed:
     dependency: "direct dev"
     description:
