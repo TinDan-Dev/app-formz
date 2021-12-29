@@ -54,7 +54,13 @@ extension EitherFutureExtension<L, R> on EitherFuture<L, R> {
         onRight: (value) => Either.right(value),
       );
 
-  Future<void> invoke() => consume(onLeft: (_) {}, onRight: (_) {});
+  EitherFuture<L, R> tap(void action(EitherFuture<L, R> value)) {
+    action(this);
+    return this;
+  }
+
+  Future<Either<L, R>> invoke() =>
+      consume(onRight: (value) => Either.right(value), onLeft: (value) => Either.left(value));
 
   Future<T?> onLeft<T>(FutureOr<T> onLeft(L value)) => consume(onLeft: onLeft, onRight: (_) => null);
 
@@ -94,9 +100,11 @@ extension FutureOfEitherFutureExtension<L, R> on FutureOr<EitherFuture<L, R>> {
 
   Future<bool> get right async => (await this).right;
 
+  Future<EitherFuture<L, R>> tap(void action(EitherFuture<L, R> value)) async => (await this).tap(action);
+
   Future<Either<L, R>> get future async => (await this).future;
 
-  Future<void> invoke() async => (await this).invoke();
+  Future<Either<L, R>> invoke() async => (await this).invoke();
 
   Future<T?> onLeft<T>(FutureOr<T> onLeft(L value)) async => (await this).onLeft(onLeft);
 
