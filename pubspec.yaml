@@ -3,7 +3,7 @@ description: Generalizes form validation
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: '1.0.3'
+version: '1.0.4'
 
 environment:
   sdk: '>=2.13.0 <3.0.0'
@@ -15,7 +15,7 @@ dependencies:
   # for state management
   flutter_bloc: ^7.0.0
   equatable: ^2.0.3
-  freezed_annotation: ^0.14.2
+  freezed_annotation: ^1.0.0
 
   # stream utils
   rxdart: ^0.27.1
