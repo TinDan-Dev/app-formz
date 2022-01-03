@@ -101,7 +101,7 @@ extension FutureOfEitherFutureExtension<L, R> on FutureOr<EitherFuture<L, R>> {
   Future<bool> get right async => (await this).right;
 
   Future<Either<L, R>> get future async => (await this).future;
-  
+
   Future<EitherFuture<L, R>> tap(void action(EitherFuture<L, R> value)) async => (await this).tap(action);
 
   Future<Either<L, R>> invoke() async => (await this).invoke();

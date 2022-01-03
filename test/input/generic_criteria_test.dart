@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart' hide equals;
 import 'package:formz/formz.dart' hide isTrue, isFalse;
-import 'package:formz_test/formz_test.dart';
 
 void _criteriaTest<T>(
   String description, {
