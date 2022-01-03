@@ -8,8 +8,7 @@ import 'formz.tuple.dart';
 import 'src/functional/either/either.dart';
 
 Either<T, Tuple<A, B>> mergeRight<T, A, B>(
-    {required Either<T, A> Function() first,
-    required Either<T, B> Function() second}) {
+    {required Either<T, A> Function() first, required Either<T, B> Function() second}) {
   return first().consume(
     onRight: (firstValue) => second().consume(
       onRight: (secondValue) => Either.right(Tuple<A, B>(
@@ -23,8 +22,7 @@ Either<T, Tuple<A, B>> mergeRight<T, A, B>(
 }
 
 Either<Tuple<A, B>, T> mergeLeft<T, A, B>(
-    {required Either<A, T> Function() first,
-    required Either<B, T> Function() second}) {
+    {required Either<A, T> Function() first, required Either<B, T> Function() second}) {
   return first().consume(
     onRight: (value) => Either.right(value),
     onLeft: (firstValue) => second().consume(
@@ -272,8 +270,7 @@ Either<T, Tuple7<A, B, C, D, E, F, G>> mergeRight7<T, A, B, C, D, E, F, G>(
           onRight: (fourthValue) => fifth().consume(
             onRight: (fifthValue) => sixth().consume(
               onRight: (sixthValue) => seventh().consume(
-                onRight: (seventhValue) =>
-                    Either.right(Tuple7<A, B, C, D, E, F, G>(
+                onRight: (seventhValue) => Either.right(Tuple7<A, B, C, D, E, F, G>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
@@ -320,8 +317,7 @@ Either<Tuple7<A, B, C, D, E, F, G>, T> mergeLeft7<T, A, B, C, D, E, F, G>(
               onRight: (value) => Either.right(value),
               onLeft: (sixthValue) => seventh().consume(
                 onRight: (value) => Either.right(value),
-                onLeft: (seventhValue) =>
-                    Either.left(Tuple7<A, B, C, D, E, F, G>(
+                onLeft: (seventhValue) => Either.left(Tuple7<A, B, C, D, E, F, G>(
                   first: firstValue,
                   second: secondValue,
                   third: thirdValue,
@@ -339,16 +335,15 @@ Either<Tuple7<A, B, C, D, E, F, G>, T> mergeLeft7<T, A, B, C, D, E, F, G>(
   );
 }
 
-Either<T, Tuple8<A, B, C, D, E, F, G, H>>
-    mergeRight8<T, A, B, C, D, E, F, G, H>(
-        {required Either<T, A> Function() first,
-        required Either<T, B> Function() second,
-        required Either<T, C> Function() third,
-        required Either<T, D> Function() fourth,
-        required Either<T, E> Function() fifth,
-        required Either<T, F> Function() sixth,
-        required Either<T, G> Function() seventh,
-        required Either<T, H> Function() eighth}) {
+Either<T, Tuple8<A, B, C, D, E, F, G, H>> mergeRight8<T, A, B, C, D, E, F, G, H>(
+    {required Either<T, A> Function() first,
+    required Either<T, B> Function() second,
+    required Either<T, C> Function() third,
+    required Either<T, D> Function() fourth,
+    required Either<T, E> Function() fifth,
+    required Either<T, F> Function() sixth,
+    required Either<T, G> Function() seventh,
+    required Either<T, H> Function() eighth}) {
   return first().consume(
     onRight: (firstValue) => second().consume(
       onRight: (secondValue) => third().consume(
@@ -357,8 +352,7 @@ Either<T, Tuple8<A, B, C, D, E, F, G, H>>
             onRight: (fifthValue) => sixth().consume(
               onRight: (sixthValue) => seventh().consume(
                 onRight: (seventhValue) => eighth().consume(
-                  onRight: (eighthValue) =>
-                      Either.right(Tuple8<A, B, C, D, E, F, G, H>(
+                  onRight: (eighthValue) => Either.right(Tuple8<A, B, C, D, E, F, G, H>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
@@ -411,8 +405,7 @@ Either<Tuple8<A, B, C, D, E, F, G, H>, T> mergeLeft8<T, A, B, C, D, E, F, G, H>(
                 onRight: (value) => Either.right(value),
                 onLeft: (seventhValue) => eighth().consume(
                   onRight: (value) => Either.right(value),
-                  onLeft: (eighthValue) =>
-                      Either.left(Tuple8<A, B, C, D, E, F, G, H>(
+                  onLeft: (eighthValue) => Either.left(Tuple8<A, B, C, D, E, F, G, H>(
                     first: firstValue,
                     second: secondValue,
                     third: thirdValue,
@@ -432,17 +425,16 @@ Either<Tuple8<A, B, C, D, E, F, G, H>, T> mergeLeft8<T, A, B, C, D, E, F, G, H>(
   );
 }
 
-Either<T, Tuple9<A, B, C, D, E, F, G, H, I>>
-    mergeRight9<T, A, B, C, D, E, F, G, H, I>(
-        {required Either<T, A> Function() first,
-        required Either<T, B> Function() second,
-        required Either<T, C> Function() third,
-        required Either<T, D> Function() fourth,
-        required Either<T, E> Function() fifth,
-        required Either<T, F> Function() sixth,
-        required Either<T, G> Function() seventh,
-        required Either<T, H> Function() eighth,
-        required Either<T, I> Function() ninth}) {
+Either<T, Tuple9<A, B, C, D, E, F, G, H, I>> mergeRight9<T, A, B, C, D, E, F, G, H, I>(
+    {required Either<T, A> Function() first,
+    required Either<T, B> Function() second,
+    required Either<T, C> Function() third,
+    required Either<T, D> Function() fourth,
+    required Either<T, E> Function() fifth,
+    required Either<T, F> Function() sixth,
+    required Either<T, G> Function() seventh,
+    required Either<T, H> Function() eighth,
+    required Either<T, I> Function() ninth}) {
   return first().consume(
     onRight: (firstValue) => second().consume(
       onRight: (secondValue) => third().consume(
@@ -452,8 +444,7 @@ Either<T, Tuple9<A, B, C, D, E, F, G, H, I>>
               onRight: (sixthValue) => seventh().consume(
                 onRight: (seventhValue) => eighth().consume(
                   onRight: (eighthValue) => ninth().consume(
-                    onRight: (ninthValue) =>
-                        Either.right(Tuple9<A, B, C, D, E, F, G, H, I>(
+                    onRight: (ninthValue) => Either.right(Tuple9<A, B, C, D, E, F, G, H, I>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
@@ -484,17 +475,16 @@ Either<T, Tuple9<A, B, C, D, E, F, G, H, I>>
   );
 }
 
-Either<Tuple9<A, B, C, D, E, F, G, H, I>, T>
-    mergeLeft9<T, A, B, C, D, E, F, G, H, I>(
-        {required Either<A, T> Function() first,
-        required Either<B, T> Function() second,
-        required Either<C, T> Function() third,
-        required Either<D, T> Function() fourth,
-        required Either<E, T> Function() fifth,
-        required Either<F, T> Function() sixth,
-        required Either<G, T> Function() seventh,
-        required Either<H, T> Function() eighth,
-        required Either<I, T> Function() ninth}) {
+Either<Tuple9<A, B, C, D, E, F, G, H, I>, T> mergeLeft9<T, A, B, C, D, E, F, G, H, I>(
+    {required Either<A, T> Function() first,
+    required Either<B, T> Function() second,
+    required Either<C, T> Function() third,
+    required Either<D, T> Function() fourth,
+    required Either<E, T> Function() fifth,
+    required Either<F, T> Function() sixth,
+    required Either<G, T> Function() seventh,
+    required Either<H, T> Function() eighth,
+    required Either<I, T> Function() ninth}) {
   return first().consume(
     onRight: (value) => Either.right(value),
     onLeft: (firstValue) => second().consume(
@@ -513,8 +503,7 @@ Either<Tuple9<A, B, C, D, E, F, G, H, I>, T>
                   onRight: (value) => Either.right(value),
                   onLeft: (eighthValue) => ninth().consume(
                     onRight: (value) => Either.right(value),
-                    onLeft: (ninthValue) =>
-                        Either.left(Tuple9<A, B, C, D, E, F, G, H, I>(
+                    onLeft: (ninthValue) => Either.left(Tuple9<A, B, C, D, E, F, G, H, I>(
                       first: firstValue,
                       second: secondValue,
                       third: thirdValue,
