@@ -42,6 +42,21 @@ mixin MutableInputContainer on InputContainer {
     replaceInput(result);
   }
 
+  void mutateInput<T>(
+    T mutate(T? value), {
+    required String name,
+    bool pure = false,
+  }) {
+    final input = getInput<Input<T, dynamic>>(name);
+    final result = input.copyWith(value: mutate(input.value), pure: pure);
+
+    assert(
+      result.runtimeType == input.runtimeType,
+      'The input $name was ${input.runtimeType} but after the mutation it was ${result.runtimeType}',
+    );
+    replaceInput(result);
+  }
+
   @protected
   @visibleForTesting
   void updateInput<T extends Input>({
