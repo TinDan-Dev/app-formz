@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../utils/extensions.dart';
-import 'either/either.dart';
-import 'either_future/either_future.dart';
+import '../../utils/extensions.dart';
+import '../either/either.dart';
+import '../either_future/either_future.dart';
 
 typedef Result<T> = Either<Failure, T>;
 typedef ResultFuture<T> = EitherFuture<Failure, T>;
@@ -66,17 +66,5 @@ Future<Result<T>> runCatchingAsync<T>({
     return Result.right(await action());
   } catch (e, s) {
     return Result.left(onError(e, s));
-  }
-}
-
-extension ResultIterableHelper<T> on Iterable<T> {
-  Result<T> firstWhereOrResult(bool test(T element), {required Result<T> orElse()}) {
-    for (final element in this) {
-      if (test(element)) {
-        return Result.right(element);
-      }
-    }
-
-    return orElse();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'functional/result.dart';
+import 'functional/result/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
 import 'utils/extensions.dart';

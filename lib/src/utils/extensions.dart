@@ -27,3 +27,9 @@ extension ObjectExtension<T> on T? {
       return value;
   }
 }
+
+extension BoolExtension on bool {
+  T? ifTrue<T>(T? value) => this ? value : null;
+
+  T? ifFalse<T>(T? value) => this ? null : value;
+}

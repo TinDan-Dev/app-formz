@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import '../functional/result.dart';
+import '../functional/result/result.dart';
 import 'cancellation_token.dart';
 
 bool _defaultShouldContinue(_) => true;

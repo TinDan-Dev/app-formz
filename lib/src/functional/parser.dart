@@ -1,6 +1,6 @@
 import 'correction_functions.dart';
 import 'either/either.dart';
-import 'result.dart';
+import 'result/result.dart';
 import 'validation_functions.dart';
 
 class ParserFailure<T> extends Failure {

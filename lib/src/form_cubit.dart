@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'attachments.dart';
 import 'form_state.dart';
-import 'functional/result.dart';
+import 'functional/result/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
 

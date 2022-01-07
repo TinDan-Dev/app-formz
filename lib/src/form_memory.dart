@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'form_cubit.dart';
-import 'functional/result.dart';
+import 'functional/result/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
 
