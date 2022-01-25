@@ -28,7 +28,16 @@ extension ObjectExtension<T> on T? {
   }
 }
 
+extension BoolNullExtension on bool? {
+  T bFold<T>(T ifNull(), {required T ifTrue(), required T ifFalse()}) => fold(
+        ifNull,
+        (some) => some.bFold(ifTrue, ifFalse),
+      );
+}
+
 extension BoolExtension on bool {
+  T bFold<T>(T ifTrue(), T ifFalse()) => this ? ifTrue() : ifFalse();
+
   T? ifTrue<T>(T? value) => this ? value : null;
 
   T? ifFalse<T>(T? value) => this ? null : value;

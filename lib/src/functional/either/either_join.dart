@@ -4,8 +4,8 @@ import 'package:equatable/equatable.dart';
 
 import '../../../formz.tuple.dart';
 import '../../utils/lazy.dart';
-import '../either_future/either_future.dart';
 import 'either.dart';
+import 'either_future.dart';
 
 /// Joins the left side of one [Either] (L) with the left side of another
 /// [Either] (S). The other Either is only invoked if the first one is left.
@@ -61,13 +61,13 @@ class _JoinRightEither<S, L, R> extends Equatable implements Either<L, Tuple<R, 
 
 /// Joins the left side of one [Either] (L) with the left side of another
 /// [Future<Either>] (S). The other Either is only invoked if the first one is left.
-class _JoinAsyncLeftEither<S, L, R> implements EitherFuture<Tuple<L, S>, R> {
+class _JoinAsyncLeftEither<S, L, R> extends EitherFuture<Tuple<L, S>, R> {
   final Either<L, R> source;
-  final LazyFuture<EitherFuture<S, R>> _joiningLazy;
+  final LazyFuture<Either<S, R>> _joiningLazy;
 
   _JoinAsyncLeftEither({
     required this.source,
-    required FutureOr<EitherFuture<S, R>> joining(),
+    required FutureOr<Either<S, R>> joining(),
   }) : _joiningLazy = LazyFuture(joining);
 
   @override
@@ -87,13 +87,13 @@ class _JoinAsyncLeftEither<S, L, R> implements EitherFuture<Tuple<L, S>, R> {
 
 /// Joins the right side of one [Either] (R) with the right side of another
 /// [Future<Either>] (S). The other Either is only invoked if the first one is right.
-class _JoinAsyncRightEither<S, L, R> implements EitherFuture<L, Tuple<R, S>> {
+class _JoinAsyncRightEither<S, L, R> extends EitherFuture<L, Tuple<R, S>> {
   final Either<L, R> source;
-  final LazyFuture<EitherFuture<L, S>> _joiningLazy;
+  final LazyFuture<Either<L, S>> _joiningLazy;
 
   _JoinAsyncRightEither({
     required this.source,
-    required FutureOr<EitherFuture<L, S>> joining(),
+    required FutureOr<Either<L, S>> joining(),
   }) : _joiningLazy = LazyFuture(joining);
 
   @override
@@ -134,7 +134,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  EitherFuture<Tuple<L, S>, R> joinLeftAsync<S>(FutureOr<EitherFuture<S, R>> other()) =>
+  Future<Either<Tuple<L, S>, R>> joinLeftAsync<S>(FutureOr<Either<S, R>> other()) =>
       _JoinAsyncLeftEither(source: this, joining: other);
 
   /// Joins the right side of one [Either] (R) with the right side of another
@@ -143,7 +143,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  EitherFuture<L, Tuple<R, S>> joinRightAsync<S>(FutureOr<EitherFuture<L, S>> other()) =>
+  Future<Either<L, Tuple<R, S>>> joinRightAsync<S>(FutureOr<Either<L, S>> other()) =>
       _JoinAsyncRightEither(source: this, joining: other);
 }
 
@@ -170,7 +170,7 @@ extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  Future<EitherFuture<Tuple<L, S>, R>> joinLeftAsync<S>(FutureOr<EitherFuture<S, R>> other()) async =>
+  Future<Either<Tuple<L, S>, R>> joinLeftAsync<S>(FutureOr<Either<S, R>> other()) async =>
       (await this).joinLeftAsync(other);
 
   /// Joins the right side of one [Either] (R) with the right side of another
@@ -179,6 +179,6 @@ extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  Future<EitherFuture<L, Tuple<R, S>>> joinRightAsync<S>(FutureOr<EitherFuture<L, S>> other()) async =>
+  Future<Either<L, Tuple<R, S>>> joinRightAsync<S>(FutureOr<Either<L, S>> other()) async =>
       (await this).joinRightAsync(other);
 }

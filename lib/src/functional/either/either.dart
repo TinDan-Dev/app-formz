@@ -93,7 +93,8 @@ extension EitherExtension<L, R> on Either<L, R> {
 }
 
 extension FutureOfEitherExtension<L, R> on FutureOr<Either<L, R>> {
-  Future<T> consume<T>({required T onLeft(L value), required T onRight(R value)}) async => (await this).consume(
+  Future<T> consume<T>({required FutureOr<T> onLeft(L value), required FutureOr<T> onRight(R value)}) async =>
+      (await this).consume(
         onLeft: onLeft,
         onRight: onRight,
       );

@@ -56,7 +56,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
 
   void setFailure(Failure? failure) => emit(state.copyWith(failure: () => failure));
 
-  Future<Result<void>> submit(FutureOr<ResultFuture<void>> action()) async {
+  Future<Result<void>> submit(FutureOr<Result<void>> action()) async {
     assert(!state.submission, 'Another submission is currently in progress');
     unfocusAll();
 

@@ -27,7 +27,7 @@ class FormWidget<Cubit extends FormCubit> extends StatefulWidget {
 class _FormWidgetState<Cubit extends FormCubit> extends State<FormWidget<Cubit>> {
   Widget _buildForm(BuildContext context) {
     final cubit = context.read<Cubit>();
-    var child = widget.child;
+    Widget child = Padding(padding: widget.padding, child: widget.child);
 
     if (widget.scroll) {
       child = SingleChildScrollView(
@@ -45,7 +45,8 @@ class _FormWidgetState<Cubit extends FormCubit> extends State<FormWidget<Cubit>>
         ),
       );
     }
-    return Padding(padding: widget.padding, child: child);
+
+    return child;
   }
 
   @override

@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../../utils/extensions.dart';
 import '../either/either.dart';
-import '../either_future/either_future.dart';
+import '../either/either_future.dart';
 
 typedef Result<T> = Either<Failure, T>;
 typedef ResultFuture<T> = EitherFuture<Failure, T>;
+typedef ResultFutureMixin<T> = EitherFutureMixin<Failure, T>;
 
 class Failure {
   static String Function(BuildContext context)? defaultLocalization;
