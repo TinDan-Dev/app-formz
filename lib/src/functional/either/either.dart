@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 
 abstract class Either<L, R> {
-  const factory Either.left(L value) = _Left;
+  const factory Either.left(L value) = _Left<L, R>;
 
-  const factory Either.right(R value) = _Right;
+  const factory Either.right(R value) = _Right<L, R>;
 
   T consume<T>({required T onRight(R value), required T onLeft(L value)});
 }

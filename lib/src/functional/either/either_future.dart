@@ -10,9 +10,9 @@ typedef EitherFutureMixin<L, R> = DelegatingFuture<Either<L, R>>;
 abstract class EitherFuture<L, R> with DelegatingFuture<Either<L, R>> {
   const EitherFuture();
 
-  const factory EitherFuture.left(FutureOr<L> value) = _Left;
+  const factory EitherFuture.left(FutureOr<L> value) = _Left<L, R>;
 
-  const factory EitherFuture.right(FutureOr<R> value) = _Right;
+  const factory EitherFuture.right(FutureOr<R> value) = _Right<L, R>;
 
   Future<T> consume<T>({required FutureOr<T> onRight(R value), required FutureOr<T> onLeft(L value)});
 
