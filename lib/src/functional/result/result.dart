@@ -17,11 +17,11 @@ class Failure {
   final Object? cause;
   final StackTrace? trace;
 
-  const Failure({
+  Failure({
     required this.message,
     this.cause,
     this.trace,
-  });
+  }) : assert(cause is! AssertionError, 'Failure of assertion error: ${cause.message}\n\n${cause.stackTrace}');
 
   @override
   String toString() {
