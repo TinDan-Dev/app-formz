@@ -25,7 +25,7 @@ class Failure {
 
   @override
   String toString() {
-    final builder = StringBuffer('Failure ($runtimeType):\n');
+    final builder = StringBuffer('Failure ($runtimeType): $message\n');
 
     cause.let((some) => builder.writeln('Caused by: $some'));
     trace.let((some) => builder.writeln('Trace: $some'));

@@ -34,8 +34,9 @@ class GenAsset {
   const GenAsset({required this.location});
 }
 
-class MockClass {
-  const MockClass._();
-}
+class Parser {
+  final Type target;
+  final Type source;
 
-const mockClass = MockClass._();
+  const Parser({required this.target, required this.source});
+}

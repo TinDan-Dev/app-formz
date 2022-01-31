@@ -231,11 +231,9 @@ packages:
   formz_test:
     dependency: "direct dev"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: dd651d18581c2cabbd3b21b4515432131435e83d
-      url: "https://git@github.com/TinDan-Dev/app-formz-test.git"
-    source: git
+      path: "../app-formz-test"
+      relative: true
+    source: path
     version: "1.0.4"
   freezed:
     dependency: "direct dev"
@@ -315,7 +313,7 @@ packages:
     source: hosted
     version: "1.0.1"
   matcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: matcher
       url: "https://pub.dartlang.org"
@@ -593,5 +591,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.15.0 <3.0.0"
   flutter: ">=1.16.0"
