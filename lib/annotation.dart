@@ -33,10 +33,3 @@ class GenAsset {
 
   const GenAsset({required this.location});
 }
-
-class Parser {
-  final Type target;
-  final Type source;
-
-  const Parser({required this.target, required this.source});
-}

@@ -35,20 +35,20 @@ class CriteriaResult extends Equatable {
 
 class GenericCriteria<T> extends Equatable {
   final List<GenericCriteria<T>> ifValid;
-  final ValidationFunc<T> validate;
+  final Matcher matcher;
   final Object? key;
 
   final LocalFunc? localize;
 
   const GenericCriteria({
     required this.ifValid,
-    required this.validate,
+    required this.matcher,
     this.key,
     this.localize,
   });
 
   CriteriaResult _validateCriteria(T? value) {
-    if (!validate(value)) return CriteriaResult._failureFrom(criteria: this);
+    if (!matcher.matches(value, {})) return CriteriaResult._failureFrom(criteria: this);
 
     return ifValid
         .map((e) => e._validateCriteria(value))
@@ -56,7 +56,7 @@ class GenericCriteria<T> extends Equatable {
   }
 
   @override
-  List<Object?> get props => [ifValid, validate, key, localize];
+  List<Object?> get props => [ifValid, matcher, key, localize];
 }
 
 class GenericCastCriteria<T, S> extends GenericCriteria<T> {
@@ -71,13 +71,10 @@ class GenericCastCriteria<T, S> extends GenericCriteria<T> {
     LocalFunc? localize,
   }) : super(
           ifValid: ifValid,
-          validate: (_) => false,
+          matcher: anything,
           key: key,
           localize: localize,
         );
-
-  @override
-  ValidationFunc<T> get validate => (value) => cast(value) != null;
 
   @override
   CriteriaResult _validateCriteria(T? value) {
@@ -113,13 +110,10 @@ class GenericBinaryCriteria<T> extends GenericCriteria<T> {
     Object? key,
   }) : super(
           ifValid: ifValid,
-          validate: (_) => false,
+          matcher: anything,
           key: key,
           localize: localize,
         );
-
-  @override
-  ValidationFunc<T> get validate => (value) => _validateCriteria(value).success;
 
   @override
   CriteriaResult _validateCriteria(T? value) {
@@ -140,7 +134,7 @@ abstract class GenericBuilder<T> {
 class GenericCriteriaBuilder<T> extends GenericBuilder<T> {
   final List<GenericCriteria<T>> _ifValid = [];
 
-  ValidationFunc<T>? _validate;
+  Matcher? _matcher;
   LocalFunc? _localize;
   Object? _key;
 
@@ -148,7 +142,7 @@ class GenericCriteriaBuilder<T> extends GenericBuilder<T> {
 
   void localize(LocalFunc func) => _localize = func;
 
-  void validate(ValidationFunc<T> func) => _validate = func;
+  void validate(Object? object) => _matcher = wrapMatcher(object);
 
   void ifValid(GenericBuilder<T> builder) => _ifValid.add(builder._build());
 
@@ -156,11 +150,11 @@ class GenericCriteriaBuilder<T> extends GenericBuilder<T> {
 
   @override
   GenericCriteria<T> _build() {
-    if (_validate == null) throw StateError('A validation function is required');
+    if (_matcher == null) throw StateError('A validation matcher is required');
 
     return GenericCriteria(
       ifValid: _ifValid,
-      validate: _validate!,
+      matcher: _matcher!,
       key: _key,
       localize: _localize,
     );

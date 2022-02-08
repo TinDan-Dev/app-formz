@@ -1,5 +1,7 @@
 library formz;
 
+export 'package:matcher/matcher.dart';
+
 export 'annotation.dart';
 export 'formz.merge.dart';
 export 'formz.tuple.dart';
@@ -7,17 +9,17 @@ export 'src/attachments.dart';
 export 'src/form_cubit.dart';
 export 'src/form_memory.dart';
 export 'src/form_state.dart';
-export 'src/functional/correction_functions.dart';
 export 'src/functional/either/either.dart';
 export 'src/functional/either/either_future.dart';
 export 'src/functional/either/either_iterable.dart';
 export 'src/functional/either/either_join.dart';
 export 'src/functional/either/either_map.dart';
 export 'src/functional/either/either_stream.dart';
+export 'src/functional/parser/exception.dart';
+export 'src/functional/parser/manual.dart';
+export 'src/functional/parser/validator.dart';
 export 'src/functional/result/result.dart';
 export 'src/functional/result/result_iterable.dart';
-export 'src/functional/validation/validator.dart' show Validator, Rule, RuleCreationExtension;
-export 'src/functional/validation_functions.dart';
 export 'src/functional/widgets/either_builder.dart';
 export 'src/functional/widgets/result_widgets.dart';
 export 'src/input/check_box_input.dart';
