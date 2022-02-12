@@ -27,6 +27,7 @@ export 'src/input/date_input.dart';
 export 'src/input/generic/generic_input.dart';
 export 'src/input/input.dart';
 export 'src/input/select_input.dart';
+export 'src/matcher/joined.dart';
 export 'src/utils/after_init.dart';
 export 'src/utils/cancellation_token.dart';
 export 'src/utils/lazy.dart';

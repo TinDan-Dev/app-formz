@@ -48,9 +48,9 @@ abstract class Validator<Source> {
 
   IfAllRule<Source> whenAll(
     List<Rule<Source, dynamic, dynamic>> rules,
-    List<Rule<Source, dynamic, dynamic>> fiTrue,
+    List<Rule<Source, dynamic, dynamic>> ifTrue,
   ) =>
-      IfAllRule(rules, fiTrue, null);
+      IfAllRule(rules, ifTrue, null);
 
   Rule<Source, void, void> assign<T>(String name, T value) => _SetRule<Source, T>(name, value);
 

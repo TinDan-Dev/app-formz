@@ -110,7 +110,7 @@ void main() {
     test('should update the failure when a failure was passed in', () {
       final state = FormState([pureInputState]);
 
-      final result = state.copyWith(failure: () => const FakeFailure());
+      final result = state.copyWith(failure: () => FakeFailure());
 
       expect(result.failure, isNotNull);
     });

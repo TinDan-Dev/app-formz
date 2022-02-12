@@ -232,21 +232,34 @@ class IfAllRule<Source> extends Rule<Source, Map<String, dynamic>, Map<String, d
   }
 
   Map<String, dynamic> _executeThis(Source source) {
-    return _executeRules(source, rules).consume(onRight: (_) {
-      return _executeRules(source, ifTrue).consume(
-        onRight: (result) => result,
-        onLeft: (failure) => throw failure,
-      );
-    }, onLeft: (_) {
+    final results = <String, dynamic>{};
+
+    try {
+      for (final entry in rules) {
+        if (entry is NestedRules<Source, dynamic>) {
+          results.addAll(entry.execute(source));
+        } else {
+          final result = entry.execute(source);
+          entry.name.let((some) => results[some] = result);
+        }
+      }
+    } on ViolationFailure {
       if (ifFalse != null) {
-        return _executeRules(source, ifFalse!).consume(
-          onRight: (result) => result,
+        _executeRules(source, ifFalse!).consume(
+          onRight: results.addAll,
           onLeft: (failure) => throw failure,
         );
-      } else {
-        return const {};
       }
-    });
+
+      return results;
+    }
+
+    _executeRules(source, ifTrue).consume(
+      onRight: results.addAll,
+      onLeft: (failure) => throw failure,
+    );
+
+    return results;
   }
 
   Rule<Source, void, void> orElse(List<Rule<Source, dynamic, dynamic>> ifFalse) =>

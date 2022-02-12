@@ -12,8 +12,8 @@ class Lazy<T> {
 
   T get value {
     if (!_evaluated) {
-      _evaluated = true;
       _value = _provider();
+      _evaluated = true;
     }
     return _value;
   }

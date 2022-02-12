@@ -10,7 +10,7 @@ extension NullRuleExtension<Source, T> on Rule<Source, dynamic, T?> {
 }
 
 extension RuleExtension<Source, T> on Rule<Source, dynamic, T> {
-  Rule<Source, T, R> map<R>(R map(T value)) => _MapRule<Source, T, R>(map, child: this);
+  Rule<Source, T, R> map<R>(R map(T v)) => _MapRule<Source, T, R>(map, child: this);
 
   Rule<Source, T, R> parser<R>(Parser<T, R> parser) => _ParserRule<Source, T, R>(parser, child: this);
 
@@ -19,7 +19,7 @@ extension RuleExtension<Source, T> on Rule<Source, dynamic, T> {
 
   Rule<Source, T, T> match(Object? matcher) => _MatchRule<Source, T>(wrapMatcher(matcher), child: this);
 
-  Rule<Source, T, T> check(bool predicate(T value)) => _CheckRule<Source, T>(predicate, child: this);
+  Rule<Source, T, T> check(bool predicate(T v)) => _CheckRule<Source, T>(predicate, child: this);
 
   Rule<Source, T, T> validator(Validator<T> validator) => _ValidatorRule<Source, T>(validator, child: this);
 
