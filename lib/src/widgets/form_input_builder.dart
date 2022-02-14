@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../form_cubit.dart';
 import '../form_state.dart';
-import '../input/input.dart';
+import '../functional/result/result.dart';
 import '../utils/extensions.dart';
 
 class FormInputState<T> {
@@ -20,9 +20,9 @@ class FormInputState<T> {
   });
 }
 
-class FormInputBuilder<Cubit extends FormCubit, T, E> extends StatelessWidget {
+class FormInputBuilder<Cubit extends FormCubit, T> extends StatelessWidget {
   final String name;
-  final String Function(E error)? mapError;
+  final String Function(Failure error)? mapError;
   final Widget Function(BuildContext context, FormInputState<T> state) builder;
 
   const FormInputBuilder({
@@ -38,12 +38,12 @@ class FormInputBuilder<Cubit extends FormCubit, T, E> extends StatelessWidget {
       buildWhen: (previous, current) =>
           previous.getInput(name) != current.getInput(name) || previous.submission != current.submission,
       builder: (context, state) {
-        final input = state.getInput<Input<T, E>>(name);
+        final input = state.getInput<T>(name);
 
         final inputState = FormInputState._(
           value: input.value,
           enabled: !state.submission,
-          error: input.error.let((some) => mapError?.call(some)),
+          error: input.failure.let((some) => mapError?.call(some)),
           pure: input.pure,
         );
 

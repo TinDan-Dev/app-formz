@@ -100,6 +100,18 @@ class _MapRule<Source, T, R> extends Rule<Source, T, R> {
   R validate(T value) => mapDelegate(value);
 }
 
+class _TryMapRule<Source, T, R> extends Rule<Source, T, R> {
+  final Result<R> Function(T value) mapDelegate;
+
+  const _TryMapRule(this.mapDelegate, {Rule<Source, dynamic, T>? child}) : super(child);
+
+  @override
+  R validate(T value) => mapDelegate(value).consume(
+        onRight: (value) => value,
+        onLeft: (failure) => throw ViolationFailure('Map field', field: name, cause: failure),
+      );
+}
+
 class _MatchRule<Source, T> extends Rule<Source, T, T> {
   final Matcher matcher;
 
@@ -369,4 +381,26 @@ class _ApplyRule<Source, T, R> extends Rule<Source, T, R> {
 
   @override
   R validate(T value) => rule.execute(value);
+}
+
+class _LocalizeRule<Source, T> extends Rule<Source, T, T> {
+  final LocalizationsDelegate localizationsDelegate;
+
+  const _LocalizeRule(this.localizationsDelegate, {Rule<Source, dynamic, T>? child}) : super(child);
+
+  @override
+  T execute(Source source) {
+    try {
+      return super.execute(source);
+    } on ViolationFailure catch (e) {
+      if (e.localizationsDelegate != null) {
+        rethrow;
+      }
+
+      throw e.setLocalization(localizationsDelegate);
+    }
+  }
+
+  @override
+  T validate(T value) => value;
 }

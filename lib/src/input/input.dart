@@ -1,49 +1,47 @@
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
+import '../functional/either/either.dart';
+import '../functional/result/result.dart';
 import '../utils/lazy.dart';
+
+typedef ValidationDelegate<T> = Result<void> Function(T? input);
 
 // Using lazy validation to improve performance, thus this class is still immutable but the validation function is only called
 // once. The mixin is used to avoid immutable warnings.
-abstract class Input<T, E> with EquatableMixin {
+class Input<T> extends Equatable {
+  final ValidationDelegate<T> delegate;
+
   final bool _pure;
   final T? value;
   final String name;
 
-  late final Lazy<E?> _validate;
+  final Lazy<Result<void>> _validate;
 
-  Input._({
+  Input._(
+    this.delegate, {
     required this.value,
     required bool pure,
     required this.name,
-  }) : _pure = pure {
-    _validate = Lazy(() => validate(value));
-  }
+  })  : _pure = pure,
+        _validate = Lazy(() => delegate(value));
 
-  Input.pure(T? value, String name)
-      : this._(
-          value: value,
-          pure: true,
-          name: name,
-        );
+  Input.create(
+    ValidationDelegate<T> delegate, {
+    required String name,
+    T? value,
+    bool pure = true,
+  }) : this._(delegate, value: value, pure: pure, name: name);
 
-  Input.dirty(T? value, String name)
-      : this._(
-          value: value,
-          pure: false,
-          name: name,
-        );
+  Input<T> copyWith({required T? value, bool pure = false}) => Input._(
+        delegate,
+        value: value,
+        pure: pure,
+        name: name,
+      );
 
-  @protected
-  E? validate(T? input);
+  Failure? get failure => pure ? null : _validate.value.leftOrNull();
 
-  Input<T, E> copyWith({required T? value, bool pure = false});
-
-  Input<T, E> pureCopy() => copyWith(value: value, pure: true);
-
-  E? get error => pure ? null : _validate.value;
-
-  bool get valid => _validate.value == null;
+  bool get valid => _validate.value.right;
 
   bool get optional => false;
 
@@ -55,16 +53,25 @@ abstract class Input<T, E> with EquatableMixin {
 
   @override
   String toString() {
-    return '$runtimeType: { value: $value, valid: $valid, pure: $pure, error: $error}';
+    return '$runtimeType: { value: $value, valid: $valid, pure: $pure, failure: $failure}';
   }
 }
 
-mixin OptionalInputMixin<T, E> on Input<T, E> {
-  @protected
-  bool isPure(T? input);
+typedef PureDelegate<T> = bool Function(T? input);
+
+class OptionalInput<T> extends Input<T> {
+  final PureDelegate<T?> pureDelegate;
+
+  OptionalInput.create(
+    ValidationDelegate<T> delegate, {
+    required this.pureDelegate,
+    required String name,
+    T? value,
+    bool pure = true,
+  }) : super._(delegate, value: value, pure: pure, name: name);
 
   @override
-  bool get pure => super.pure || isPure(value);
+  bool get pure => super.pure || pureDelegate(value);
 
   @override
   bool get optional => true;

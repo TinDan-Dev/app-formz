@@ -16,6 +16,7 @@ abstract class EitherFuture<L, R> with DelegatingFuture<Either<L, R>> {
 
   Future<T> consume<T>({required FutureOr<T> onRight(R value), required FutureOr<T> onLeft(L value)});
 
+  @override
   Future<Either<L, R>> get future => consume(
         onLeft: (value) => Either.left(value),
         onRight: (value) => Either.right(value),

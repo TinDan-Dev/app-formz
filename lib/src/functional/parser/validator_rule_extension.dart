@@ -12,6 +12,8 @@ extension NullRuleExtension<Source, T> on Rule<Source, dynamic, T?> {
 extension RuleExtension<Source, T> on Rule<Source, dynamic, T> {
   Rule<Source, T, R> map<R>(R map(T v)) => _MapRule<Source, T, R>(map, child: this);
 
+  Rule<Source, T, R> tryMap<R>(Result<R> map(T v)) => _TryMapRule<Source, T, R>(map, child: this);
+
   Rule<Source, T, R> parser<R>(Parser<T, R> parser) => _ParserRule<Source, T, R>(parser, child: this);
 
   Rule<Source, T, R> apply<R>(Rule<T, dynamic, R> createRule(SourceRule<T> rule)) =>
@@ -22,6 +24,9 @@ extension RuleExtension<Source, T> on Rule<Source, dynamic, T> {
   Rule<Source, T, T> check(bool predicate(T v)) => _CheckRule<Source, T>(predicate, child: this);
 
   Rule<Source, T, T> validator(Validator<T> validator) => _ValidatorRule<Source, T>(validator, child: this);
+
+  Rule<Source, T, T> localize<L>(LocalizationsDelegate<L> delegate) =>
+      _LocalizeRule((context) => delegate(context as L), child: this);
 
   Rule<Source, void, void> fallback(T fallback(Source s)) => _FallbackRule<Source, T>(fallback, child: this);
 

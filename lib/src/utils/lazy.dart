@@ -5,7 +5,7 @@ import 'mutex.dart';
 class Lazy<T> {
   final T Function() _provider;
 
-  late bool _evaluated;
+  bool _evaluated;
   late T _value;
 
   Lazy(this._provider) : _evaluated = false;

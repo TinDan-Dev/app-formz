@@ -50,10 +50,11 @@ class FormState extends Equatable with InputContainer {
   bool _isValid() {
     final inputsValid = _inputs.every((e) => e.valid || (e.optional && e.pure));
 
-    if (inputsValid)
+    if (inputsValid) {
       return _criteria.every((e) => e(this));
-    else
+    } else {
       return false;
+    }
   }
 
   bool get pure => _pure.value;

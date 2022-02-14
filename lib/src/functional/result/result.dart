@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import '../../utils/extensions.dart';
 import '../either/either.dart';
 import '../either/either_future.dart';
@@ -10,8 +8,10 @@ typedef Result<T> = Either<Failure, T>;
 typedef ResultFuture<T> = EitherFuture<Failure, T>;
 typedef ResultFutureMixin<T> = EitherFutureMixin<Failure, T>;
 
+typedef LocalizationsDelegate<T> = String Function(T context);
+
 class Failure {
-  static String Function(BuildContext context)? defaultLocalization;
+  static LocalizationsDelegate? defaultLocalization;
 
   final String message;
   final Object? cause;
@@ -33,7 +33,7 @@ class Failure {
     return builder.toString();
   }
 
-  String localize(BuildContext context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
+  String localize(dynamic context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
 
   Failure copyWith({
     String message()?,
