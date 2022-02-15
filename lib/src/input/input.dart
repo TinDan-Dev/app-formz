@@ -4,39 +4,34 @@ import '../functional/either/either.dart';
 import '../functional/result/result.dart';
 import '../utils/lazy.dart';
 
-typedef ValidationDelegate<T> = Result<void> Function(T? input);
+part 'input_identifier.dart';
+
+typedef ValidationDelegate<T> = Result<void> Function(T input);
 
 // Using lazy validation to improve performance, thus this class is still immutable but the validation function is only called
 // once. The mixin is used to avoid immutable warnings.
-class Input<T> extends Equatable {
+class Input<T> extends Equatable implements Result<void> {
   final ValidationDelegate<T> delegate;
 
   final bool _pure;
-  final T? value;
-  final String name;
+  final T value;
+  final InputIdentifier<T> id;
 
   final Lazy<Result<void>> _validate;
 
-  Input._(
+  Input(
     this.delegate, {
     required this.value,
+    required this.id,
     required bool pure,
-    required this.name,
   })  : _pure = pure,
         _validate = Lazy(() => delegate(value));
 
-  Input.create(
-    ValidationDelegate<T> delegate, {
-    required String name,
-    T? value,
-    bool pure = true,
-  }) : this._(delegate, value: value, pure: pure, name: name);
-
-  Input<T> copyWith({required T? value, bool pure = false}) => Input._(
+  Input<T> copyWith({required T value, bool pure = false}) => Input<T>(
         delegate,
         value: value,
         pure: pure,
-        name: name,
+        id: id,
       );
 
   Failure? get failure => pure ? null : _validate.value.leftOrNull();
@@ -49,12 +44,16 @@ class Input<T> extends Equatable {
 
   @override
   // uses the final pure to ensure the equality does not change
-  List<Object?> get props => [_pure, value, name];
+  List<Object?> get props => [_pure, value, id];
 
   @override
   String toString() {
     return '$runtimeType: { value: $value, valid: $valid, pure: $pure, failure: $failure}';
   }
+
+  @override
+  S consume<S>({required S onRight(void value), required S onLeft(Failure value)}) =>
+      _validate.value.consume(onRight: onRight, onLeft: onLeft);
 }
 
 typedef PureDelegate<T> = bool Function(T? input);
@@ -62,13 +61,13 @@ typedef PureDelegate<T> = bool Function(T? input);
 class OptionalInput<T> extends Input<T> {
   final PureDelegate<T?> pureDelegate;
 
-  OptionalInput.create(
+  OptionalInput(
     ValidationDelegate<T> delegate, {
     required this.pureDelegate,
-    required String name,
-    T? value,
+    required InputIdentifier<T> id,
+    required T value,
     bool pure = true,
-  }) : super._(delegate, value: value, pure: pure, name: name);
+  }) : super(delegate, value: value, pure: pure, id: id);
 
   @override
   bool get pure => super.pure || pureDelegate(value);

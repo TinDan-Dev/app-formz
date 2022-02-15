@@ -10,7 +10,7 @@ typedef ResultFutureMixin<T> = EitherFutureMixin<Failure, T>;
 
 typedef LocalizationsDelegate<T> = String Function(T context);
 
-class Failure {
+class Failure<R> implements Result<R> {
   static LocalizationsDelegate? defaultLocalization;
 
   final String message;
@@ -46,6 +46,9 @@ class Failure {
       trace: trace.fold(() => this.trace, (some) => some()),
     );
   }
+
+  @override
+  T consume<T>({required T onRight(R _), required T onLeft(Failure value)}) => onLeft(this);
 }
 
 Result<T> runCatching<T>({

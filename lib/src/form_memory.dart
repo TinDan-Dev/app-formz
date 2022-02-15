@@ -15,14 +15,16 @@ class FormMemory with InputContainer {
   @override
   Iterable<Input> get inputs => _inputs;
 
-  void save<T extends Input>(T input) {
-    _inputs.removeWhere((e) => e.name == input.name);
+  void save(Input input) {
+    _inputs.removeWhere((e) => e.id == input.id);
     _inputs.add(input);
   }
 
   @visibleForTesting
   void saveAndNotify(Object identifier, Iterable<Input> inputs, Failure? failure) {
-    for (final input in inputs) save(input);
+    for (final input in inputs) {
+      save(input);
+    }
     _failures[identifier] = failure;
 
     _listeners.entries.where((e) => e.key != identifier).forEach((e) => e.value());
@@ -32,7 +34,7 @@ class FormMemory with InputContainer {
 
   void _removeListener(Object identifier) => _listeners.remove(identifier);
 
-  Iterable<Input> _loadInputs(Iterable<String> targets) => _inputs.where((e) => targets.contains(e.name));
+  Iterable<Input> _loadInputs(Iterable<InputIdentifier> targets) => _inputs.where((e) => targets.contains(e.id));
 
   Failure? _loadFailure(Object identifier) => _failures[identifier];
 }
@@ -53,33 +55,32 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
     stream.listen((e) => memory.saveAndNotify(identifier, e.inputs, e.failure));
   }
 
-  @protected
   void _load() {
     emit(state.copyWith(
-      inputs: memory._loadInputs(state.inputs.map((e) => e.name)),
+      inputs: memory._loadInputs(state.inputs.map((e) => e.id)),
       failure: () => memory._loadFailure(identifier),
     ));
   }
 
   @override
   Future<void> close() async {
-    super.close();
+    await super.close();
 
     memory._removeListener(identifier);
   }
 
   @override
-  T getInput<T extends Input>(String name) {
-    final inputCandidates = state.inputs.where((e) => e.name == name);
-    assert(inputCandidates.length <= 1, '${inputCandidates.length} with name: $name');
+  Input<I> getInput<I>(InputIdentifier<I> id) {
+    final inputCandidates = state.inputs.where((e) => e.id == id);
+    assert(inputCandidates.length <= 1, '${inputCandidates.length} with id: $id');
 
-    if (inputCandidates.length > 0) {
+    if (inputCandidates.isNotEmpty) {
       final input = inputCandidates.first;
-      assert(input is T, 'Input found of type ${input.runtimeType} but $T was requested');
+      assert(input is Input<I>, 'Input found of type ${input.runtimeType} but ${Input<I>} was requested');
 
-      return input as T;
+      return input as Input<I>;
     } else {
-      return memory.getInput<T>(name);
+      return memory.getInput<I>(id);
     }
   }
 }

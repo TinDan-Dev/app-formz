@@ -1,7 +1,7 @@
 import '../../utils/extensions.dart';
 import '../result/result.dart';
 
-class ViolationFailure<L> extends Failure implements Exception {
+class ViolationFailure<R> extends Failure<R> implements Exception {
   final String? field;
   final LocalizationsDelegate? localizationsDelegate;
 

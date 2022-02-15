@@ -1,72 +1,72 @@
-import '../functional/parser/exception.dart';
-import '../functional/parser/validator.dart';
-import '../functional/result/result.dart';
-import 'input.dart';
+import '../../functional/parser/exception.dart';
+import '../../functional/parser/validator.dart';
+import '../../functional/result/result.dart';
+import '../input.dart';
 
 Input<T> createValidatorInput<T>(
-  Validator<T?> validator, {
-  required String name,
+  Validator<T> validator, {
+  required InputIdentifier<T> id,
+  required T value,
   bool pure = true,
-  T? value,
 }) =>
-    Input<T>.create(
+    Input<T>(
       validator.validate,
-      name: name,
+      id: id,
       pure: pure,
       value: value,
     );
 
 Input<T> createOptionalValidatorInput<T>(
-  Validator<T?> validator, {
+  Validator<T> validator, {
   required PureDelegate<T?> pureDelegate,
-  required String name,
+  required InputIdentifier<T> id,
+  required T value,
   bool pure = true,
-  T? value,
 }) =>
-    OptionalInput<T>.create(
+    OptionalInput<T>(
       validator.validate,
       pureDelegate: pureDelegate,
-      name: name,
+      id: id,
       pure: pure,
       value: value,
     );
 
 Input<T> createInput<T>(
-  bool validate(T? value), {
-  required String name,
+  bool validate(T value), {
+  required InputIdentifier<T> id,
+  required T value,
   bool pure = true,
-  T? value,
 }) =>
-    Input<T>.create(
+    Input<T>(
       (value) {
         if (validate(value)) {
           return const Result.right(null);
         } else {
-          return Result.left(ViolationFailure('value is null'));
+          return ViolationFailure('value could not be validated');
         }
       },
-      name: name,
+      id: id,
       pure: pure,
       value: value,
     );
 
 Input<T> createOptionalInput<T>(
   bool validate(T? value), {
-  required String name,
+  required InputIdentifier<T> id,
   required PureDelegate<T?> pureDelegate,
+  required T value,
   bool pure = true,
-  T? value,
 }) =>
-    OptionalInput<T>.create(
+    OptionalInput<T>(
       (value) {
         if (validate(value)) {
           return const Result.right(null);
         } else {
-          return Result.left(ViolationFailure('value is null'));
+          return ViolationFailure('value could not be validated');
         }
       },
       pureDelegate: pureDelegate,
-      name: name,
+      id: id,
       pure: pure,
       value: value,
     );

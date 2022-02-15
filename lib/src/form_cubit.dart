@@ -18,7 +18,7 @@ class _InputAttachment<T> {
 }
 
 abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableInputContainer {
-  final _attachments = <String, List<_InputAttachment>>{};
+  final _attachments = <InputIdentifier, List<_InputAttachment>>{};
 
   FormCubit(FormState initialState) : super(initialState);
 
@@ -31,22 +31,22 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
   }
 
   T getAttachment<T>(
-    String name, {
+    InputIdentifier inputId, {
     required T create(),
     void dispose(T value)?,
   }) {
-    final attachments = _attachments.putIfAbsent(name, () => []);
+    final attachments = _attachments.putIfAbsent(inputId, () => []);
 
-    final attachment = attachments.where((e) => e.value is T);
+    final attachment = attachments.whereType<T>();
     assert(attachment.length <= 1, '${attachment.length} attachments of Type $T found');
 
-    if (attachment.length < 1) {
+    if (attachment.isEmpty) {
       final value = create();
       attachments.add(_InputAttachment<T>(value, dispose));
 
       return value;
     } else {
-      return attachment.first.value;
+      return attachment.first;
     }
   }
 
