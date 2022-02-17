@@ -10,17 +10,22 @@ import 'package:meta/meta.dart';
 ///  /   \               /   \
 /// O     Z             Z     O
 ///
-/// Assumes that this node has a left child (X) the right child of X (Z) can
-/// be null. The heights of the nodes are also updated.
-InnerAVLNode rotateRight(InnerAVLNode node) {
-  final x = node.left as InnerAVLNode;
+/// Assumes that the node has a left child (X) the right child of X (Z) can
+/// be a leaf.
+InnerAVLNode rotateRight({
+  required int value,
+  required int height,
+  required AVLNode right,
+  required InnerAVLNode left,
+}) {
+  final x = left;
   final z = x.right;
 
   final y = InnerAVLNode(
-    node.value,
-    right: node.right,
+    value,
+    right: right,
     left: z,
-    height: max(node.right.height, z.height) + 1,
+    height: max(right.height, z.height) + 1,
   );
 
   return InnerAVLNode(
@@ -39,17 +44,22 @@ InnerAVLNode rotateRight(InnerAVLNode node) {
 ///     /   \         /   \
 ///    Z     O       O     Z
 ///
-/// Assumes that this node has a right child (X) the left child of X (Z) can
-/// be null. The heights of the nodes are also updated.
-InnerAVLNode rotateLeft(InnerAVLNode node) {
-  final x = node.right as InnerAVLNode;
+/// Assumes that the node has a right child (X) the left child of X (Z) can
+/// be a leaf.
+InnerAVLNode rotateLeft({
+  required int value,
+  required int height,
+  required InnerAVLNode right,
+  required AVLNode left,
+}) {
+  final x = right;
   final z = x.left;
 
   final y = InnerAVLNode(
-    node.value,
-    left: node.left,
+    value,
     right: z,
-    height: max(node.left.height, z.height) + 1,
+    left: left,
+    height: max(left.height, z.height) + 1,
   );
 
   return InnerAVLNode(
@@ -60,37 +70,132 @@ InnerAVLNode rotateLeft(InnerAVLNode node) {
   );
 }
 
+/// Performers a right rotation on Y nad a left on Z:
+///
+///    Z                Z                      X
+///  /   \            /   \                  /   \
+/// 1     Y     ==>  1     X        ==>    Z       Y
+///     /   \            /   \            / \     / \
+///    X     4          2     Y          1   2   3   4
+///  /   \                  /   \
+/// 2     3                3     4
+///
+/// Assumes that the node has a right child (Y) and that Y has a left child (X).
+InnerAVLNode rotateRightLeft({
+  required int value,
+  required InnerAVLNode right,
+  required AVLNode left,
+}) {
+  final x = right.left as InnerAVLNode;
+
+  final y = InnerAVLNode(
+    right.value,
+    right: right.right,
+    left: x.right,
+    height: max(x.right.height, right.right.height) + 1,
+  );
+
+  final z = InnerAVLNode(
+    value,
+    right: x.left,
+    left: left,
+    height: max(x.left.height, left.height) + 1,
+  );
+
+  return InnerAVLNode(
+    x.value,
+    right: y,
+    left: z,
+    height: max(z.height, y.height) + 1,
+  );
+}
+
+/// Performers a left rotation on Y nad a right on Z:
+///
+///       Z                   Z                X
+///     /   \               /   \            /   \
+///    Y     1  ==>        X     1  ==>    Y       Z
+///  /   \               /   \            / \     / \
+/// 4     X             Y     2          4   3   2   1
+///     /   \         /   \
+///    3     2       4     3
+///
+/// Assumes that the node has a left child (Y) and that Y has a right child (X).
+InnerAVLNode rotateLeftRight({
+  required int value,
+  required AVLNode right,
+  required InnerAVLNode left,
+}) {
+  final x = left.right as InnerAVLNode;
+
+  final y = InnerAVLNode(
+    left.value,
+    right: x.left,
+    left: left.left,
+    height: max(x.left.height, left.left.height) + 1,
+  );
+
+  final z = InnerAVLNode(
+    value,
+    right: right,
+    left: x.right,
+    height: max(x.right.height, right.height) + 1,
+  );
+
+  return InnerAVLNode(
+    x.value,
+    right: z,
+    left: y,
+    height: max(z.height, y.height) + 1,
+  );
+}
+
 /// Rebalances the tree if necessary depending on the hight of the children.
-InnerAVLNode rebalance(InnerAVLNode node) {
-  final balance = node.balance;
+InnerAVLNode rebalance({
+  required int value,
+  required int height,
+  required AVLNode right,
+  required AVLNode left,
+}) {
+  final balance = right.height - left.height;
 
   if (balance > 1) {
-    if (node.right.right.height > node.right.left.height) {
-      return rotateLeft(node);
-    } else {
-      final temp = InnerAVLNode(
-        node.value,
-        right: rotateRight(node.right as InnerAVLNode),
-        left: node.left,
-        height: node.height,
+    assert(right is InnerAVLNode);
+
+    if (right.right.height > right.left.height) {
+      return rotateLeft(
+        value: value,
+        height: height,
+        right: right as InnerAVLNode,
+        left: left,
       );
-      return rotateLeft(temp);
+    } else {
+      return rotateRightLeft(
+        value: value,
+        right: right as InnerAVLNode,
+        left: left,
+      );
     }
   } else if (balance < -1) {
-    if (node.left.left.height > node.left.right.height) {
-      return rotateRight(node);
-    } else {
-      final temp = InnerAVLNode(
-        node.value,
-        right: node.right,
-        left: rotateLeft(node.left as InnerAVLNode),
-        height: node.height,
+    assert(left is InnerAVLNode);
+
+    if (left.left.height > left.right.height) {
+      return rotateRight(
+        value: value,
+        height: height,
+        right: right,
+        left: left as InnerAVLNode,
       );
-      return rotateRight(temp);
+    } else {
+      return rotateLeftRight(
+        value: value,
+        right: right,
+        left: left as InnerAVLNode,
+      );
     }
   }
 
-  return node;
+  return InnerAVLNode(value, height: height, right: right, left: left);
 }
 
 void _graphviz(StringBuffer buffer, InnerAVLNode node) {
@@ -98,7 +203,7 @@ void _graphviz(StringBuffer buffer, InnerAVLNode node) {
   final right = node.right;
   final left = node.left;
 
-  buffer.writeln('"$value"[label="$value (${node.height} @ ${node.balance})"]');
+  buffer.writeln('"$value"[label="$value (${node.height} @ ${node.right.height - node.left.height})"]');
 
   if (right is InnerAVLNode) {
     buffer.writeln('"$value"->"${right.value}"[label="R"]');
@@ -117,8 +222,6 @@ abstract class AVLNode {
 
   AVLNode get left;
   AVLNode get right;
-
-  int get balance => right.height - left.height;
 
   AVLNode insert(int value);
 }
@@ -163,13 +266,11 @@ class InnerAVLNode extends AVLNode {
   /// height.
   @override
   AVLNode insert(int value) {
-    var node = this;
-
     if (value < this.value) {
       final result = left.insert(value);
 
-      node = InnerAVLNode(
-        this.value,
+      return rebalance(
+        value: this.value,
         height: max(result.height, right.height) + 1,
         left: result,
         right: right,
@@ -177,15 +278,15 @@ class InnerAVLNode extends AVLNode {
     } else if (value > this.value) {
       final result = right.insert(value);
 
-      node = InnerAVLNode(
-        this.value,
+      return rebalance(
+        value: this.value,
         height: max(result.height, left.height) + 1,
         left: left,
         right: result,
       );
     }
 
-    return rebalance(node);
+    return this;
   }
 }
 
