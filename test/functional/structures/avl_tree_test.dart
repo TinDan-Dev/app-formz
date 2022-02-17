@@ -10,49 +10,50 @@ void expectInvariant(AVLNode node) {
 }
 
 void main() {
-  late AVLTree tree;
-  late AVLTree populatedTree;
+  var tmpTree = AVLTree<int, String>();
 
-  setUp(() {
-    tree = const AVLTree();
-    populatedTree = const AVLTree();
+  for (int i = -99; i < 100; i++) {
+    tmpTree = tmpTree.insert(i, 'String: $i');
+  }
 
-    for (int i = -99; i < 100; i++) {
-      populatedTree = populatedTree.insert(i);
-    }
-  });
+  final AVLTree<int, String> tree = AVLTree();
+  final AVLTree<int, String> populatedTree = tmpTree;
 
   group('balancing', () {
     test('in order asc insert', () {
+      var t = tree;
+
       for (int i = 0; i < 100; i++) {
-        tree = tree.insert(i);
+        t = t.insert(i, '');
       }
 
-      expect(tree.root.height, equals(6));
-      expectInvariant(tree.root);
+      expect(t.root.height, equals(6));
+      expectInvariant(t.root);
     });
 
     test('in order dsc insert', () {
+      var t = tree;
+
       for (int i = 100; i > 0; i--) {
-        tree = tree.insert(i);
+        t = t.insert(i, '');
       }
 
-      expect(tree.root.height, equals(6));
-      expectInvariant(tree.root);
+      expect(t.root.height, equals(6));
+      expectInvariant(t.root);
     });
 
     test('right left rotation', () {
-      tree = tree.insert(0).insert(2).insert(1);
+      final result = tree.insert(0, '').insert(2, '').insert(1, '');
 
-      expect(tree.root.height, equals(1));
-      expectInvariant(tree.root);
+      expect(result.root.height, equals(1));
+      expectInvariant(result.root);
     });
 
     test('left right rotation', () {
-      tree = tree.insert(0).insert(-2).insert(-1);
+      final result = tree.insert(0, '').insert(-2, '').insert(-1, '');
 
-      expect(tree.root.height, equals(1));
-      expectInvariant(tree.root);
+      expect(result.root.height, equals(1));
+      expectInvariant(result.root);
     });
   });
 
@@ -62,30 +63,26 @@ void main() {
     });
 
     test('true if the value was inserted before', () {
-      tree = tree.insert(0);
+      final result = tree.insert(0, '');
 
-      expect(tree.contains(0), isTrue);
+      expect(result.contains(0), isTrue);
     });
 
     test('true on copy after insert and false on original', () {
-      final copy = tree.insert(0);
+      final result = tree.insert(0, '');
 
       expect(tree.contains(0), isFalse);
-      expect(copy.contains(0), isTrue);
+      expect(result.contains(0), isTrue);
     });
 
     test('true after many inserts', () {
-      for (int i = 0; i < 100; i++) {
-        tree = tree.insert(i);
-      }
-
-      expect(tree.contains(42), isTrue);
+      expect(populatedTree.contains(42), isTrue);
     });
   });
 
   group('insert', () {
     test('should not change the tree when value was already inserted', () {
-      final result = populatedTree.insert(0);
+      final result = populatedTree.insert(42, '');
 
       expect(result, same(populatedTree));
     });
