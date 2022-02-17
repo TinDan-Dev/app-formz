@@ -11,45 +11,99 @@ void expectInvariant(AVLNode node) {
 
 void main() {
   late AVLTree tree;
+  late AVLTree populatedTree;
 
-  setUp(() => tree = AVLTree());
+  setUp(() {
+    tree = const AVLTree();
+    populatedTree = const AVLTree();
 
-  test('in order asc insert', () {
-    for (int i = 0; i < 100; i++) {
-      tree = tree.insert(i);
+    for (int i = -99; i < 100; i++) {
+      populatedTree = populatedTree.insert(i);
     }
-
-    expect(tree.root.height, equals(6));
-    expectInvariant(tree.root);
   });
 
-  test('in order dsc insert', () {
-    for (int i = 100; i > 0; i--) {
-      tree = tree.insert(i);
-    }
+  group('balancing', () {
+    test('in order asc insert', () {
+      for (int i = 0; i < 100; i++) {
+        tree = tree.insert(i);
+      }
 
-    expect(tree.root.height, equals(6));
-    expectInvariant(tree.root);
+      expect(tree.root.height, equals(6));
+      expectInvariant(tree.root);
+    });
+
+    test('in order dsc insert', () {
+      for (int i = 100; i > 0; i--) {
+        tree = tree.insert(i);
+      }
+
+      expect(tree.root.height, equals(6));
+      expectInvariant(tree.root);
+    });
+
+    test('right left rotation', () {
+      tree = tree.insert(0).insert(2).insert(1);
+
+      expect(tree.root.height, equals(1));
+      expectInvariant(tree.root);
+    });
+
+    test('left right rotation', () {
+      tree = tree.insert(0).insert(-2).insert(-1);
+
+      expect(tree.root.height, equals(1));
+      expectInvariant(tree.root);
+    });
   });
 
-  test('right left rotation', () {
-    tree = tree.insert(0).insert(2).insert(1);
+  group('contains', () {
+    test('false on empty tree', () {
+      expect(tree.contains(0), isFalse);
+    });
 
-    expect(tree.root.height, equals(1));
-    expectInvariant(tree.root);
+    test('true if the value was inserted before', () {
+      tree = tree.insert(0);
+
+      expect(tree.contains(0), isTrue);
+    });
+
+    test('true on copy after insert and false on original', () {
+      final copy = tree.insert(0);
+
+      expect(tree.contains(0), isFalse);
+      expect(copy.contains(0), isTrue);
+    });
+
+    test('true after many inserts', () {
+      for (int i = 0; i < 100; i++) {
+        tree = tree.insert(i);
+      }
+
+      expect(tree.contains(42), isTrue);
+    });
   });
 
-  test('left right rotation', () {
-    tree = tree.insert(0).insert(-2).insert(-1);
+  group('insert', () {
+    test('should not change the tree when value was already inserted', () {
+      final result = populatedTree.insert(0);
 
-    expect(tree.root.height, equals(1));
-    expectInvariant(tree.root);
+      expect(result, same(populatedTree));
+    });
   });
 
-  test('insert duplicate', () {
-    final tree1 = tree.insert(1);
-    final tree2 = tree1.insert(1);
+  group('delete', () {
+    test('should not change the tree when value was not found', () {
+      final result = populatedTree.delete(300);
 
-    expect(tree1.root, same(tree2.root));
+      expect(result, same(populatedTree));
+    });
+
+    test('should remove value from tree', () {
+      final result = populatedTree.delete(0);
+
+      expectInvariant(result.root);
+      expect(result.contains(0), isFalse);
+      expect(populatedTree.contains(0), isTrue);
+    });
   });
 }

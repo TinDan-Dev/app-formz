@@ -2,6 +2,15 @@ import 'dart:math';
 
 import 'package:meta/meta.dart';
 
+import 'reference_box.dart';
+
+/// If the operation can be reset and no copy of the tree needs to be created.
+///
+/// For example when inserting a duplicate or removing a not existing value.
+class AVLResetOperationException implements Exception {
+  const AVLResetOperationException();
+}
+
 /// Performers a right rotation on a node (Y):
 ///
 ///       Y             X
@@ -220,10 +229,31 @@ abstract class AVLNode {
 
   int get height;
 
+  bool get isLeaf;
+
   AVLNode get left;
   AVLNode get right;
 
+  /// Inserts a new value into the tree.
+  ///
+  /// Walks the tree recursively and inserts the node at the right position.
+  /// The actual insert is handled be the leaf and the search by the inner
+  /// nodes.
   AVLNode insert(int value);
+
+  /// Removes a node from the tree.
+  ///
+  /// If the node was not found nothing will happen.
+  AVLNode delete(int value);
+
+  /// Gets the value of the right most inner node and deletes it.
+  ///
+  /// This is a helper method for the delete function to find the replacement
+  /// for the deleted node when it has two children.
+  AVLNode deleteRightMostChild(InnerAVLNode parent, ReferenceBox<int> result);
+
+  /// Checks if the tree contains a value.
+  bool contains(int value);
 }
 
 class LeafAVLNode extends AVLNode {
@@ -233,12 +263,28 @@ class LeafAVLNode extends AVLNode {
   int get height => -1;
 
   @override
+  bool get isLeaf => true;
+
+  @override
   AVLNode get left => this;
   @override
   AVLNode get right => this;
 
   @override
   AVLNode insert(int value) => InnerAVLNode(value);
+
+  @override
+  bool contains(int value) => false;
+
+  @override
+  AVLNode delete(int value) => throw const AVLResetOperationException();
+
+  @override
+  AVLNode deleteRightMostChild(InnerAVLNode parent, ReferenceBox<int> result) {
+    result.value = parent.value;
+
+    return parent.left;
+  }
 }
 
 class InnerAVLNode extends AVLNode {
@@ -259,11 +305,9 @@ class InnerAVLNode extends AVLNode {
     this.right = const LeafAVLNode(),
   });
 
-  /// Inserts a new value into the tree.
-  ///
-  /// Walks the tree recursively and inserts the node at the right position.
-  /// Also updates the height of the current node if necessary and returns its
-  /// height.
+  @override
+  bool get isLeaf => false;
+
   @override
   AVLNode insert(int value) {
     if (value < this.value) {
@@ -286,7 +330,71 @@ class InnerAVLNode extends AVLNode {
       );
     }
 
-    return this;
+    throw const AVLResetOperationException();
+  }
+
+  @override
+  AVLNode delete(int value) {
+    if (value < this.value) {
+      final result = left.delete(value);
+
+      return rebalance(
+        value: this.value,
+        height: max(result.height, right.height) + 1,
+        left: result,
+        right: right,
+      );
+    } else if (value > this.value) {
+      final result = right.delete(value);
+
+      return rebalance(
+        value: this.value,
+        height: max(result.height, left.height) + 1,
+        left: left,
+        right: result,
+      );
+    }
+
+    if (left.isLeaf) {
+      return right;
+    }
+    if (right.isLeaf) {
+      return left;
+    }
+
+    final rightMostRef = ReferenceBox<int>();
+    final leftUpdated = left.deleteRightMostChild(this, rightMostRef);
+    assert(rightMostRef.accessed);
+
+    return rebalance(
+      value: rightMostRef.value,
+      height: max(leftUpdated.height, right.height) + 1,
+      right: right,
+      left: leftUpdated,
+    );
+  }
+
+  @override
+  AVLNode deleteRightMostChild(InnerAVLNode parent, ReferenceBox<int> result) {
+    final node = right.deleteRightMostChild(this, result);
+
+    return InnerAVLNode(
+      parent.value,
+      height: max(parent.left.height, node.height) + 1,
+      right: node,
+      left: parent.left,
+    );
+  }
+
+  @override
+  bool contains(int value) {
+    if (value < this.value) {
+      return left.contains(value);
+    } else if (value > this.value) {
+      return right.contains(value);
+    }
+
+    return true;
   }
 }
 
@@ -298,7 +406,23 @@ class AVLTree {
 
   const AVLTree() : this._(const LeafAVLNode());
 
-  AVLTree insert(int value) => AVLTree._(root.insert(value));
+  AVLTree insert(int value) {
+    try {
+      return AVLTree._(root.insert(value));
+    } on AVLResetOperationException {
+      return this;
+    }
+  }
+
+  AVLTree delete(int value) {
+    try {
+      return AVLTree._(root.delete(value));
+    } on AVLResetOperationException {
+      return this;
+    }
+  }
+
+  bool contains(int value) => root.contains(value);
 
   String graphviz() {
     final buffer = StringBuffer();
