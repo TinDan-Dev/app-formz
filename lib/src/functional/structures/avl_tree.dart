@@ -1,10 +1,6 @@
 import 'dart:math';
 
-/// Gets the hight from a node or -1 if null.
-int getHeight(AVLNode? node) => node?.height ?? -1;
-
-/// Gets the balance of a node.
-int getBalance(AVLNode node) => getHeight(node.right) - getHeight(node.left);
+import 'package:meta/meta.dart';
 
 /// Performers a right rotation on a node (Y):
 ///
@@ -16,17 +12,23 @@ int getBalance(AVLNode node) => getHeight(node.right) - getHeight(node.left);
 ///
 /// Assumes that this node has a left child (X) the right child of X (Z) can
 /// be null. The heights of the nodes are also updated.
-AVLNode rotateRight(AVLNode node) {
-  final x = node.left!;
+InnerAVLNode rotateRight(InnerAVLNode node) {
+  final x = node.left as InnerAVLNode;
   final z = x.right;
 
-  x.right = node;
-  node.left = z;
+  final y = InnerAVLNode(
+    node.value,
+    right: node.right,
+    left: z,
+    height: max(node.right.height, z.height) + 1,
+  );
 
-  node.height = max(getHeight(node.right), getHeight(z)) + 1;
-  x.height = max(getHeight(x.right), node.height) + 1;
-
-  return x;
+  return InnerAVLNode(
+    x.value,
+    right: y,
+    left: x.left,
+    height: max(x.left.height, y.height) + 1,
+  );
 }
 
 /// Performers a left rotation on a node (Y):
@@ -39,111 +41,173 @@ AVLNode rotateRight(AVLNode node) {
 ///
 /// Assumes that this node has a right child (X) the left child of X (Z) can
 /// be null. The heights of the nodes are also updated.
-AVLNode rotateLeft(AVLNode node) {
-  final x = node.right!;
+InnerAVLNode rotateLeft(InnerAVLNode node) {
+  final x = node.right as InnerAVLNode;
   final z = x.left;
 
-  x.left = node;
-  node.right = z;
+  final y = InnerAVLNode(
+    node.value,
+    left: node.left,
+    right: z,
+    height: max(node.left.height, z.height) + 1,
+  );
 
-  node.height = max(getHeight(node.left), getHeight(z)) + 1;
-  x.height = max(getHeight(x.left), node.height) + 1;
-
-  return x;
+  return InnerAVLNode(
+    x.value,
+    right: x.right,
+    left: y,
+    height: max(x.right.height, y.height) + 1,
+  );
 }
 
 /// Rebalances the tree if necessary depending on the hight of the children.
-AVLNode rebalance(AVLNode node) {
-  final balance = getBalance(node);
+InnerAVLNode rebalance(InnerAVLNode node) {
+  final balance = node.balance;
 
   if (balance > 1) {
-    if (getHeight(node.right?.right) > getHeight(node.right?.left)) {
+    if (node.right.right.height > node.right.left.height) {
       return rotateLeft(node);
     } else {
-      node.right = rotateRight(node.right!);
-      return rotateLeft(node);
+      final temp = InnerAVLNode(
+        node.value,
+        right: rotateRight(node.right as InnerAVLNode),
+        left: node.left,
+        height: node.height,
+      );
+      return rotateLeft(temp);
     }
   } else if (balance < -1) {
-    if (getHeight(node.left?.left) > getHeight(node.left?.right)) {
+    if (node.left.left.height > node.left.right.height) {
       return rotateRight(node);
     } else {
-      node.left = rotateLeft(node.left!);
-      return rotateRight(node);
+      final temp = InnerAVLNode(
+        node.value,
+        right: node.right,
+        left: rotateLeft(node.left as InnerAVLNode),
+        height: node.height,
+      );
+      return rotateRight(temp);
     }
   }
 
   return node;
 }
 
-class AVLNode {
-  int value;
-  int height;
+void _graphviz(StringBuffer buffer, InnerAVLNode node) {
+  final value = node.value;
+  final right = node.right;
+  final left = node.left;
 
-  AVLNode? left;
-  AVLNode? right;
+  buffer.writeln('"$value"[label="$value (${node.height} @ ${node.balance})"]');
 
-  AVLNode(this.value) : height = 0;
+  if (right is InnerAVLNode) {
+    buffer.writeln('"$value"->"${right.value}"[label="R"]');
+    _graphviz(buffer, right);
+  }
+  if (left is InnerAVLNode) {
+    buffer.writeln('"$value"->"${left.value}"[label="L"]');
+    _graphviz(buffer, left);
+  }
+}
+
+abstract class AVLNode {
+  const AVLNode();
+
+  int get height;
+
+  AVLNode get left;
+  AVLNode get right;
+
+  int get balance => right.height - left.height;
+
+  AVLNode insert(int value);
+}
+
+class LeafAVLNode extends AVLNode {
+  const LeafAVLNode();
+
+  @override
+  int get height => -1;
+
+  @override
+  AVLNode get left => this;
+  @override
+  AVLNode get right => this;
+
+  @override
+  AVLNode insert(int value) => InnerAVLNode(value);
+}
+
+class InnerAVLNode extends AVLNode {
+  final int value;
+
+  @override
+  final int height;
+
+  @override
+  final AVLNode left;
+  @override
+  final AVLNode right;
+
+  const InnerAVLNode(
+    this.value, {
+    this.height = 0,
+    this.left = const LeafAVLNode(),
+    this.right = const LeafAVLNode(),
+  });
 
   /// Inserts a new value into the tree.
   ///
   /// Walks the tree recursively and inserts the node at the right position.
   /// Also updates the height of the current node if necessary and returns its
   /// height.
+  @override
   AVLNode insert(int value) {
+    var node = this;
+
     if (value < this.value) {
-      if (left == null) {
-        left = AVLNode(value);
-        height = max(height, 1);
-      } else {
-        left = left!.insert(value);
-        height = max(left!.height, getHeight(right)) + 1;
-      }
+      final result = left.insert(value);
+
+      node = InnerAVLNode(
+        this.value,
+        height: max(result.height, right.height) + 1,
+        left: result,
+        right: right,
+      );
     } else if (value > this.value) {
-      if (right == null) {
-        right = AVLNode(value);
-        height = max(height, 1);
-      } else {
-        right = right!.insert(value);
-        height = max(right!.height, getHeight(left)) + 1;
-      }
+      final result = right.insert(value);
+
+      node = InnerAVLNode(
+        this.value,
+        height: max(result.height, left.height) + 1,
+        left: left,
+        right: result,
+      );
     }
 
-    return rebalance(this);
-  }
-
-  void graphviz(StringBuffer buffer) {
-    buffer.writeln('"$value"[label="$value ($height @ ${getBalance(this)})"]');
-
-    if (right != null) {
-      buffer.writeln('"$value"->"${right!.value}"[label="R"]');
-      right!.graphviz(buffer);
-    }
-    if (left != null) {
-      buffer.writeln('"$value"->"${left!.value}"[label="L"]');
-      left!.graphviz(buffer);
-    }
+    return rebalance(node);
   }
 }
 
 class AVLTree {
-  AVLNode? root;
+  @visibleForTesting
+  final AVLNode root;
 
-  void insert(int value) {
-    if (root == null) {
-      root = AVLNode(value);
-      return;
-    }
+  const AVLTree._(this.root);
 
-    root = root!.insert(value);
-  }
+  const AVLTree() : this._(const LeafAVLNode());
+
+  AVLTree insert(int value) => AVLTree._(root.insert(value));
 
   String graphviz() {
     final buffer = StringBuffer();
-
     buffer.writeln('digraph G {');
-    root?.graphviz(buffer);
-    buffer.writeln('}');
 
+    if (root is InnerAVLNode) {
+      _graphviz(buffer, root as InnerAVLNode);
+    }
+
+    buffer.writeln('}');
     return buffer.toString();
   }
 }
