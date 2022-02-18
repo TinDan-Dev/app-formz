@@ -1,14 +1,11 @@
 import 'dart:math';
 
-import 'package:meta/meta.dart';
+import '../../result/result.dart';
+import '../reference_box.dart';
+import 'tree.dart';
 
-import 'reference_box.dart';
-
-/// If the operation can be reset and no copy of the tree needs to be created.
-///
-/// For example when inserting a duplicate or removing a not existing value.
-class AVLResetOperationException implements Exception {
-  const AVLResetOperationException();
+class AVLNotFoundFailure<R> extends Failure<R> {
+  AVLNotFoundFailure({required Object key}) : super(message: 'Key could not be found: $key', cause: key);
 }
 
 /// Performers a right rotation on a node (Y):
@@ -226,24 +223,7 @@ InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
   return InnerAVLNode(key, value, height: height, right: right, left: left);
 }
 
-void _graphviz(StringBuffer buffer, InnerAVLNode node) {
-  final key = node.key;
-  final right = node.right;
-  final left = node.left;
-
-  buffer.writeln('"$key"[label="$key: ${node.value} (${node.height}@${node.right.height - node.left.height})"]');
-
-  if (right is InnerAVLNode) {
-    buffer.writeln('"$key"->"${right.key}"[label="R"]');
-    _graphviz(buffer, right);
-  }
-  if (left is InnerAVLNode) {
-    buffer.writeln('"$key"->"${left.key}"[label="L"]');
-    _graphviz(buffer, left);
-  }
-}
-
-abstract class AVLNode<K extends Comparable, V> {
+abstract class AVLNode<K extends Comparable, V> implements TreeNode<K, V> {
   const AVLNode();
 
   int get height;
@@ -253,16 +233,10 @@ abstract class AVLNode<K extends Comparable, V> {
   AVLNode<K, V> get left;
   AVLNode<K, V> get right;
 
-  /// Inserts a new value into the tree.
-  ///
-  /// Walks the tree recursively and inserts the node at the right position.
-  /// The actual insert is handled be the leaf and the search by the inner
-  /// nodes.
+  @override
   AVLNode<K, V> insert(K key, V value);
 
-  /// Removes a node from the tree.
-  ///
-  /// If the node was not found nothing will happen.
+  @override
   AVLNode<K, V> delete(K key);
 
   /// Gets the value of the right most inner node and deletes it.
@@ -271,8 +245,8 @@ abstract class AVLNode<K extends Comparable, V> {
   /// for the deleted node when it has two children.
   AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<InnerAVLNode<K, V>> result);
 
-  /// Checks if the tree contains a value.
-  bool contains(K key);
+  @override
+  Result<V> find(K key);
 }
 
 class LeafAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
@@ -293,10 +267,7 @@ class LeafAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
   AVLNode<K, V> insert(K key, V value) => InnerAVLNode<K, V>(key, value);
 
   @override
-  bool contains(K key) => false;
-
-  @override
-  AVLNode<K, V> delete(K key) => throw const AVLResetOperationException();
+  AVLNode<K, V> delete(K key) => throw const TreeResetOperationException();
 
   @override
   AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<InnerAVLNode<K, V>> result) {
@@ -304,10 +275,18 @@ class LeafAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
 
     return parent.left;
   }
+
+  @override
+  Result<V> find(K key) => AVLNotFoundFailure(key: key);
+
+  @override
+  Iterable<TreeEntry<K, V>> get entries => Iterable<TreeEntry<K, V>>.empty();
 }
 
-class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
+class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements TreeEntry<K, V> {
+  @override
   final K key;
+  @override
   final V value;
 
   @override
@@ -356,7 +335,7 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
       );
     }
 
-    throw const AVLResetOperationException();
+    throw const TreeResetOperationException();
   }
 
   @override
@@ -419,54 +398,53 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
   }
 
   @override
-  bool contains(K key) {
+  Result<V> find(K key) {
     final comp = this.key.compareTo(key);
 
     if (comp > 0) {
-      return left.contains(key);
+      return left.find(key);
     } else if (comp < 0) {
-      return right.contains(key);
+      return right.find(key);
     }
 
-    return true;
+    return Result.right(value);
+  }
+
+  @override
+  Iterable<TreeEntry<K, V>> get entries sync* {
+    yield* left.entries;
+    yield this;
+    yield* right.entries;
   }
 }
 
-class AVLTree<K extends Comparable, V> {
-  @visibleForTesting
-  final AVLNode<K, V> root;
+/// For testing only, creates a string representation of the tree that can be
+/// viewed with: https://dreampuf.github.io/GraphvizOnline/
+String graphviz(AVLNode root) {
+  final buffer = StringBuffer();
+  buffer.writeln('digraph G {');
 
-  AVLTree._(this.root);
-
-  AVLTree() : this._(LeafAVLNode<K, V>());
-
-  AVLTree<K, V> insert(K key, V value) {
-    try {
-      return AVLTree<K, V>._(root.insert(key, value));
-    } on AVLResetOperationException {
-      return this;
-    }
+  if (root is InnerAVLNode) {
+    _graphviz(buffer, root);
   }
 
-  AVLTree<K, V> delete(K key) {
-    try {
-      return AVLTree<K, V>._(root.delete(key));
-    } on AVLResetOperationException {
-      return this;
-    }
+  buffer.writeln('}');
+  return buffer.toString();
+}
+
+void _graphviz(StringBuffer buffer, InnerAVLNode node) {
+  final key = node.key;
+  final right = node.right;
+  final left = node.left;
+
+  buffer.writeln('"$key"[label="$key: ${node.value} (${node.height}@${node.right.height - node.left.height})"]');
+
+  if (right is InnerAVLNode) {
+    buffer.writeln('"$key"->"${right.key}"[label="R"]');
+    _graphviz(buffer, right);
   }
-
-  bool contains(K key) => root.contains(key);
-
-  String graphviz() {
-    final buffer = StringBuffer();
-    buffer.writeln('digraph G {');
-
-    if (root is InnerAVLNode) {
-      _graphviz(buffer, root as InnerAVLNode);
-    }
-
-    buffer.writeln('}');
-    return buffer.toString();
+  if (left is InnerAVLNode) {
+    buffer.writeln('"$key"->"${left.key}"[label="L"]');
+    _graphviz(buffer, left);
   }
 }

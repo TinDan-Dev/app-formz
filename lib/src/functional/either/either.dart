@@ -2,6 +2,12 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 
+export 'either_future.dart';
+export 'either_iterable.dart';
+export 'either_join.dart';
+export 'either_map.dart';
+export 'either_stream.dart';
+
 abstract class Either<L, R> {
   const factory Either.left(L value) = _Left<L, R>;
 
