@@ -1,18 +1,26 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formz/src/functional/structures/trees/rb_tree.dart';
-import 'package:formz/src/functional/structures/trees/tree.dart';
 
 void expectInvariant(RBNode node) {
+  expect(node.color, equals(black));
+
   expectRBInvariant(node, true);
   expectPathInvariant(node);
 }
 
 void expectRBInvariant(RBNode node, bool isRoot) {
-  if (node is LeafRBNode) return;
+  if (node is LeafRBNode) {
+    expect(node.color, equals(black));
+    return;
+  }
 
-  if (node.color && !isRoot) {
-    expect(node.left.color, isFalse);
-    expect(node.right.color, isFalse);
+  expect(node.color, anyOf(equals(red), equals(black)));
+
+  if (node.color == red) {
+    expect(node.left.color, equals(black));
+    expect(node.right.color, equals(black));
   }
 
   expectRBInvariant(node.left, false);
@@ -28,12 +36,14 @@ int expectPathInvariant(RBNode node) {
   final left = expectPathInvariant(node.left);
   final right = expectPathInvariant(node.right);
 
-  expect(left, equals(right));
+  if (!node.left.isLeaf && !node.right.isLeaf) {
+    expect(left, equals(right));
+  }
 
-  if (node.color) {
-    return left;
+  if (node.color == black) {
+    return max(left, right) + 1;
   } else {
-    return left + 1;
+    return max(left, right);
   }
 }
 
@@ -47,6 +57,7 @@ void main() {
       for (int i = 0; i < 100; i++) {
         t = t.insert(i, i);
       }
+
       expectInvariant(t);
     });
 
@@ -56,6 +67,7 @@ void main() {
       for (int i = -99; i >= 0; i--) {
         t = t.insert(i, i);
       }
+
       expectInvariant(t);
     });
 
