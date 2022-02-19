@@ -30,6 +30,8 @@ class TreeMap<K extends Comparable, V> {
 
   TreeMap.avl() : this._(LeafAVLNode<K, TreeMapEntry<K, V>>());
 
+  TreeMap.rb() : this._(LeafRBNode<K, TreeMapEntry<K, V>>());
+
   /// Whether the map is empty or not in O(1);
   bool get isEmpty => _root.isEmpty;
 

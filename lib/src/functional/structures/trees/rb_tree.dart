@@ -394,9 +394,6 @@ abstract class RBNode<K, V extends Comparable> implements TreeNode<K, V> {
   /// This is a helper method for the delete function to find the replacement
   /// for the deleted node when it has two children.
   RBNode<K, V> deleteRightMostChild(InnerRBNode<K, V> parent, ReferenceBox<V> result);
-
-  @override
-  Result<V> find(K key) => throw UnimplementedError();
 }
 
 class LeafRBNode<K, V extends Comparable> extends RBNode<K, V> {
@@ -416,6 +413,7 @@ class LeafRBNode<K, V extends Comparable> extends RBNode<K, V> {
   @override
   RBNode<K, V> get right => recolor(black);
 
+  @override
   RBNode<K, V> recolor(int color) {
     assert(color == black || color == doubleBlack);
 
@@ -444,6 +442,9 @@ class LeafRBNode<K, V extends Comparable> extends RBNode<K, V> {
 
     return parent.left;
   }
+
+  @override
+  Result<V> find(K key) => TreeNotFoundFailure(key: key);
 
   @override
   Iterable<TreeEntry<K, V>> get entries => Iterable<TreeEntry<K, V>>.empty();
@@ -596,6 +597,19 @@ class InnerRBNode<K, V extends Comparable> extends RBNode<K, V> implements TreeE
       right: node,
       left: parent.left,
     );
+  }
+
+  @override
+  Result<V> find(K key) {
+    final comp = value.compareTo(key);
+
+    if (comp > 0) {
+      return left.find(key);
+    } else if (comp < 0) {
+      return right.find(key);
+    }
+
+    return Result.right(value);
   }
 
   @override

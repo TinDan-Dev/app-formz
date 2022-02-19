@@ -7,16 +7,15 @@ import 'trees/tree.dart';
 
 @sealed
 class TreeSet<V extends Comparable> with IterableMixin<V> {
-  @override
-  final int length;
-
   final TreeNode<V, V> _root;
 
-  TreeSet._(this._root, this.length);
+  TreeSet._(this._root);
 
   TreeSet() : this.avl();
 
-  TreeSet.avl() : this._(LeafAVLNode<V, V>(), 0);
+  TreeSet.avl() : this._(LeafAVLNode<V, V>());
+
+  TreeSet.rb() : this._(LeafRBNode<V, V>());
 
   /// Whether the map is empty or not in O(1);
   @override
@@ -31,7 +30,7 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
 
   TreeSet<V> insert(V value) {
     try {
-      return TreeSet<V>._(_root.insert(value, value), length + 1);
+      return TreeSet<V>._(_root.insert(value, value));
     } on TreeResetOperationException {
       return this;
     }
@@ -39,7 +38,7 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
 
   TreeSet<V> delete(V value) {
     try {
-      return TreeSet<V>._(_root.delete(value), length - 1);
+      return TreeSet<V>._(_root.delete(value));
     } on TreeResetOperationException {
       return this;
     }

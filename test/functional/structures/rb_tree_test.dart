@@ -1,7 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:formz/src/functional/structures/tree_map.dart';
+import 'package:formz/src/functional/structures/tree_set.dart';
 import 'package:formz/src/functional/structures/trees/rb_tree.dart';
+
+import 'tree_map_test.dart';
+import 'tree_set_test.dart';
 
 void expectInvariant(RBNode node) {
   expect(node.color, equals(black));
@@ -96,4 +101,8 @@ void main() {
       }
     });
   });
+
+  group('map', () => runMapTest(() => TreeMap<int, String>.rb()));
+
+  group('set', () => runSetTest(() => TreeSet<int>.rb()));
 }
