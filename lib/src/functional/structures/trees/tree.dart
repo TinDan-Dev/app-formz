@@ -1,6 +1,7 @@
 import '../../result/result.dart';
 
-export 'avl_tree.dart';
+export 'avl_tree.dart' show AVLNode, LeafAVLNode;
+export 'rb_tree.dart' show RBNode, LeafRBNode;
 
 /// If the operation can be reset and no copy of the tree needs to be created.
 ///

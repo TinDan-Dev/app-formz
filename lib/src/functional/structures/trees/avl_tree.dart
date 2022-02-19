@@ -265,9 +265,6 @@ class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
 
 class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements TreeEntry<K, V> {
   @override
-  bool get isEmpty => false;
-
-  @override
   final V value;
 
   @override
@@ -284,6 +281,9 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements Tre
     required this.left,
     required this.right,
   });
+
+  @override
+  bool get isEmpty => false;
 
   @override
   bool get isLeaf => false;

@@ -18,6 +18,14 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
 
   TreeSet.avl() : this._(LeafAVLNode<V, V>(), 0);
 
+  /// Whether the map is empty or not in O(1);
+  @override
+  bool get isEmpty => _root.isEmpty;
+
+  /// Whether the map is empty or not in O(1);
+  @override
+  bool get isNotEmpty => !_root.isEmpty;
+
   @override
   Iterator<V> get iterator => _root.entries.map((e) => e.value).iterator;
 

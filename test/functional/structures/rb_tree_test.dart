@@ -1,58 +1,73 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:formz/src/functional/structures/trees/rb_tree.dart';
 import 'package:formz/src/functional/structures/trees/tree.dart';
-import 'package:formz_test/formz_test.dart';
 
-import 'tree_map_test.dart';
-import 'tree_set_test.dart';
+void expectInvariant(RBNode node) {
+  expectRBInvariant(node, true);
+  expectPathInvariant(node);
+}
 
-void expectInvariant(AVLNode node) {
-  if (node is LeafAVLNode) return;
-  expect(node.right.height - node.left.height, inInclusiveRange(-1, 1));
+void expectRBInvariant(RBNode node, bool isRoot) {
+  if (node is LeafRBNode) return;
+
+  if (node.color && !isRoot) {
+    expect(node.left.color, isFalse);
+    expect(node.right.color, isFalse);
+  }
+
+  expectRBInvariant(node.left, false);
+  expectRBInvariant(node.right, false);
+}
+
+int expectPathInvariant(RBNode node) {
+  if (node is LeafRBNode) return 0;
 
   expect(node.left, isNot(same(node)));
   expect(node.right, isNot(same(node)));
 
-  expectInvariant(node.left);
-  expectInvariant(node.right);
+  final left = expectPathInvariant(node.left);
+  final right = expectPathInvariant(node.right);
+
+  expect(left, equals(right));
+
+  if (node.color) {
+    return left;
+  } else {
+    return left + 1;
+  }
 }
 
 void main() {
-  final AVLNode<num, num> tree = LeafAVLNode<num, num>();
+  final RBNode<num, num> tree = LeafRBNode<num, num>();
 
   group('balancing', () {
     test('in order asc insert', () {
       var t = tree;
 
       for (int i = 0; i < 100; i++) {
-        t = t.insert(i, 0);
+        t = t.insert(i, i);
       }
-
-      expect(t.height, equals(6));
       expectInvariant(t);
     });
 
     test('in order dsc insert', () {
       var t = tree;
 
-      for (int i = 100; i > 0; i--) {
+      for (int i = -99; i >= 0; i--) {
         t = t.insert(i, i);
       }
-
-      expect(t.height, equals(6));
       expectInvariant(t);
     });
 
     test('right left rotation', () {
       final result = tree.insert(0, 0).insert(2, 2).insert(1, 1);
 
-      expect(result.height, equals(1));
       expectInvariant(result);
     });
 
     test('left right rotation', () {
       final result = tree.insert(0, 0).insert(-2, -2).insert(-1, -1);
 
-      expect(result.height, equals(1));
       expectInvariant(result);
     });
 
@@ -69,8 +84,4 @@ void main() {
       }
     });
   });
-
-  group('map', () => runMapTest(() => TreeMap<int, String>.avl()));
-
-  group('set', () => runSetTest(() => TreeSet<int>.avl()));
 }
