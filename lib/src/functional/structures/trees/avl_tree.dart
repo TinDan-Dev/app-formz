@@ -4,10 +4,6 @@ import '../../result/result.dart';
 import '../reference_box.dart';
 import 'tree.dart';
 
-class AVLNotFoundFailure<R> extends Failure<R> {
-  AVLNotFoundFailure({required Object key}) : super(message: 'Key could not be found: $key', cause: key);
-}
-
 /// Performers a right rotation on a node (Y):
 ///
 ///       Y             X
@@ -18,8 +14,7 @@ class AVLNotFoundFailure<R> extends Failure<R> {
 ///
 /// Assumes that the node has a left child (X) the right child of X (Z) can
 /// be a leaf.
-InnerAVLNode<K, V> rotateRight<K extends Comparable, V>({
-  required K key,
+InnerAVLNode<K, V> rotateRight<K, V extends Comparable>({
   required V value,
   required int height,
   required AVLNode<K, V> right,
@@ -29,7 +24,6 @@ InnerAVLNode<K, V> rotateRight<K extends Comparable, V>({
   final z = x.right;
 
   final y = InnerAVLNode<K, V>(
-    key,
     value,
     right: right,
     left: z,
@@ -37,7 +31,6 @@ InnerAVLNode<K, V> rotateRight<K extends Comparable, V>({
   );
 
   return InnerAVLNode<K, V>(
-    x.key,
     x.value,
     right: y,
     left: x.left,
@@ -55,8 +48,7 @@ InnerAVLNode<K, V> rotateRight<K extends Comparable, V>({
 ///
 /// Assumes that the node has a right child (X) the left child of X (Z) can
 /// be a leaf.
-InnerAVLNode<K, V> rotateLeft<K extends Comparable, V>({
-  required K key,
+InnerAVLNode<K, V> rotateLeft<K, V extends Comparable>({
   required V value,
   required int height,
   required InnerAVLNode<K, V> right,
@@ -66,7 +58,6 @@ InnerAVLNode<K, V> rotateLeft<K extends Comparable, V>({
   final z = x.left;
 
   final y = InnerAVLNode<K, V>(
-    key,
     value,
     right: z,
     left: left,
@@ -74,7 +65,6 @@ InnerAVLNode<K, V> rotateLeft<K extends Comparable, V>({
   );
 
   return InnerAVLNode<K, V>(
-    x.key,
     x.value,
     right: x.right,
     left: y,
@@ -93,8 +83,7 @@ InnerAVLNode<K, V> rotateLeft<K extends Comparable, V>({
 /// 2     3                3     4
 ///
 /// Assumes that the node has a right child (Y) and that Y has a left child (X).
-InnerAVLNode<K, V> rotateRightLeft<K extends Comparable, V>({
-  required K key,
+InnerAVLNode<K, V> rotateRightLeft<K, V extends Comparable>({
   required V value,
   required InnerAVLNode<K, V> right,
   required AVLNode<K, V> left,
@@ -102,7 +91,6 @@ InnerAVLNode<K, V> rotateRightLeft<K extends Comparable, V>({
   final x = right.left as InnerAVLNode<K, V>;
 
   final y = InnerAVLNode<K, V>(
-    right.key,
     right.value,
     right: right.right,
     left: x.right,
@@ -110,7 +98,6 @@ InnerAVLNode<K, V> rotateRightLeft<K extends Comparable, V>({
   );
 
   final z = InnerAVLNode<K, V>(
-    key,
     value,
     right: x.left,
     left: left,
@@ -118,7 +105,6 @@ InnerAVLNode<K, V> rotateRightLeft<K extends Comparable, V>({
   );
 
   return InnerAVLNode<K, V>(
-    x.key,
     x.value,
     right: y,
     left: z,
@@ -137,8 +123,7 @@ InnerAVLNode<K, V> rotateRightLeft<K extends Comparable, V>({
 ///    3     2       4     3
 ///
 /// Assumes that the node has a left child (Y) and that Y has a right child (X).
-InnerAVLNode<K, V> rotateLeftRight<K extends Comparable, V>({
-  required K key,
+InnerAVLNode<K, V> rotateLeftRight<K, V extends Comparable>({
   required V value,
   required AVLNode<K, V> right,
   required InnerAVLNode<K, V> left,
@@ -146,7 +131,6 @@ InnerAVLNode<K, V> rotateLeftRight<K extends Comparable, V>({
   final x = left.right as InnerAVLNode<K, V>;
 
   final y = InnerAVLNode<K, V>(
-    left.key,
     left.value,
     right: x.left,
     left: left.left,
@@ -154,7 +138,6 @@ InnerAVLNode<K, V> rotateLeftRight<K extends Comparable, V>({
   );
 
   final z = InnerAVLNode<K, V>(
-    key,
     value,
     right: right,
     left: x.right,
@@ -162,7 +145,6 @@ InnerAVLNode<K, V> rotateLeftRight<K extends Comparable, V>({
   );
 
   return InnerAVLNode<K, V>(
-    x.key,
     x.value,
     right: z,
     left: y,
@@ -171,8 +153,7 @@ InnerAVLNode<K, V> rotateLeftRight<K extends Comparable, V>({
 }
 
 /// Rebalances the tree if necessary depending on the hight of the children.
-InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
-  required K key,
+InnerAVLNode<K, V> rebalance<K, V extends Comparable>({
   required V value,
   required int height,
   required AVLNode<K, V> right,
@@ -185,7 +166,6 @@ InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
 
     if (right.right.height > right.left.height) {
       return rotateLeft(
-        key: key,
         value: value,
         height: height,
         right: right as InnerAVLNode<K, V>,
@@ -193,7 +173,6 @@ InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
       );
     } else {
       return rotateRightLeft(
-        key: key,
         value: value,
         right: right as InnerAVLNode<K, V>,
         left: left,
@@ -204,7 +183,6 @@ InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
 
     if (left.left.height > left.right.height) {
       return rotateRight(
-        key: key,
         value: value,
         height: height,
         right: right,
@@ -212,7 +190,6 @@ InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
       );
     } else {
       return rotateLeftRight(
-        key: key,
         value: value,
         right: right,
         left: left as InnerAVLNode<K, V>,
@@ -220,10 +197,10 @@ InnerAVLNode<K, V> rebalance<K extends Comparable, V>({
     }
   }
 
-  return InnerAVLNode(key, value, height: height, right: right, left: left);
+  return InnerAVLNode(value, height: height, right: right, left: left);
 }
 
-abstract class AVLNode<K extends Comparable, V> implements TreeNode<K, V> {
+abstract class AVLNode<K, V extends Comparable> implements TreeNode<K, V> {
   const AVLNode();
 
   int get height;
@@ -243,14 +220,17 @@ abstract class AVLNode<K extends Comparable, V> implements TreeNode<K, V> {
   ///
   /// This is a helper method for the delete function to find the replacement
   /// for the deleted node when it has two children.
-  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<InnerAVLNode<K, V>> result);
+  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result);
 
   @override
   Result<V> find(K key);
 }
 
-class LeafAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
+class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   const LeafAVLNode();
+
+  @override
+  bool get isEmpty => true;
 
   @override
   int get height => -1;
@@ -264,28 +244,29 @@ class LeafAVLNode<K extends Comparable, V> extends AVLNode<K, V> {
   AVLNode<K, V> get right => this;
 
   @override
-  AVLNode<K, V> insert(K key, V value) => InnerAVLNode<K, V>(key, value);
+  AVLNode<K, V> insert(K key, V value) => InnerAVLNode<K, V>(value, left: this, right: this);
 
   @override
   AVLNode<K, V> delete(K key) => throw const TreeResetOperationException();
 
   @override
-  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<InnerAVLNode<K, V>> result) {
-    result.value = parent;
+  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result) {
+    result.value = parent.value;
 
     return parent.left;
   }
 
   @override
-  Result<V> find(K key) => AVLNotFoundFailure(key: key);
+  Result<V> find(K key) => TreeNotFoundFailure(key: key);
 
   @override
   Iterable<TreeEntry<K, V>> get entries => Iterable<TreeEntry<K, V>>.empty();
 }
 
-class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements TreeEntry<K, V> {
+class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements TreeEntry<K, V> {
   @override
-  final K key;
+  bool get isEmpty => false;
+
   @override
   final V value;
 
@@ -298,26 +279,23 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
   final AVLNode<K, V> right;
 
   InnerAVLNode(
-    this.key,
     this.value, {
     this.height = 0,
-    AVLNode<K, V>? left,
-    AVLNode<K, V>? right,
-  })  : left = left ?? LeafAVLNode<K, V>(),
-        right = right ?? LeafAVLNode<K, V>();
+    required this.left,
+    required this.right,
+  });
 
   @override
   bool get isLeaf => false;
 
   @override
   AVLNode<K, V> insert(K key, V value) {
-    final comp = this.key.compareTo(key);
+    final comp = this.value.compareTo(key);
 
     if (comp > 0) {
       final result = left.insert(key, value);
 
       return rebalance(
-        key: this.key,
         value: this.value,
         height: max(result.height, right.height) + 1,
         left: result,
@@ -327,11 +305,19 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
       final result = right.insert(key, value);
 
       return rebalance(
-        key: this.key,
         value: this.value,
         height: max(result.height, left.height) + 1,
         left: left,
         right: result,
+      );
+    }
+
+    if (value != this.value) {
+      return InnerAVLNode(
+        value,
+        height: height,
+        left: left,
+        right: right,
       );
     }
 
@@ -340,13 +326,12 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
 
   @override
   AVLNode<K, V> delete(K key) {
-    final comp = this.key.compareTo(key);
+    final comp = value.compareTo(key);
 
     if (comp > 0) {
       final result = left.delete(key);
 
       return rebalance(
-        key: this.key,
         value: value,
         height: max(result.height, right.height) + 1,
         left: result,
@@ -356,7 +341,6 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
       final result = right.delete(key);
 
       return rebalance(
-        key: this.key,
         value: value,
         height: max(result.height, left.height) + 1,
         left: left,
@@ -371,13 +355,12 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
       return left;
     }
 
-    final rightMostRef = ReferenceBox<InnerAVLNode<K, V>>();
-    final leftUpdated = left.deleteRightMostChild(this, rightMostRef);
+    final rightMostRef = ReferenceBox<V>();
+    final leftUpdated = left.right.deleteRightMostChild(left as InnerAVLNode<K, V>, rightMostRef);
     assert(rightMostRef.accessed);
 
     return rebalance(
-      key: rightMostRef.value.key,
-      value: rightMostRef.value.value,
+      value: rightMostRef.value,
       height: max(leftUpdated.height, right.height) + 1,
       right: right,
       left: leftUpdated,
@@ -385,11 +368,10 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
   }
 
   @override
-  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<InnerAVLNode<K, V>> result) {
+  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result) {
     final node = right.deleteRightMostChild(this, result);
 
     return InnerAVLNode(
-      parent.key,
       parent.value,
       height: max(parent.left.height, node.height) + 1,
       right: node,
@@ -399,7 +381,7 @@ class InnerAVLNode<K extends Comparable, V> extends AVLNode<K, V> implements Tre
 
   @override
   Result<V> find(K key) {
-    final comp = this.key.compareTo(key);
+    final comp = value.compareTo(key);
 
     if (comp > 0) {
       return left.find(key);
@@ -433,18 +415,18 @@ String graphviz(AVLNode root) {
 }
 
 void _graphviz(StringBuffer buffer, InnerAVLNode node) {
-  final key = node.key;
+  final value = node.value;
   final right = node.right;
   final left = node.left;
 
-  buffer.writeln('"$key"[label="$key: ${node.value} (${node.height}@${node.right.height - node.left.height})"]');
+  buffer.writeln('"$value"[label="$value (${node.height}@${node.right.height - node.left.height})"]');
 
   if (right is InnerAVLNode) {
-    buffer.writeln('"$key"->"${right.key}"[label="R"]');
+    buffer.writeln('"$value"->"${right.value}"[label="R"]');
     _graphviz(buffer, right);
   }
   if (left is InnerAVLNode) {
-    buffer.writeln('"$key"->"${left.key}"[label="L"]');
+    buffer.writeln('"$value"->"${left.value}"[label="L"]');
     _graphviz(buffer, left);
   }
 }
