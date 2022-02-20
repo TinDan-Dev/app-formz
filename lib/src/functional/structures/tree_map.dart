@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 
 import '../either/either.dart';
 import '../result/result.dart';
-import 'trees/tree.dart';
+import 'avl_tree.dart';
 
 class TreeMapEntry<K extends Comparable, V> implements Comparable<K> {
   final K key;
@@ -22,21 +22,17 @@ class TreeMapEntry<K extends Comparable, V> implements Comparable<K> {
 
 @sealed
 class TreeMap<K extends Comparable, V> {
-  final TreeNode<K, TreeMapEntry<K, V>> _root;
+  final AVLNode<K, TreeMapEntry<K, V>> _root;
 
   TreeMap._(this._root);
 
-  TreeMap() : this.avl();
-
-  TreeMap.avl() : this._(LeafAVLNode<K, TreeMapEntry<K, V>>());
-
-  TreeMap.rb() : this._(LeafRBNode<K, TreeMapEntry<K, V>>());
+  TreeMap() : this._(LeafAVLNode<K, TreeMapEntry<K, V>>());
 
   /// Whether the map is empty or not in O(1);
-  bool get isEmpty => _root.isEmpty;
+  bool get isEmpty => _root.isLeaf;
 
   /// Whether the map is empty or not in O(1);
-  bool get isNotEmpty => !_root.isEmpty;
+  bool get isNotEmpty => !_root.isLeaf;
 
   /// The length of the map in O(n).
   ///
@@ -46,13 +42,13 @@ class TreeMap<K extends Comparable, V> {
   int get length => _root.entries.length;
 
   /// All entries of the map in order.
-  Iterable<TreeMapEntry<K, V>> get entries => _root.entries.map((e) => e.value);
+  Iterable<TreeMapEntry<K, V>> get entries => _root.entries;
 
   /// All keys of the map in order.
-  Iterable<K> get keys => _root.entries.map((e) => e.value.key);
+  Iterable<K> get keys => _root.entries.map((e) => e.key);
 
   /// All values of the map in order of the keys.
-  Iterable<V> get values => _root.entries.map((e) => e.value.value);
+  Iterable<V> get values => _root.entries.map((e) => e.value);
 
   /// Finds a value in the map in O(log n).
   ///
@@ -78,7 +74,7 @@ class TreeMap<K extends Comparable, V> {
   TreeMap<K, V> insert(K key, V value) {
     try {
       return TreeMap<K, V>._(_root.insert(key, TreeMapEntry<K, V>(key, value)));
-    } on TreeResetOperationException {
+    } on AVLResetOperationException {
       return this;
     }
   }
@@ -89,14 +85,14 @@ class TreeMap<K extends Comparable, V> {
   TreeMap<K, V> delete(K key) {
     try {
       return TreeMap<K, V>._(_root.delete(key));
-    } on TreeResetOperationException {
+    } on AVLResetOperationException {
       return this;
     }
   }
 
   Result<V> find(Object? key) {
     if (key is! K) {
-      return TreeNotFoundFailure(key: key, trace: StackTrace.current);
+      return AVLNotFoundFailure(key: key, trace: StackTrace.current);
     }
 
     return _root.find(key).mapRight((v) => v.value).mapLeft((v) => v.copyWith(trace: () => StackTrace.current));

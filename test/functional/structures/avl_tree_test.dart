@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formz/src/functional/structures/trees/tree.dart';
+import 'package:formz/src/functional/structures/avl_tree.dart';
 import 'package:formz_test/formz_test.dart';
 
 import 'tree_map_test.dart';
@@ -70,7 +70,7 @@ void main() {
     });
   });
 
-  group('map', () => runMapTest(() => TreeMap<int, String>.avl()));
+  group('map', () => runMapTest(() => TreeMap<int, String>()));
 
-  group('set', () => runSetTest(() => TreeSet<int>.avl()));
+  group('set', () => runSetTest(() => TreeSet<int>()));
 }

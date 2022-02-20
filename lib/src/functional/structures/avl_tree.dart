@@ -1,8 +1,24 @@
 import 'dart:math';
 
-import '../../result/result.dart';
-import '../reference_box.dart';
-import 'tree.dart';
+import '../result/result.dart';
+import 'reference_box.dart';
+
+/// If the operation can be reset and no copy of the tree needs to be created.
+///
+/// For example when inserting a duplicate or removing a not existing value.
+class AVLResetOperationException implements Exception {
+  const AVLResetOperationException();
+}
+
+/// If a key could not be found in the tree.
+///
+/// Can be returned by the find operation.
+class AVLNotFoundFailure<R> extends Failure<R> {
+  AVLNotFoundFailure({
+    required Object? key,
+    StackTrace? trace,
+  }) : super(message: 'Key could not be found: $key', cause: key, trace: trace);
+}
 
 /// Performers a right rotation on a node (Y):
 ///
@@ -200,7 +216,7 @@ InnerAVLNode<K, V> rebalance<K, V extends Comparable>({
   return InnerAVLNode(value, height: height, right: right, left: left);
 }
 
-abstract class AVLNode<K, V extends Comparable> implements TreeNode<K, V> {
+abstract class AVLNode<K, V extends Comparable> {
   const AVLNode();
 
   int get height;
@@ -210,10 +226,8 @@ abstract class AVLNode<K, V extends Comparable> implements TreeNode<K, V> {
   AVLNode<K, V> get left;
   AVLNode<K, V> get right;
 
-  @override
   AVLNode<K, V> insert(K key, V value);
 
-  @override
   AVLNode<K, V> delete(K key);
 
   /// Gets the value of the right most inner node and deletes it.
@@ -222,15 +236,13 @@ abstract class AVLNode<K, V extends Comparable> implements TreeNode<K, V> {
   /// for the deleted node when it has two children.
   AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result);
 
-  @override
   Result<V> find(K key);
+
+  Iterable<V> get entries;
 }
 
 class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   const LeafAVLNode();
-
-  @override
-  bool get isEmpty => true;
 
   @override
   int get height => -1;
@@ -247,7 +259,7 @@ class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   AVLNode<K, V> insert(K key, V value) => InnerAVLNode<K, V>(value, left: this, right: this);
 
   @override
-  AVLNode<K, V> delete(K key) => throw const TreeResetOperationException();
+  AVLNode<K, V> delete(K key) => throw const AVLResetOperationException();
 
   @override
   AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result) {
@@ -257,13 +269,13 @@ class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   }
 
   @override
-  Result<V> find(K key) => TreeNotFoundFailure(key: key);
+  Result<V> find(K key) => AVLNotFoundFailure(key: key);
 
   @override
-  Iterable<TreeEntry<K, V>> get entries => Iterable<TreeEntry<K, V>>.empty();
+  Iterable<V> get entries => Iterable<V>.empty();
 }
 
-class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements TreeEntry<K, V> {
+class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   @override
   final V value;
 
@@ -281,9 +293,6 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements Tre
     required this.left,
     required this.right,
   });
-
-  @override
-  bool get isEmpty => false;
 
   @override
   bool get isLeaf => false;
@@ -321,7 +330,7 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements Tre
       );
     }
 
-    throw const TreeResetOperationException();
+    throw const AVLResetOperationException();
   }
 
   @override
@@ -393,9 +402,9 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> implements Tre
   }
 
   @override
-  Iterable<TreeEntry<K, V>> get entries sync* {
+  Iterable<V> get entries sync* {
     yield* left.entries;
-    yield this;
+    yield value;
     yield* right.entries;
   }
 }
