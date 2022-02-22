@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formz_test/formz_test.dart';
 
-void runMapTest(TreeMap<int, String> create()) {
-  var tmpMap = create();
+void main() {
+  var tmpMap = TreeMap<int, String>();
 
   for (int i = -99; i < 100; i++) {
     tmpMap = tmpMap.insert(i, 'String: $i');
   }
 
-  final map = create();
+  final map = TreeMap<int, String>();
   final populatedMap = tmpMap;
 
   test('isEmpty should be true if the map is empty', () {
@@ -117,6 +117,21 @@ void runMapTest(TreeMap<int, String> create()) {
 
         prevElement = element.key;
       }
+    });
+  });
+
+  group('from', () {
+    test('empty map', () {
+      final result = TreeMap<int, String>.from({});
+
+      expect(result.isEmpty, isTrue);
+    });
+
+    test('not empty map', () {
+      final result = TreeMap<int, String>.from({1: '1', 2: '2'});
+
+      expect(result.isNotEmpty, isTrue);
+      expect(result[1], equals('1'));
     });
   });
 }

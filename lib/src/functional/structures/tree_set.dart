@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../either/either.dart';
@@ -12,6 +13,13 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
   TreeSet._(this._root);
 
   TreeSet() : this._(LeafAVLNode<V, V>());
+
+  factory TreeSet.from(Set<V> set) {
+    final sorted = set.sorted((a, b) => a.compareTo(b));
+    final root = fromIterator<V, V>(sorted.iterator, set.length);
+
+    return TreeSet<V>._(root);
+  }
 
   /// Whether the map is empty or not in O(1);
   @override

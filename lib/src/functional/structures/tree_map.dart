@@ -1,17 +1,27 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../either/either.dart';
 import '../result/result.dart';
 import 'avl_tree.dart';
 
-class TreeMapEntry<K extends Comparable, V> implements Comparable<K> {
+class TreeMapEntry<K extends Comparable, V> implements Comparable {
   final K key;
   final V value;
 
   TreeMapEntry(this.key, this.value);
 
   @override
-  int compareTo(K other) => key.compareTo(other);
+  int compareTo(Object? other) {
+    if (other is K) {
+      return key.compareTo(other);
+    }
+    if (other is TreeMapEntry<K, V>) {
+      return key.compareTo(other.key);
+    }
+
+    throw UnimplementedError('Only comparisons with a key or an entry are supported');
+  }
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is TreeMapEntry && other.value == value;
@@ -27,6 +37,15 @@ class TreeMap<K extends Comparable, V> {
   TreeMap._(this._root);
 
   TreeMap() : this._(LeafAVLNode<K, TreeMapEntry<K, V>>());
+
+  factory TreeMap.from(Map<K, V> map) {
+    final sorted = map.entries.sorted((a, b) => a.key.compareTo(b.key));
+    final it = sorted.map((e) => TreeMapEntry<K, V>(e.key, e.value)).iterator;
+
+    final root = fromIterator<K, TreeMapEntry<K, V>>(it, map.length);
+
+    return TreeMap<K, V>._(root);
+  }
 
   /// Whether the map is empty or not in O(1);
   bool get isEmpty => _root.isLeaf;

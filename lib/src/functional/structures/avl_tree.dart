@@ -276,7 +276,6 @@ class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
 }
 
 class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
-  @override
   final V value;
 
   @override
@@ -407,6 +406,30 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
     yield value;
     yield* right.entries;
   }
+}
+
+AVLNode<K, V> fromIterator<K, V extends Comparable>(Iterator<V> sortedIterator, int size) =>
+    _fromIterator(sortedIterator, LeafAVLNode(), size);
+
+AVLNode<K, V> _fromIterator<K, V extends Comparable>(Iterator<V> sortedIterator, LeafAVLNode<K, V> leaf, int size) {
+  if (size <= 0) return leaf;
+
+  final leftSize = size ~/ 2;
+  final rightSize = max(0, size - leftSize - 1);
+
+  final left = _fromIterator(sortedIterator, leaf, leftSize);
+
+  sortedIterator.moveNext();
+  final value = sortedIterator.current;
+
+  final right = _fromIterator(sortedIterator, leaf, rightSize);
+
+  return InnerAVLNode<K, V>(
+    value,
+    height: max(left.height, right.height) + 1,
+    left: left,
+    right: right,
+  );
 }
 
 /// For testing only, creates a string representation of the tree that can be

@@ -2,9 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:formz/src/functional/structures/avl_tree.dart';
 import 'package:formz_test/formz_test.dart';
 
-import 'tree_map_test.dart';
-import 'tree_set_test.dart';
-
 void expectInvariant(AVLNode node) {
   if (node is LeafAVLNode) return;
   expect(node.right.height - node.left.height, inInclusiveRange(-1, 1));
@@ -70,7 +67,21 @@ void main() {
     });
   });
 
-  group('map', () => runMapTest(() => TreeMap<int, String>()));
+  group('from iterable', () {
+    test('empty', () {
+      final result = fromIterator<int, int>(<int>[].iterator, 0);
 
-  group('set', () => runSetTest(() => TreeSet<int>()));
+      expect(result, isA<LeafAVLNode<int, int>>());
+    });
+
+    test('not empty', () {
+      final it = Iterable<int>.generate(100);
+      final result = fromIterator<int, int>(it.iterator, 100);
+
+      expect(result, isA<InnerAVLNode<int, int>>());
+      expectInvariant(result);
+
+      expect(it.every((e) => result.find(e).right), isTrue);
+    });
+  });
 }

@@ -1,15 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formz/src/functional/structures/tree_set.dart';
 import 'package:formz_test/formz_test.dart';
 
-void runSetTest(TreeSet<int> create()) {
-  var tmpSet = create();
+void main() {
+  var tmpSet = TreeSet<int>();
 
   for (int i = -99; i < 100; i++) {
     tmpSet = tmpSet.insert(i);
   }
 
-  final set = create();
+  final set = TreeSet<int>();
   final populatedSet = tmpSet;
 
   test('isEmpty should be true if the set is empty', () {
@@ -109,6 +108,21 @@ void runSetTest(TreeSet<int> create()) {
 
         prevElement = element;
       }
+    });
+  });
+
+  group('from', () {
+    test('empty iterable', () {
+      final result = TreeSet<int>.from({});
+
+      expect(result.isEmpty, isTrue);
+    });
+
+    test('not empty iterable', () {
+      final result = TreeSet<int>.from({1, 2, 3});
+
+      expect(result.isNotEmpty, isTrue);
+      expect(result.contains(1), isTrue);
     });
   });
 }
