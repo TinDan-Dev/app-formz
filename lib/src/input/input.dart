@@ -10,7 +10,7 @@ typedef ValidationDelegate<T> = Result<void> Function(T input);
 
 // Using lazy validation to improve performance, thus this class is still immutable but the validation function is only called
 // once. The mixin is used to avoid immutable warnings.
-class Input<T> extends Equatable implements Result<void> {
+class Input<T> extends Equatable implements Result<T> {
   final ValidationDelegate<T> delegate;
 
   final bool _pure;
@@ -52,8 +52,13 @@ class Input<T> extends Equatable implements Result<void> {
   }
 
   @override
-  S consume<S>({required S onRight(void value), required S onLeft(Failure value)}) =>
-      _validate.value.consume(onRight: onRight, onLeft: onLeft);
+  S consume<S>({required S onRight(T value), required S onLeft(Failure value)}) {
+    if (valid) {
+      return onRight(value);
+    } else {
+      return onLeft(failure ?? Failure(message: 'Unexpected state: Input invalid but no failure provided'));
+    }
+  }
 }
 
 typedef PureDelegate<T> = bool Function(T? input);
@@ -74,4 +79,16 @@ class OptionalInput<T> extends Input<T> {
 
   @override
   bool get optional => true;
+
+  @override
+  bool get valid => super.valid || pure;
+
+  @override
+  Input<T> copyWith({required T value, bool pure = false}) => OptionalInput<T>(
+        delegate,
+        pureDelegate: pureDelegate,
+        value: value,
+        pure: pure,
+        id: id,
+      );
 }
