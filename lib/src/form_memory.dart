@@ -1,84 +1,86 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart';
 
 import 'form_cubit.dart';
+import 'functional/result/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
-import 'utils/failure.dart';
 
 class FormMemory with InputContainer {
   final _inputs = <Input>[];
-  final _failures = <Type, Failure?>{};
-  final _listeners = <Type, void Function()>{};
+  final _failures = <Object, Failure?>{};
+  final _listeners = <Object, VoidCallback>{};
 
   @override
   Iterable<Input> get inputs => _inputs;
 
-  void save<T extends Input>(T input) {
-    _inputs.removeWhere((e) => e.name == input.name);
+  void save(Input input) {
+    _inputs.removeWhere((e) => e.id == input.id);
     _inputs.add(input);
   }
 
   @visibleForTesting
-  void saveAndNotify(Type type, Iterable<Input> inputs, Failure? failure) {
-    for (final input in inputs) save(input);
-    _failures[type] = failure;
+  void saveAndNotify(Object identifier, Iterable<Input> inputs, Failure? failure) {
+    for (final input in inputs) {
+      save(input);
+    }
+    _failures[identifier] = failure;
 
-    _listeners.entries.where((e) => e.key != type).forEach((e) => e.value());
+    _listeners.entries.where((e) => e.key != identifier).forEach((e) => e.value());
   }
 
-  Iterable<Input> _loadInputs(Iterable<String> targets) => _inputs.where((e) => targets.contains(e.name));
+  void _addListener(Object identifier, VoidCallback callback) => _listeners[identifier] = callback;
 
-  Failure? _loadFailure(Type type) => _failures[type];
+  void _removeListener(Object identifier) => _listeners.remove(identifier);
+
+  Iterable<Input> _loadInputs(Iterable<InputIdentifier> targets) => _inputs.where((e) => targets.contains(e.id));
+
+  Failure? _loadFailure(Object identifier) => _failures[identifier];
 }
 
-mixin FormMemoryMixin on FormCubit {
+mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
   @protected
   FormMemory get memory;
 
   @protected
-  void initMemory() {
-    memory._listeners[runtimeType] = _load;
-    _load();
-
-    memory.saveAndNotify(runtimeType, state.inputs, null);
-    stream.listen((e) => memory.saveAndNotify(runtimeType, e.inputs, e.failure));
-  }
+  Object get identifier;
 
   @protected
+  void initMemory() {
+    memory._addListener(identifier, _load);
+    _load();
+
+    memory.saveAndNotify(identifier, state.inputs, state.failure);
+    stream.listen((e) => memory.saveAndNotify(identifier, e.inputs, e.failure));
+  }
+
   void _load() {
     emit(state.copyWith(
-      inputs: memory._loadInputs(state.inputs.map((e) => e.name)),
-      failure: () => memory._loadFailure(runtimeType),
+      inputs: memory._loadInputs(state.inputs.map((e) => e.id)),
+      failure: () => memory._loadFailure(identifier),
     ));
   }
 
   @override
   Future<void> close() async {
-    super.close();
+    await super.close();
 
-    memory._listeners.remove(runtimeType);
+    memory._removeListener(identifier);
   }
 
   @override
-  T getInput<T extends Input>(String name) {
-    final inputCandidates = state.inputs.where((e) => e.name == name);
-    assert(inputCandidates.length <= 1, '${inputCandidates.length} with name: $name');
+  Input<I> getInput<I>(InputIdentifier<I> id) {
+    final inputCandidates = state.inputs.where((e) => e.id == id);
+    assert(inputCandidates.length <= 1, '${inputCandidates.length} with id: $id');
 
-    if (inputCandidates.length > 0) {
+    if (inputCandidates.isNotEmpty) {
       final input = inputCandidates.first;
-      assert(input is T, 'Input found of type ${input.runtimeType} but $T was requested');
+      assert(input is Input<I>, 'Input found of type ${input.runtimeType} but ${Input<I>} was requested');
 
-      return input as T;
+      return input as Input<I>;
     } else {
-      final memoryCandidates = memory._inputs.where((e) => e.name == name);
-      assert(memoryCandidates.length == 1, '${memoryCandidates.length} inputs found with name $name in memory');
-
-      final input = memoryCandidates.first;
-      assert(input is T, 'Input found in memory of type ${input.runtimeType} but $T was requested');
-
-      return input as T;
+      return memory.getInput<I>(id);
     }
   }
 }

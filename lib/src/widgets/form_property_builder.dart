@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide FormState;
-import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../formz.dart';
 import '../form_cubit.dart';
 import '../form_state.dart';
 
@@ -17,7 +17,8 @@ class FormPropertyBuilder<Cubit extends FormCubit, T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<Cubit, FormState>(
+    return FormStateBuilder<Cubit>(
+      buildWhen: (state) => [state.getProperty(propertyKey)],
       builder: (context, state) => builder(context, state, state.getProperty(propertyKey)),
     );
   }

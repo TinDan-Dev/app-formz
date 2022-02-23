@@ -5,6 +5,9 @@ class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
   @override
   final FormMemory memory;
 
+  @override
+  final String identifier = 'cubit';
+
   TestMemoryFormCubit({
     required this.memory,
     required FormState state,
@@ -16,8 +19,8 @@ class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
 void main() {
   late FormMemory memory;
 
-  final pureInput = GenericTestInput.pure('test', name: 'test');
-  final dirtyInput = GenericTestInput.dirty('dirty', name: 'test');
+  final pureInput = createTestInput('test', pure: true);
+  final dirtyInput = createTestInput('dirty', pure: true);
 
   setUp(() {
     memory = FormMemory();
@@ -40,19 +43,19 @@ void main() {
   });
 
   group('saveAndNotify', () {
-    late FormCubit cubit;
+    late TestMemoryFormCubit cubit;
 
     setUp(() {
       cubit = TestMemoryFormCubit(
         memory: memory,
-        state: FormState([GenericTestInput.pure('', name: 'test')]),
+        state: FormState([createTestInput('')]),
       );
     });
 
-    test('should not update the cubit when the cubit matches the input type', () {
+    test('should not update the cubit when the cubit matches the identifier', () {
       final expectation = expectNoEmits(cubit.stream);
 
-      memory.saveAndNotify(TestMemoryFormCubit, [dirtyInput], null);
+      memory.saveAndNotify(cubit.identifier, [dirtyInput], null);
 
       return expectation;
     });
@@ -60,10 +63,18 @@ void main() {
     test('should update the cubit when the cubit does not match the input type', () {
       final expectation = expectLater(
         cubit.stream,
-        emits(predicate<FormState>((s) => s.getValue<String>('test') == 'dirty')),
+        emits(predicate<FormState>((s) => s.getValue<String>(testInputId) == 'dirty')),
       );
 
       memory.saveAndNotify(String, [dirtyInput], null);
+
+      return expectation;
+    });
+
+    test('should update the cubit when the cubit does not match the identifier', () {
+      final expectation = expectLater(cubit.stream, emits(anything));
+
+      memory.saveAndNotify('x', [dirtyInput], null);
 
       return expectation;
     });

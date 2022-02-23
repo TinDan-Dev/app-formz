@@ -4,10 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'attachments.dart';
 import 'form_state.dart';
+import 'functional/result/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
-import 'utils/consumable.dart';
-import 'utils/failure.dart';
 
 class _InputAttachment<T> {
   final T value;
@@ -19,7 +18,7 @@ class _InputAttachment<T> {
 }
 
 abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableInputContainer {
-  final _attachments = <String, List<_InputAttachment>>{};
+  final _attachments = <InputIdentifier, List<_InputAttachment>>{};
 
   FormCubit(FormState initialState) : super(initialState);
 
@@ -32,22 +31,22 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
   }
 
   T getAttachment<T>(
-    String name, {
+    InputIdentifier inputId, {
     required T create(),
     void dispose(T value)?,
   }) {
-    final attachments = _attachments.putIfAbsent(name, () => []);
+    final attachments = _attachments.putIfAbsent(inputId, () => []);
 
-    final attachment = attachments.where((e) => e.value is T);
+    final attachment = attachments.whereType<T>();
     assert(attachment.length <= 1, '${attachment.length} attachments of Type $T found');
 
-    if (attachment.length < 1) {
+    if (attachment.isEmpty) {
       final value = create();
       attachments.add(_InputAttachment<T>(value, dispose));
 
       return value;
     } else {
-      return attachment.first.value;
+      return attachment.first;
     }
   }
 
@@ -57,7 +56,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
 
   void setFailure(Failure? failure) => emit(state.copyWith(failure: () => failure));
 
-  Future<bool> submit(FutureOr<ConsumableAsync> action()) async {
+  Future<Result<void>> submit(FutureOr<Result<void>> action()) async {
     assert(!state.submission, 'Another submission is currently in progress');
     unfocusAll();
 
@@ -65,13 +64,13 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
     final result = await action();
 
     return result.consume(
-      onSuccess: (_) {
+      onRight: (_) {
         emit(state.copyWith(submission: false, failure: () => null));
-        return true;
+        return Result.right(null);
       },
-      onError: (failure) {
+      onLeft: (failure) {
         emit(state.copyWith(submission: false, failure: () => failure));
-        return false;
+        return Result.left(failure);
       },
     );
   }

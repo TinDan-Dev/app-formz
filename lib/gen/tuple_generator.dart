@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:build/build.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart' hide LibraryBuilder;
@@ -60,7 +58,7 @@ class TupleGenerator extends Generator {
   }
 
   @override
-  Future<String> generate(LibraryReader _, __) async {
+  String generate(LibraryReader _, __) {
     final classBuf = StringBuffer();
 
     for (int i = 2; i <= 9; i++) {

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart' hide FormState;
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../form_cubit.dart';
-import '../form_state.dart';
+import '../../formz.dart';
 import '../utils/extensions.dart';
-import '../utils/failure.dart';
 
 class FormErrorBuilder<Cubit extends FormCubit> extends StatelessWidget {
   final Widget Function(BuildContext context, Failure failure) builder;
@@ -18,9 +15,8 @@ class FormErrorBuilder<Cubit extends FormCubit> extends StatelessWidget {
   Widget build(BuildContext context) {
     const placeholder = SizedBox.shrink();
 
-    return BlocBuilder<Cubit, FormState>(
-      buildWhen: (previous, current) =>
-          previous.failure != current.failure || previous.submission != current.submission,
+    return FormStateBuilder<Cubit>(
+      buildWhen: (state) => [state.failure, state.submission],
       builder: (context, state) {
         if (state.submission) return placeholder;
 
