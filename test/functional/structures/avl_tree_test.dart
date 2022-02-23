@@ -119,4 +119,21 @@ void main() {
       expect(result.entries, equals([0, 1, 2, 3, 4]));
     });
   });
+
+  group('minus', () {
+    final a = fromIterator<int, int>(<int>[1, 2, 3].iterator, 3);
+    final b = fromIterator<int, int>(<int>[0, 1, 2, 4].iterator, 4);
+
+    test('empty', () {
+      final result = minus(a, LeafAVLNode());
+
+      expect(result.entries, equals([1, 2, 3]));
+    });
+
+    test('not empty', () {
+      final result = minus(b, a);
+
+      expect(result.entries, equals([0, 4]));
+    });
+  });
 }

@@ -115,3 +115,46 @@ class AVLUnionIterator<V extends Comparable> extends NextIterator<V> {
     }
   }
 }
+
+AVLNode<K, V> minus<K, V extends Comparable>(AVLNode<K, V> a, AVLNode<K, V> b) {
+  final it = AVLMinusIterator<V>(a.entries.iterator, b.entries.iterator);
+
+  final list = <V>[];
+  while (it.moveNext()) {
+    list.add(it.current);
+  }
+
+  return fromIterator(list.iterator, list.length);
+}
+
+class AVLMinusIterator<V extends Comparable> extends Iterator<V> {
+  final Iterator<V> a;
+  final PeekIterator<V> b;
+
+  @override
+  V get current => a.current;
+
+  AVLMinusIterator(this.a, b) : b = PeekIterator.from(b);
+
+  @override
+  bool moveNext() {
+    while (true) {
+      if (!a.moveNext()) return false;
+
+      while (true) {
+        if (!b.hasNext) return true;
+
+        final result = a.current.compareTo(b.peek);
+        if (result < 0) {
+          return true;
+        } else if (result > 0) {
+          b.next();
+          continue;
+        } else {
+          b.next();
+          break;
+        }
+      }
+    }
+  }
+}
