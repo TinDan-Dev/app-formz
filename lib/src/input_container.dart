@@ -5,21 +5,20 @@ import 'input/input.dart';
 mixin InputContainer {
   Iterable<Input> get inputs;
 
-  T getInput<T extends Input>(String name) {
-    final inputCandidates = inputs.where((e) => e.name == name);
-    assert(inputCandidates.length == 1, '${inputCandidates.length} with name: $name');
+  Input<T> getInput<T>(InputIdentifier<T> id) {
+    final inputCandidates = inputs.where((e) => e.id == id);
+    assert(inputCandidates.length == 1, '${inputCandidates.length} Inputs with id: $id');
 
     final input = inputCandidates.first;
-    assert(input is T, 'Input found of type ${input.runtimeType} but $T was requested');
+    assert(input is Input<T>, '${input.id.toString()} requested but ${input.runtimeType} was found');
 
-    return input as T;
+    return input as Input<T>;
   }
 
-  T getValue<T>(String name) {
-    final input = getInput(name);
-    assert(input.value is T, 'Input has value of type ${input.value.runtimeType} but $T was requested');
+  T getValue<T>(InputIdentifier<T> id) {
+    final input = getInput<T>(id);
 
-    return input.value as T;
+    return input.value;
   }
 }
 
@@ -27,34 +26,41 @@ mixin MutableInputContainer on InputContainer {
   @protected
   void replaceInput(Input input);
 
-  void setInput<T extends Input>(
-    dynamic value, {
-    required String name,
+  void setInput<T>(
+    T value, {
+    required InputIdentifier<T> id,
     bool pure = false,
   }) {
-    final input = getInput<T>(name);
+    assert(id.checkType(value), 'Value ($value) is not assignable to the input $id');
+
+    final input = getInput<T>(id);
     final result = input.copyWith(value: value, pure: pure);
 
-    assert(
-      result.runtimeType == input.runtimeType,
-      'The input $name was ${input.runtimeType} but after the mutation it was ${result.runtimeType}',
-    );
+    replaceInput(result);
+  }
+
+  void mutateInput<T>(
+    T mutate(T value), {
+    required InputIdentifier<T> id,
+    bool pure = false,
+  }) {
+    final input = getInput<T>(id);
+    final result = input.copyWith(value: mutate(input.value), pure: pure);
+
     replaceInput(result);
   }
 
   @protected
   @visibleForTesting
-  void updateInput<T extends Input>({
-    required Input update(T input),
-    required String name,
+  void updateInput<T>({
+    required Input<T> update(Input<T> input),
+    required InputIdentifier<T> id,
   }) {
-    final input = getInput<T>(name);
+    final input = getInput<T>(id);
     final result = update(input);
 
-    assert(
-      result.runtimeType == input.runtimeType,
-      'The input $name was ${input.runtimeType} but after the mutation it was ${result.runtimeType}',
-    );
+    assert(result.id == id, 'The id of the input is not allowed to change');
+
     replaceInput(result);
   }
 }

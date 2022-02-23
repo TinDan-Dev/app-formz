@@ -17,7 +17,7 @@ void main() {
   });
 
   Result<T> errorToFailure<T>(Object? error, StackTrace? trace, CancellationToken token) {
-    return Result.left(const FakeFailure());
+    return Result.left(FakeFailure());
   }
 
   test('should execute once when successful', () async {

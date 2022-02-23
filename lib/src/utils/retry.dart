@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import '../functional/result.dart';
+import '../functional/result/result.dart';
 import 'cancellation_token.dart';
 
 bool _defaultShouldContinue(_) => true;
@@ -24,7 +24,7 @@ abstract class Retries {
 
 /// Wraps a function and applies retry logic to it. Thus the function is called multiple times if it throws a exception.
 /// Make sure there are no side effects when calling the function multiple times.
-class Retry<T> implements ResultFuture<T> {
+class Retry<T> extends ResultFuture<T> {
   final _completer = Completer<Result<T>>();
 
   /// This function is tried.

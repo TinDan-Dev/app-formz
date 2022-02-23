@@ -1,30 +1,31 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
-import '../utils/extensions.dart';
-import 'either/either.dart';
-import 'either_future/either_future.dart';
+import '../../utils/extensions.dart';
+import '../either/either.dart';
+import '../either/either_future.dart';
 
 typedef Result<T> = Either<Failure, T>;
 typedef ResultFuture<T> = EitherFuture<Failure, T>;
+typedef ResultFutureMixin<T> = EitherFutureMixin<Failure, T>;
 
-class Failure {
-  static String Function(BuildContext context)? defaultLocalization;
+typedef LocalizationsDelegate<T> = String Function(T context);
+
+class Failure<R> implements Result<R> {
+  static LocalizationsDelegate? defaultLocalization;
 
   final String message;
   final Object? cause;
   final StackTrace? trace;
 
-  const Failure({
+  Failure({
     required this.message,
     this.cause,
     this.trace,
-  });
+  }) : assert(cause is! AssertionError, 'Failure of assertion error: ${cause.message}\n\n${cause.stackTrace}');
 
   @override
   String toString() {
-    final builder = StringBuffer('Failure ($runtimeType):\n');
+    final builder = StringBuffer('Failure ($runtimeType): $message\n');
 
     cause.let((some) => builder.writeln('Caused by: $some'));
     trace.let((some) => builder.writeln('Trace: $some'));
@@ -32,7 +33,7 @@ class Failure {
     return builder.toString();
   }
 
-  String localize(BuildContext context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
+  String localize(dynamic context) => defaultLocalization?.call(context) ?? 'Could not localize failure';
 
   Failure copyWith({
     String message()?,
@@ -45,6 +46,9 @@ class Failure {
       trace: trace.fold(() => this.trace, (some) => some()),
     );
   }
+
+  @override
+  T consume<T>({required T onRight(R _), required T onLeft(Failure value)}) => onLeft(this);
 }
 
 Result<T> runCatching<T>({
@@ -66,17 +70,5 @@ Future<Result<T>> runCatchingAsync<T>({
     return Result.right(await action());
   } catch (e, s) {
     return Result.left(onError(e, s));
-  }
-}
-
-extension ResultIterableHelper<T> on Iterable<T> {
-  Result<T> firstWhereOrResult(bool test(T element), {required Result<T> orElse()}) {
-    for (final element in this) {
-      if (test(element)) {
-        return Result.right(element);
-      }
-    }
-
-    return orElse();
   }
 }

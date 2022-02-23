@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'functional/result.dart';
+import 'functional/result/result.dart';
 import 'input/input.dart';
 import 'input_container.dart';
 import 'utils/extensions.dart';
@@ -50,10 +50,11 @@ class FormState extends Equatable with InputContainer {
   bool _isValid() {
     final inputsValid = _inputs.every((e) => e.valid || (e.optional && e.pure));
 
-    if (inputsValid)
+    if (inputsValid) {
       return _criteria.every((e) => e(this));
-    else
+    } else {
       return false;
+    }
   }
 
   bool get pure => _pure.value;
@@ -67,7 +68,7 @@ class FormState extends Equatable with InputContainer {
     Failure? failure()?,
   }) {
     assert(
-      inputs.every((e) => _inputs.any((o) => o.name == e.name)),
+      inputs.every((e) => _inputs.any((o) => o.id == e.id)),
       'Cannot add inputs that where not defined in the constructor',
     );
     assert(
@@ -77,7 +78,7 @@ class FormState extends Equatable with InputContainer {
 
     return FormState(
       [
-        for (final input in _inputs) inputs.firstWhere((e) => e.name == input.name, orElse: () => input),
+        for (final input in _inputs) inputs.firstWhere((e) => e.id == input.id, orElse: () => input),
       ],
       properties: {
         for (final key in _properties.keys) key: properties.containsKey(key) ? properties[key]! : _properties[key]!,

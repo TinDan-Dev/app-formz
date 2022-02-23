@@ -2,10 +2,16 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 
-abstract class Either<L, R> {
-  const factory Either.left(L value) = _Left;
+export 'either_future.dart';
+export 'either_iterable.dart';
+export 'either_join.dart';
+export 'either_map.dart';
+export 'either_stream.dart';
 
-  const factory Either.right(R value) = _Right;
+abstract class Either<L, R> {
+  const factory Either.left(L value) = _Left<L, R>;
+
+  const factory Either.right(R value) = _Right<L, R>;
 
   T consume<T>({required T onRight(R value), required T onLeft(L value)});
 }
@@ -93,7 +99,8 @@ extension EitherExtension<L, R> on Either<L, R> {
 }
 
 extension FutureOfEitherExtension<L, R> on FutureOr<Either<L, R>> {
-  Future<T> consume<T>({required T onLeft(L value), required T onRight(R value)}) async => (await this).consume(
+  Future<T> consume<T>({required FutureOr<T> onLeft(L value), required FutureOr<T> onRight(R value)}) async =>
+      (await this).consume(
         onLeft: onLeft,
         onRight: onRight,
       );

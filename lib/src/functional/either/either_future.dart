@@ -1,9 +1,61 @@
 import 'dart:async';
 
-import '../either_future/either_future.dart';
+import 'package:equatable/equatable.dart';
+
+import '../../utils/delegate/delegating_future.dart';
 import 'either.dart';
 
-class _EitherToEitherFuture<L, R> implements EitherFuture<L, R> {
+typedef EitherFutureMixin<L, R> = DelegatingFuture<Either<L, R>>;
+
+abstract class EitherFuture<L, R> with DelegatingFuture<Either<L, R>> {
+  const EitherFuture();
+
+  const factory EitherFuture.left(FutureOr<L> value) = _Left<L, R>;
+
+  const factory EitherFuture.right(FutureOr<R> value) = _Right<L, R>;
+
+  Future<T> consume<T>({required FutureOr<T> onRight(R value), required FutureOr<T> onLeft(L value)});
+
+  @override
+  Future<Either<L, R>> get future => consume(
+        onLeft: (value) => Either.left(value),
+        onRight: (value) => Either.right(value),
+      );
+}
+
+class _Left<L, R> extends EitherFuture<L, R> with EquatableMixin {
+  final FutureOr<L> value;
+
+  const _Left(this.value);
+
+  @override
+  Future<T> consume<T>({
+    required FutureOr<T> onRight(R value),
+    required FutureOr<T> onLeft(L value),
+  }) async =>
+      onLeft(await value);
+
+  @override
+  List<Object?> get props => [value];
+}
+
+class _Right<L, R> extends EitherFuture<L, R> with EquatableMixin {
+  final FutureOr<R> value;
+
+  const _Right(this.value);
+
+  @override
+  Future<T> consume<T>({
+    required FutureOr<T> onRight(R value),
+    required FutureOr<T> onLeft(L value),
+  }) async =>
+      onRight(await value);
+
+  @override
+  List<Object?> get props => [value];
+}
+
+class _EitherToEitherFuture<L, R> extends EitherFuture<L, R> {
   final FutureOr<Either<L, R>> source;
 
   const _EitherToEitherFuture({required this.source});
