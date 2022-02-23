@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import '../../../formz.tuple.dart';
 import '../../utils/lazy.dart';
 import 'either.dart';
-import 'either_future.dart';
 
 /// Joins the left side of one [Either] (L) with the left side of another
 /// [Either] (S). The other Either is only invoked if the first one is left.

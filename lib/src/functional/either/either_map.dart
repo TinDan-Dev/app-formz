@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 
 import '../../utils/lazy.dart';
 import 'either.dart';
-import 'either_future.dart';
 
 // Maps an [Either] (L, R) to an [Either] (S, K).
 class _MapFlatEither<S, K, L, R> extends Equatable implements Either<S, K> {

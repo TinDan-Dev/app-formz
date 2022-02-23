@@ -9,7 +9,7 @@ import 'avl_tree.dart';
 /// any duplicates. This is method is more efficient then inserting all elements
 /// one after the other, because this method only creates one tree.
 AVLNode<K, V> fromIterator<K, V extends Comparable>(Iterator<V> sortedIterator, int size) =>
-    _fromIterator(sortedIterator, LeafAVLNode(), size);
+    _fromIterator(sortedIterator, const LeafAVLNode(), size);
 
 AVLNode<K, V> _fromIterator<K, V extends Comparable>(Iterator<V> sortedIterator, LeafAVLNode<K, V> leaf, int size) {
   if (size <= 0) return leaf;

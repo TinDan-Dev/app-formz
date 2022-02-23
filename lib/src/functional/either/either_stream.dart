@@ -87,7 +87,7 @@ abstract class EitherStream<T extends Either> implements Stream<T>, Future<T> {
   Future<bool> get isEmpty => stream.isEmpty;
 
   @override
-  Future<String> join([String separator = ""]) => stream.join(separator);
+  Future<String> join([String separator = '']) => stream.join(separator);
 
   @override
   Future<T> get last => stream.last;

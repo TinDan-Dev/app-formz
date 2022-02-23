@@ -66,7 +66,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
     return result.consume(
       onRight: (_) {
         emit(state.copyWith(submission: false, failure: () => null));
-        return Result.right(null);
+        return const Result.right(null);
       },
       onLeft: (failure) {
         emit(state.copyWith(submission: false, failure: () => failure));
@@ -83,6 +83,10 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
   Future<void> close() async {
     await super.close();
 
-    _attachments.values.forEach((attachments) => attachments.forEach((attachment) => attachment.dispose.call()));
+    for (final attachments in _attachments.values) {
+      for (final attachment in attachments) {
+        attachment.dispose.call();
+      }
+    }
   }
 }

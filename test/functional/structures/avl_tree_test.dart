@@ -15,7 +15,7 @@ void expectInvariant(AVLNode node) {
 }
 
 void main() {
-  final AVLNode<num, num> tree = LeafAVLNode<num, num>();
+  const AVLNode<num, num> tree = LeafAVLNode<num, num>();
 
   group('balancing', () {
     test('in order asc insert', () {
@@ -91,7 +91,7 @@ void main() {
     final b = fromIterator<int, int>(<int>[0, 1, 2, 4].iterator, 4);
 
     test('empty', () {
-      final result = intersect(a, LeafAVLNode());
+      final result = intersect(a, const LeafAVLNode());
 
       expect(result, isA<LeafAVLNode>());
     });
@@ -108,7 +108,7 @@ void main() {
     final b = fromIterator<int, int>(<int>[0, 1, 2, 4].iterator, 4);
 
     test('empty', () {
-      final result = union(a, LeafAVLNode());
+      final result = union(a, const LeafAVLNode());
 
       expect(result.entries, equals([1, 2, 3]));
     });
@@ -125,7 +125,7 @@ void main() {
     final b = fromIterator<int, int>(<int>[0, 1, 2, 4].iterator, 4);
 
     test('empty', () {
-      final result = minus(a, LeafAVLNode());
+      final result = minus(a, const LeafAVLNode());
 
       expect(result.entries, equals([1, 2, 3]));
     });

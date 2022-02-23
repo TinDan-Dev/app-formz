@@ -52,7 +52,7 @@ void main() {
     test('should throw an exception when no input with the name was added', () {
       final state = FormState([pureInputState]);
 
-      expect(() => state.getInput(InputIdentifier.named('unknown')), throwsA(anything));
+      expect(() => state.getInput(const InputIdentifier.named('unknown')), throwsA(anything));
     });
   });
 
@@ -68,7 +68,7 @@ void main() {
     test('should throw an exception when no input with the name was added', () {
       final state = FormState([pureInputState]);
 
-      expect(() => state.getInput(InputIdentifier.named('unknown')).value, throwsA(anything));
+      expect(() => state.getInput(const InputIdentifier.named('unknown')).value, throwsA(anything));
     });
   });
 
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('should throw a exception when a state should be updated but no state with this name was added', () {
-      when(invalidInputState.id).thenReturn(InputIdentifier.named('unknown'));
+      when(invalidInputState.id).thenReturn(const InputIdentifier.named('unknown'));
 
       final state = FormState([pureInputState]);
 
@@ -228,8 +228,8 @@ void main() {
         final input1 = MockInputState();
         final input2 = MockInputState();
 
-        when(input1.id).thenReturn(InputIdentifier.named('1'));
-        when(input2.id).thenReturn(InputIdentifier.named('2'));
+        when(input1.id).thenReturn(const InputIdentifier.named('1'));
+        when(input2.id).thenReturn(const InputIdentifier.named('2'));
         when(input1.pure).thenReturn(test[0][0]);
         when(input2.pure).thenReturn(test[1][0]);
         when(input1.valid).thenReturn(test[0][1]);

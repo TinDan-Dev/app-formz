@@ -2,7 +2,6 @@ import 'dart:async';
 
 import '../../utils/extensions.dart';
 import '../either/either.dart';
-import '../either/either_future.dart';
 
 typedef Result<T> = Either<Failure, T>;
 typedef ResultFuture<T> = EitherFuture<Failure, T>;

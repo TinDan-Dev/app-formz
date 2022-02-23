@@ -86,7 +86,7 @@ void main() {
 
     test('should throw an error when the input is not tracked', () {
       expect(
-        () => cubit.setInput('3', id: InputIdentifier.named('3')),
+        () => cubit.setInput('3', id: const InputIdentifier.named('3')),
         throwsA(isAssertionError),
       );
     });
@@ -118,7 +118,7 @@ void main() {
       expect(
         () => cubit.updateInput<String>(
           update: (input) => input.copyWith(value: '3'),
-          id: InputIdentifier.named('3'),
+          id: const InputIdentifier.named('3'),
         ),
         throwsA(isAssertionError),
       );
@@ -127,7 +127,7 @@ void main() {
     test('should throw an error when return type is different', () {
       expect(
         () => cubit.updateInput(
-          update: (input) => createInput<int>((_) => true, id: InputIdentifier.named('3'), value: 3),
+          update: (input) => createInput<int>((_) => true, id: const InputIdentifier.named('3'), value: 3),
           id: inputId1,
         ),
         throwsA(isAssertionError),
@@ -143,7 +143,7 @@ void main() {
 
     test('should throw an error when the requested input is not tracked', () {
       expect(
-        () => cubit.getValue(InputIdentifier.named('3')),
+        () => cubit.getValue(const InputIdentifier.named('3')),
         throwsA(isAssertionError),
       );
     });
@@ -161,7 +161,7 @@ void main() {
 
       test('should throw an error when the requested input is not tracked', () {
         expect(
-          () => cubit.getValue(InputIdentifier.named('3')),
+          () => cubit.getValue(const InputIdentifier.named('3')),
           throwsA(isAssertionError),
         );
       });

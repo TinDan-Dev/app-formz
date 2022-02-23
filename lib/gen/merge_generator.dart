@@ -10,7 +10,8 @@ Builder mergeGeneratorBuilder(BuilderOptions options) =>
 class MergeGenerator extends Generator {
   final emitter = DartEmitter();
 
-  String generate(LibraryReader _, __) {
+  @override
+  String generate(LibraryReader library, BuildStep buildStep) {
     final buffer = StringBuffer();
 
     buffer.write('''

@@ -44,10 +44,11 @@ class TupleGenerator extends Generator {
     buf.write('Tuple${suffixes[count - 2]}<');
 
     for (int i = 0; i < count; i++) {
-      if (i == tPlace)
+      if (i == tPlace) {
         buf.write('T');
-      else
+      } else {
         buf.write(generics[i]);
+      }
 
       if (i + 1 < count) buf.write(', ');
     }
@@ -58,7 +59,7 @@ class TupleGenerator extends Generator {
   }
 
   @override
-  String generate(LibraryReader _, __) {
+  String generate(LibraryReader library, BuildStep buildStep) {
     final classBuf = StringBuffer();
 
     for (int i = 2; i <= 9; i++) {
@@ -66,7 +67,9 @@ class TupleGenerator extends Generator {
         builder.name = 'Tuple${suffixes[i - 2]}';
         builder.extend = refer('Equatable');
 
-        for (int k = 0; k < i; k++) builder.types.add(refer(generics[k]));
+        for (int k = 0; k < i; k++) {
+          builder.types.add(refer(generics[k]));
+        }
 
         for (int k = 0; k < i; k++) {
           builder.fields.add(Field((fBuilder) => fBuilder
@@ -140,10 +143,11 @@ class TupleGenerator extends Generator {
             final name = fields[i];
 
             if (i == tPlace) {
-              if (async)
+              if (async) {
                 buf.write('$name: await mapper($name), ');
-              else
+              } else {
                 buf.write('$name: mapper($name), ');
+              }
             } else {
               buf.write('$name: $name, ');
             }
