@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../either/either.dart';
+import 'avl_operations.dart' as avl;
 import 'avl_tree.dart';
 
 @sealed
@@ -16,7 +17,7 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
 
   factory TreeSet.from(Set<V> set) {
     final sorted = set.sorted((a, b) => a.compareTo(b));
-    final root = fromIterator<V, V>(sorted.iterator, set.length);
+    final root = avl.fromIterator<V, V>(sorted.iterator, set.length);
 
     return TreeSet<V>._(root);
   }
@@ -56,4 +57,8 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
 
     return _root.find(element).right;
   }
+
+  TreeSet<V> intersect(TreeSet<V> other) => TreeSet._(avl.intersect(_root, other._root));
+
+  TreeSet<V> union(TreeSet<V> other) => TreeSet._(avl.union(_root, other._root));
 }

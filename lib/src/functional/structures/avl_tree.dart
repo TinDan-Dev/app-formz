@@ -1,7 +1,7 @@
 import 'dart:math';
 
+import '../../utils/ref_box.dart';
 import '../result/result.dart';
-import 'reference_box.dart';
 
 /// If the operation can be reset and no copy of the tree needs to be created.
 ///
@@ -234,7 +234,7 @@ abstract class AVLNode<K, V extends Comparable> {
   ///
   /// This is a helper method for the delete function to find the replacement
   /// for the deleted node when it has two children.
-  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result);
+  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, RefBox<V> result);
 
   Result<V> find(K key);
 
@@ -262,7 +262,7 @@ class LeafAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   AVLNode<K, V> delete(K key) => throw const AVLResetOperationException();
 
   @override
-  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result) {
+  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, RefBox<V> result) {
     result.value = parent.value;
 
     return parent.left;
@@ -363,7 +363,7 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
       return left;
     }
 
-    final rightMostRef = ReferenceBox<V>();
+    final rightMostRef = RefBox<V>();
     final leftUpdated = left.right.deleteRightMostChild(left as InnerAVLNode<K, V>, rightMostRef);
     assert(rightMostRef.accessed);
 
@@ -376,7 +376,7 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
   }
 
   @override
-  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, ReferenceBox<V> result) {
+  AVLNode<K, V> deleteRightMostChild(InnerAVLNode<K, V> parent, RefBox<V> result) {
     final node = right.deleteRightMostChild(this, result);
 
     return InnerAVLNode(
@@ -406,30 +406,6 @@ class InnerAVLNode<K, V extends Comparable> extends AVLNode<K, V> {
     yield value;
     yield* right.entries;
   }
-}
-
-AVLNode<K, V> fromIterator<K, V extends Comparable>(Iterator<V> sortedIterator, int size) =>
-    _fromIterator(sortedIterator, LeafAVLNode(), size);
-
-AVLNode<K, V> _fromIterator<K, V extends Comparable>(Iterator<V> sortedIterator, LeafAVLNode<K, V> leaf, int size) {
-  if (size <= 0) return leaf;
-
-  final leftSize = size ~/ 2;
-  final rightSize = max(0, size - leftSize - 1);
-
-  final left = _fromIterator(sortedIterator, leaf, leftSize);
-
-  sortedIterator.moveNext();
-  final value = sortedIterator.current;
-
-  final right = _fromIterator(sortedIterator, leaf, rightSize);
-
-  return InnerAVLNode<K, V>(
-    value,
-    height: max(left.height, right.height) + 1,
-    left: left,
-    right: right,
-  );
 }
 
 /// For testing only, creates a string representation of the tree that can be

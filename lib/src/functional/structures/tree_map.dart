@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 import '../either/either.dart';
 import '../result/result.dart';
+import 'avl_operations.dart';
 import 'avl_tree.dart';
 
 class TreeMapEntry<K extends Comparable, V> implements Comparable {

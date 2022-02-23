@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:formz/src/functional/structures/avl_operations.dart';
 import 'package:formz/src/functional/structures/avl_tree.dart';
 import 'package:formz_test/formz_test.dart';
 
@@ -82,6 +83,40 @@ void main() {
       expectInvariant(result);
 
       expect(it.every((e) => result.find(e).right), isTrue);
+    });
+  });
+
+  group('intersect', () {
+    final a = fromIterator<int, int>(<int>[1, 2, 3].iterator, 3);
+    final b = fromIterator<int, int>(<int>[0, 1, 2, 4].iterator, 4);
+
+    test('empty', () {
+      final result = intersect(a, LeafAVLNode());
+
+      expect(result, isA<LeafAVLNode>());
+    });
+
+    test('not empty', () {
+      final result = intersect(a, b);
+
+      expect(result.entries, equals([1, 2]));
+    });
+  });
+
+  group('union', () {
+    final a = fromIterator<int, int>(<int>[1, 2, 3].iterator, 3);
+    final b = fromIterator<int, int>(<int>[0, 1, 2, 4].iterator, 4);
+
+    test('empty', () {
+      final result = union(a, LeafAVLNode());
+
+      expect(result.entries, equals([1, 2, 3]));
+    });
+
+    test('not empty', () {
+      final result = union(a, b);
+
+      expect(result.entries, equals([0, 1, 2, 3, 4]));
     });
   });
 }
