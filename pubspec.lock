@@ -223,6 +223,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.2.0"
+  flutter_lints:
+    dependency: "direct main"
+    description:
+      name: flutter_lints
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -231,9 +238,11 @@ packages:
   formz_test:
     dependency: "direct dev"
     description:
-      path: "../app-formz-test"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: dd651d18581c2cabbd3b21b4515432131435e83d
+      url: "https://git@github.com/TinDan-Dev/app-formz-test.git"
+    source: git
     version: "1.0.4"
   freezed:
     dependency: "direct dev"
@@ -306,7 +315,7 @@ packages:
     source: hosted
     version: "4.4.0"
   lints:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: lints
       url: "https://pub.dartlang.org"
