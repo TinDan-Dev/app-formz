@@ -19,8 +19,8 @@ class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
 void main() {
   late FormMemory memory;
 
-  final pureInput = GenericTestInput.pure('test', name: 'test');
-  final dirtyInput = GenericTestInput.dirty('dirty', name: 'test');
+  final pureInput = createTestInput('test', pure: true);
+  final dirtyInput = createTestInput('dirty', pure: true);
 
   setUp(() {
     memory = FormMemory();
@@ -48,7 +48,7 @@ void main() {
     setUp(() {
       cubit = TestMemoryFormCubit(
         memory: memory,
-        state: FormState([GenericTestInput.pure('', name: 'test')]),
+        state: FormState([createTestInput('')]),
       );
     });
 
@@ -63,7 +63,7 @@ void main() {
     test('should update the cubit when the cubit does not match the input type', () {
       final expectation = expectLater(
         cubit.stream,
-        emits(predicate<FormState>((s) => s.getValue<String>('test') == 'dirty')),
+        emits(predicate<FormState>((s) => s.getValue<String>(testInputId) == 'dirty')),
       );
 
       memory.saveAndNotify(String, [dirtyInput], null);

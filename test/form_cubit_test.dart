@@ -15,20 +15,23 @@ class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
 }
 
 void main() {
-  final input = GenericTestInput.dirty('value', name: 'test');
-  final input2 = GenericTestInput.pure('value2', name: 'test2');
+  const inputId1 = InputIdentifier<String>.named('1');
+  const inputId2 = InputIdentifier<String>.named('2');
+
+  final input1 = createInput<String>((_) => true, id: inputId1, value: '1', pure: true);
+  final input2 = createInput<String>((_) => true, id: inputId2, value: '2', pure: false);
 
   late FormMemory memory;
   late FormCubit cubit;
 
   setUp(() {
     memory = FormMemory();
-    memory.save(input);
+    memory.save(input1);
     memory.save(input2);
 
     cubit = TestMemoryFormCubit(
       memory: memory,
-      state: FormState([GenericTestInput.pure('', name: 'test')]),
+      state: FormState([createInput<String>((v) => true, id: inputId1, value: '')]),
     );
   });
 
@@ -36,11 +39,11 @@ void main() {
     test('should add all inputs from the memory to the state when no filter is passed in', () {
       final cubit = TestMemoryFormCubit(
         memory: memory,
-        state: FormState([GenericTestInput.pure('', name: 'test')]),
+        state: FormState([createInput<String>((v) => true, id: inputId1, value: '')]),
       );
-      final result = cubit.state.getInput(input.name);
+      final result = cubit.state.getInput(inputId1);
 
-      expect(result.value, equals(input.value));
+      expect(result.value, equals(input1.value));
     });
   });
 
@@ -48,22 +51,23 @@ void main() {
     blocTest<FormCubit, FormState>(
       'should update the state when the memory receives a update',
       build: () => cubit,
-      act: (_) => memory.saveAndNotify(String, [GenericTestInput.dirty('new value', name: 'test')], null),
+      act: (_) =>
+          memory.saveAndNotify(String, [createInput<String>((v) => true, id: inputId1, value: '3', pure: false)], null),
       expect: () => [isA<FormState>()],
       verify: (cubit) => expect(
-        cubit.state.getInput(input.name).value,
-        equals('new value'),
+        cubit.state.getInput(inputId1).value,
+        equals('3'),
       ),
     );
 
     blocTest<FormCubit, FormState>(
       'should ignore the memory update when it updates itself',
       build: () => cubit,
-      act: (cubit) => cubit.setInput('new value', name: 'test'),
+      act: (cubit) => cubit.setInput('3', id: inputId1),
       expect: () => [isA<FormState>()],
       verify: (cubit) => expect(
-        cubit.state.getInput(input.name).value,
-        equals('new value'),
+        cubit.state.getInput(inputId1).value,
+        equals('3'),
       ),
     );
   });
@@ -72,24 +76,24 @@ void main() {
     blocTest<FormCubit, FormState>(
       'should emit a new state with the updated input',
       build: () => cubit,
-      act: (cubit) => cubit.setInput('new value', name: 'test'),
+      act: (cubit) => cubit.setInput('3', id: inputId1),
       expect: () => [isA<FormState>()],
       verify: (cubit) => expect(
-        cubit.state.getInput(input.name).value,
-        equals('new value'),
+        cubit.state.getInput(inputId1).value,
+        equals('3'),
       ),
     );
 
     test('should throw an error when the input is not tracked', () {
       expect(
-        () => cubit.setInput('new value', name: 'unknown'),
+        () => cubit.setInput('3', id: InputIdentifier.named('3')),
         throwsA(isAssertionError),
       );
     });
 
     test('should throw an error when the input has a different type then the old one', () {
       expect(
-        () => cubit.setInput(1, name: 'unknown'),
+        () => cubit.setInput(1, id: inputId1),
         throwsA(isAssertionError),
       );
     });
@@ -99,32 +103,22 @@ void main() {
     blocTest<FormCubit, FormState>(
       'should emit a new state with the updated input',
       build: () => cubit,
-      act: (cubit) => cubit.updateInput<GenericTestInput>(
-        update: (input) => input.copyWith(value: 'new value'),
-        name: 'test',
+      act: (cubit) => cubit.updateInput<String>(
+        update: (input) => input.copyWith(value: '3'),
+        id: inputId1,
       ),
       expect: () => [isA<FormState>()],
       verify: (cubit) => expect(
-        cubit.state.getInput(input.name).value,
-        equals('new value'),
+        cubit.state.getInput(inputId1).value,
+        equals('3'),
       ),
     );
 
     test('should throw an error when the input is not tracked', () {
       expect(
-        () => cubit.updateInput<GenericTestInput>(
-          update: (input) => input.copyWith(value: 'new value'),
-          name: 'unknown',
-        ),
-        throwsA(isAssertionError),
-      );
-    });
-
-    test('should throw an error when the generic type does not match', () {
-      expect(
-        () => cubit.updateInput<CheckBoxInput>(
-          update: (input) => input.copyWith(value: CheckBoxInputData([])),
-          name: 'unknown',
+        () => cubit.updateInput<String>(
+          update: (input) => input.copyWith(value: '3'),
+          id: InputIdentifier.named('3'),
         ),
         throwsA(isAssertionError),
       );
@@ -132,13 +126,9 @@ void main() {
 
     test('should throw an error when return type is different', () {
       expect(
-        () => cubit.updateInput<Input>(
-          update: (input) => CheckBoxInput.dirty(
-            CheckBoxInputData(['key']),
-            name: 'test',
-            pattern: CheckBoxValidationPatter.atLeastOne,
-          ),
-          name: 'test',
+        () => cubit.updateInput(
+          update: (input) => createInput<int>((_) => true, id: InputIdentifier.named('3'), value: 3),
+          id: inputId1,
         ),
         throwsA(isAssertionError),
       );
@@ -147,45 +137,31 @@ void main() {
 
   group('getValue', () {
     test('should return the value from the requested input', () {
-      final result = cubit.getValue('test');
-      expect(result, equals('value'));
+      final result = cubit.getValue(inputId1);
+      expect(result, equals(input1.value));
     });
 
     test('should throw an error when the requested input is not tracked', () {
       expect(
-        () => cubit.getValue('unknown'),
-        throwsA(isAssertionError),
-      );
-    });
-
-    test('should throw an error when a different type was expected', () {
-      expect(
-        () => cubit.getValue<int>('test'),
+        () => cubit.getValue(InputIdentifier.named('3')),
         throwsA(isAssertionError),
       );
     });
 
     group('include memory', () {
       test('should return the value from the requested input when it is currently not tracked, but in the memory', () {
-        final result = cubit.getValue('test2');
-        expect(result, equals('value2'));
+        final result = cubit.getValue(inputId2);
+        expect(result, equals(input2.value));
       });
 
       test('should return the value from the requested input, if it is found', () {
-        final result = cubit.getValue('test');
-        expect(result, equals('value'));
+        final result = cubit.getValue(inputId1);
+        expect(result, equals(input1.value));
       });
 
       test('should throw an error when the requested input is not tracked', () {
         expect(
-          () => cubit.getValue('unknown'),
-          throwsA(isAssertionError),
-        );
-      });
-
-      test('should throw an error when a different type was expected', () {
-        expect(
-          () => cubit.getValue<int>('test2'),
+          () => cubit.getValue(InputIdentifier.named('3')),
           throwsA(isAssertionError),
         );
       });

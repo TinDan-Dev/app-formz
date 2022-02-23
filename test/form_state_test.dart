@@ -5,7 +5,11 @@ import 'package:mockito/mockito.dart';
 
 import 'form_state_test.mocks.dart';
 
-@GenerateMocks([], customMocks: [MockSpec<Input<String, String>>(as: #MockInputState)])
+S onConsume<S>({required S onRight(String value)?, required S onLeft(Failure failure)?}) => null as S;
+
+@GenerateMocks([], customMocks: [
+  MockSpec<Input<String>>(as: #MockInputState, fallbackGenerators: {#consume: onConsume})
+])
 void main() {
   late MockInputState pureInputState;
   late MockInputState invalidInputState;
@@ -16,36 +20,39 @@ void main() {
     invalidInputState = MockInputState();
     validInputState = MockInputState();
 
-    when(pureInputState.name).thenReturn('test');
+    when(pureInputState.id).thenReturn(testInputId);
     when(pureInputState.value).thenReturn('');
     when(pureInputState.pure).thenReturn(true);
     when(pureInputState.valid).thenReturn(false);
     when(pureInputState.optional).thenReturn(false);
-    when(pureInputState.pureCopy()).thenReturn(pureInputState);
+    when(pureInputState.copyWith(value: anyNamed('value'), pure: argThat(isTrue, named: 'pure')))
+        .thenReturn(pureInputState);
 
-    when(invalidInputState.name).thenReturn('test');
+    when(invalidInputState.id).thenReturn(testInputId);
     when(invalidInputState.pure).thenReturn(false);
     when(invalidInputState.valid).thenReturn(false);
     when(invalidInputState.optional).thenReturn(false);
-    when(invalidInputState.pureCopy()).thenReturn(pureInputState);
+    when(invalidInputState.copyWith(value: anyNamed('value'), pure: argThat(isTrue, named: 'pure')))
+        .thenReturn(pureInputState);
 
-    when(validInputState.name).thenReturn('test');
+    when(validInputState.id).thenReturn(testInputId);
     when(validInputState.pure).thenReturn(false);
     when(validInputState.valid).thenReturn(true);
     when(validInputState.optional).thenReturn(false);
-    when(validInputState.pureCopy()).thenReturn(pureInputState);
+    when(validInputState.copyWith(value: anyNamed('value'), pure: argThat(isTrue, named: 'pure')))
+        .thenReturn(pureInputState);
   });
   group('getInput', () {
     test('should return the InputState when a input with the name was added', () {
       final state = FormState([pureInputState]);
 
-      expect(state.getInput('test'), equals(pureInputState));
+      expect(state.getInput(testInputId), equals(pureInputState));
     });
 
     test('should throw an exception when no input with the name was added', () {
       final state = FormState([pureInputState]);
 
-      expect(() => state.getInput('no'), throwsA(anything));
+      expect(() => state.getInput(InputIdentifier.named('unknown')), throwsA(anything));
     });
   });
 
@@ -55,13 +62,13 @@ void main() {
 
       final state = FormState([pureInputState]);
 
-      expect(state.getInput('test').value, equals('testValue'));
+      expect(state.getInput(testInputId).value, equals('testValue'));
     });
 
     test('should throw an exception when no input with the name was added', () {
       final state = FormState([pureInputState]);
 
-      expect(() => state.getInput('no').value, throwsA(anything));
+      expect(() => state.getInput(InputIdentifier.named('unknown')).value, throwsA(anything));
     });
   });
 
@@ -80,13 +87,13 @@ void main() {
       final result = state.copyWith(inputs: [invalidInputState]);
 
       expect(
-        result.getInput(invalidInputState.name),
+        result.getInput(invalidInputState.id),
         equals(invalidInputState),
       );
     });
 
     test('should throw a exception when a state should be updated but no state with this name was added', () {
-      when(invalidInputState.name).thenReturn('no');
+      when(invalidInputState.id).thenReturn(InputIdentifier.named('unknown'));
 
       final state = FormState([pureInputState]);
 
@@ -221,8 +228,8 @@ void main() {
         final input1 = MockInputState();
         final input2 = MockInputState();
 
-        when(input1.name).thenReturn('1');
-        when(input2.name).thenReturn('2');
+        when(input1.id).thenReturn(InputIdentifier.named('1'));
+        when(input2.id).thenReturn(InputIdentifier.named('2'));
         when(input1.pure).thenReturn(test[0][0]);
         when(input2.pure).thenReturn(test[1][0]);
         when(input1.valid).thenReturn(test[0][1]);
