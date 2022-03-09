@@ -37,7 +37,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
   }) {
     final attachments = _attachments.putIfAbsent(inputId, () => []);
 
-    final attachment = attachments.whereType<T>();
+    final attachment = attachments.whereType<_InputAttachment<T>>();
     assert(attachment.length <= 1, '${attachment.length} attachments of Type $T found');
 
     if (attachment.isEmpty) {
@@ -46,7 +46,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
 
       return value;
     } else {
-      return attachment.first;
+      return attachment.first.value;
     }
   }
 

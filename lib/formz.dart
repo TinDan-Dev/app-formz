@@ -10,6 +10,7 @@ export 'src/form_cubit.dart';
 export 'src/form_memory.dart';
 export 'src/form_state.dart';
 export 'src/functional/either/either.dart';
+export 'src/functional/enum.dart' show Enum;
 export 'src/functional/parser/exception.dart';
 export 'src/functional/parser/manual.dart';
 export 'src/functional/parser/validator.dart';
