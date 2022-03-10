@@ -15,6 +15,7 @@ export 'src/functional/parser/exception.dart';
 export 'src/functional/parser/manual.dart';
 export 'src/functional/parser/validator.dart';
 export 'src/functional/result/result.dart';
+export 'src/functional/result/result_extension.dart';
 export 'src/functional/result/result_iterable.dart';
 export 'src/functional/structures/tree_map.dart' show TreeMap;
 export 'src/functional/structures/tree_set.dart' show TreeSet;
