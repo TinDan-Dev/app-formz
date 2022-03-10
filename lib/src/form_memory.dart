@@ -47,12 +47,15 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
   Object get identifier;
 
   @protected
-  void initMemory() {
+  void initMemory([bool syncManual = false]) {
     memory._addListener(identifier, _load);
     _load();
 
     memory.saveAndNotify(identifier, state.inputs, state.failure);
-    stream.listen((e) => memory.saveAndNotify(identifier, e.inputs, e.failure));
+
+    if (!syncManual) {
+      stream.listen((e) => memory.saveAndNotify(identifier, e.inputs, e.failure));
+    }
   }
 
   void _load() {
@@ -82,5 +85,9 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
     } else {
       return memory.getInput<I>(id);
     }
+  }
+
+  void sync() {
+    memory.saveAndNotify(identifier, state.inputs, state.failure);
   }
 }

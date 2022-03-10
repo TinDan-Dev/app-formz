@@ -12,6 +12,8 @@ abstract class Rule<Source, T, R> {
 
   String? get name => child?.name;
 
+  bool get hasResult => child?.hasResult ?? false;
+
   R execute(Source source) {
     final value = child!.execute(source);
     return validate(value);
@@ -37,9 +39,12 @@ class _AccessRule<Source, T> extends Rule<Source, T, T> {
   final T Function(Source source) accessDelegate;
 
   @override
-  final String? name;
+  final String name;
 
   const _AccessRule(this.name, this.accessDelegate) : super(null);
+
+  @override
+  bool get hasResult => true;
 
   @override
   T execute(Source source) => accessDelegate(source);
@@ -55,6 +60,9 @@ class _SetRule<Source, T> extends Rule<Source, void, T> {
   final String name;
 
   const _SetRule(this.name, this.value) : super(null);
+
+  @override
+  bool get hasResult => true;
 
   @override
   T execute(Source source) => value;

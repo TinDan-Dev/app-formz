@@ -71,10 +71,6 @@ extension EitherExtension<L, R> on Either<L, R> {
 
   T? onRight<T>(T onRight(R value)) => consume(onLeft: (_) => null, onRight: onRight);
 
-  Future<T?> onLeftAsync<T>(FutureOr<T> onLeft(L value)) async => consume(onLeft: onLeft, onRight: (_) => null);
-
-  Future<T?> onRightAsync<T>(FutureOr<T> onRight(R value)) async => consume(onLeft: (_) => null, onRight: onRight);
-
   L leftOr(L fallback()) => consume(onLeft: (value) => value, onRight: (_) => fallback());
 
   R rightOr(R fallback()) => consume(onLeft: (_) => fallback(), onRight: (value) => value);
@@ -116,10 +112,6 @@ extension FutureOfEitherExtension<L, R> on FutureOr<Either<L, R>> {
   Future<T?> onLeft<T>(T onLeft(L value)) async => (await this).onLeft(onLeft);
 
   Future<T?> onRight<T>(T onRight(R value)) async => (await this).onRight(onRight);
-
-  Future<T?> onLeftAsync<T>(FutureOr<T> onLeft(L value)) async => (await this).onLeftAsync(onLeft);
-
-  Future<T?> onRightAsync<T>(FutureOr<T> onRight(R value)) async => (await this).onRightAsync(onRight);
 
   Future<L> leftOr(L fallback()) async => (await this).leftOr(fallback);
 

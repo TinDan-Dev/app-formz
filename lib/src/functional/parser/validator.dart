@@ -19,7 +19,10 @@ Result<Map<String, dynamic>> _executeRules<S>(S source, List<Rule<S, dynamic, dy
         results.addAll(entry.execute(source));
       } else {
         final result = entry.execute(source);
-        entry.name.let((some) => results[some] = result);
+
+        if (entry.hasResult) {
+          entry.name.let((some) => results[some] = result);
+        }
       }
     } on ViolationFailure catch (e) {
       return Result.left(e);
@@ -34,23 +37,23 @@ abstract class Validator<Source> {
 
   List<Rule<Source, dynamic, dynamic>> get rules;
 
-  Rule<Source, Source, Source> expect() => _SourceRule<Source>(null);
-
-  Rule<Source, T, T> expectFor<T>(T delegate(Source s)) => _AccessRule<Source, T>(null, delegate);
+  Rule<Source, Source, Source> expect([String? name]) => _SourceRule<Source>(name);
 
   Rule<Source, T, T> access<T>(String name, T delegate(Source s)) => _AccessRule<Source, T>(name, delegate);
 
   IfRule<Source> when(
     bool predicate(Source s),
-    List<Rule<Source, dynamic, dynamic>> fiTrue,
+    List<Rule<Source, dynamic, dynamic>> ifTrue,
   ) =>
-      IfRule(predicate, fiTrue, null);
+      IfRule(predicate, ifTrue, null);
 
   IfAllRule<Source> whenAll(
     List<Rule<Source, dynamic, dynamic>> rules,
     List<Rule<Source, dynamic, dynamic>> ifTrue,
   ) =>
-      IfAllRule(rules, ifTrue, null);
+      IfAllRule<Source>(rules, ifTrue, null);
+
+  Rule<Source, void, void> tryAll(List<Rule<Source, dynamic, dynamic>> rules) => whenAll(rules, []);
 
   Rule<Source, void, void> assign<T>(String name, T value) => _SetRule<Source, T>(name, value);
 
