@@ -46,7 +46,9 @@ class Retry<T> extends ResultFuture<T> {
     required this.action,
     required this.errorToResult,
     this.shouldContinue = _defaultShouldContinue,
-  });
+  }) {
+    _invoke();
+  }
 
   Retry({
     required FutureOr<T> action(),
@@ -71,7 +73,7 @@ class Retry<T> extends ResultFuture<T> {
   /// Starts the retry cycle.
   ///
   /// Returns whether the [action] could be executed successfully or not.
-  Future<Result<T>> invoke() async {
+  void _invoke() async {
     // make sure the count does not change during one request
     final attempts = Retries.retryAttempts;
     final cancellationToken = CancellationToken();
@@ -99,7 +101,6 @@ class Retry<T> extends ResultFuture<T> {
     // here and the bang operator is safe
 
     _completer.complete(result!);
-    return result;
   }
 
   @override
