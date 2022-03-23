@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 abstract class Enum {
   /// This value's integer value.
   final int value;
@@ -9,7 +11,8 @@ abstract class Enum {
   const Enum(this.value, this.name);
 
   @override
-  bool operator ==(Object other) => identical(this, other);
+  @mustCallSuper
+  bool operator ==(Object other);
 
   @override
   int get hashCode => value;
