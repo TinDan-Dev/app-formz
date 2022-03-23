@@ -1,8 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Path;
 
 import '../utils/extensions.dart';
 import 'path.dart';
 import 'router_dialog.dart';
+
+typedef OnPathBuilder = Widget Function(BuildContext context, Widget child);
 
 /// A named page, used by the [FormzRouterDelegate].
 class FormzRouterPage<T> extends Page<T> {
@@ -58,6 +61,9 @@ class FormzRouterDelegate with ChangeNotifier {
   /// A map of all possible routes and the associated builder function.
   final Map<Path, WidgetBuilder> routes;
 
+  /// Widgets that are build on a specific path.
+  final List<Map<Path, OnPathBuilder>> onPaths;
+
   /// The current page stack.
   List<FormzRouterPage> get pages => List.unmodifiable(_pages);
 
@@ -69,6 +75,7 @@ class FormzRouterDelegate with ChangeNotifier {
 
   FormzRouterDelegate({
     required this.routes,
+    this.onPaths = const [],
     Path initialPath = Path.root,
   })  : _pages = [],
         _observer = [],
@@ -335,8 +342,20 @@ class FormzRouterDelegate with ChangeNotifier {
     _observer.remove(observer);
   }
 
+  Widget _getWidgetsOnPath(BuildContext context, Widget child) {
+    final builders = onPaths
+        .map((e) => e.entries.where((e) => e.key <= currentPath).sortedBy<num>((e) => e.key.length).map((e) => e.value))
+        .flattened;
+
+    for (final builder in builders) {
+      child = builder(context, child);
+    }
+
+    return child;
+  }
+
   Widget build(BuildContext context) {
-    return Navigator(
+    final nav = Navigator(
       key: navigatorKey,
       observers: _observer,
       pages: List.unmodifiable(_pages),
@@ -347,5 +366,7 @@ class FormzRouterDelegate with ChangeNotifier {
         return true;
       },
     );
+
+    return _getWidgetsOnPath(context, nav);
   }
 }
