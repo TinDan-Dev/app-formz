@@ -8,6 +8,7 @@ import 'router_dialog.dart';
 typedef OnPathBuilder = Widget Function(BuildContext context, Widget child);
 
 /// A named page, used by the [FormzRouterDelegate].
+/// ignore: must_be_immutable
 class FormzRouterPage<T> extends Page<T> {
   /// Stores a reference to the current route.
   Route<T>? currentRoute;
