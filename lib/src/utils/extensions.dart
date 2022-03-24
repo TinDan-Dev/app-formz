@@ -14,22 +14,6 @@ extension ObjectExtension<T> on T? {
       return null;
     }
   }
-
-  T or(T value) {
-    if (this != null) {
-      return this as T;
-    } else {
-      return value;
-    }
-  }
-
-  T? orOther(T? value) {
-    if (this != null) {
-      return this as T;
-    } else {
-      return value;
-    }
-  }
 }
 
 extension BoolNullExtension on bool? {
