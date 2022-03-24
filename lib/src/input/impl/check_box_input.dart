@@ -23,6 +23,8 @@ class CheckBoxState {
 
   bool isSet(Object key) => _values.contains(key);
 
+  bool operator [](Object key) => isSet(key);
+
   bool get atLeastOne => _values.isNotEmpty;
 
   bool get exactlyOne => _values.length == 1;
