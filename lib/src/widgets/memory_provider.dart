@@ -17,7 +17,7 @@ class MemoryProvider extends StatefulWidget {
     required Path path,
     required this.child,
     this.initMemory,
-  }) : super(key: ValueKey(path));
+  }) : super(key: ValueKey('MEMORY:$path'));
 
   @override
   State<MemoryProvider> createState() => _MemoryProviderState();
@@ -28,10 +28,19 @@ class _MemoryProviderState extends State<MemoryProvider> {
 
   @override
   void initState() {
+    print('Memory created: ${widget.key}');
+
     memory = FormMemory();
     widget.initMemory.let((some) => some(memory));
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    print('Memory destroyed: ${widget.key}');
+
+    super.dispose();
   }
 
   @override

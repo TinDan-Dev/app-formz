@@ -73,7 +73,9 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
 
   void _load() {
     emit(state.copyWith(
-      inputs: memory._loadInputs(state.inputs.map((e) => e.id)),
+      inputs: memory
+          ._loadInputs(state.inputs.where((e) => !e.id.ignoreMemory).map((e) => e.id))
+          .followedBy(state.inputs.where((e) => e.id.ignoreMemory)),
       failure: () => memory._loadFailure(identifier),
     ));
   }
