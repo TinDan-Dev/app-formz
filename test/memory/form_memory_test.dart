@@ -3,17 +3,11 @@ import 'package:formz_test/formz_test.dart';
 
 class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
   @override
-  final FormMemory memory;
-
-  @override
   final String identifier = 'cubit';
 
   TestMemoryFormCubit({
-    required this.memory,
     required FormState state,
-  }) : super(state) {
-    initMemory();
-  }
+  }) : super(state);
 }
 
 void main() {
@@ -47,9 +41,8 @@ void main() {
 
     setUp(() {
       cubit = TestMemoryFormCubit(
-        memory: memory,
         state: FormState([createTestInput('')]),
-      );
+      )..initMemory(memory);
     });
 
     test('should not update the cubit when the cubit matches the identifier', () {
