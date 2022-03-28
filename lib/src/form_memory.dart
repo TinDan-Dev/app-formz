@@ -40,14 +40,27 @@ class FormMemory with InputContainer {
 }
 
 mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
-  @protected
-  FormMemory get memory;
+  bool _debugMemorySet = false;
+  late final FormMemory memory;
 
   @protected
   Object get identifier;
 
-  @protected
-  void initMemory([bool syncManual = false]) {
+  bool get syncManual => false;
+
+  void initMemory(FormMemory memory) {
+    assert(
+      () {
+        if (_debugMemorySet) return false;
+
+        _debugMemorySet = true;
+        return true;
+      }(),
+      'Do not call init memory twice',
+    );
+
+    this.memory = memory;
+
     memory._addListener(identifier, _load);
     _load();
 
@@ -60,7 +73,9 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
 
   void _load() {
     emit(state.copyWith(
-      inputs: memory._loadInputs(state.inputs.map((e) => e.id)),
+      inputs: memory
+          ._loadInputs(state.inputs.where((e) => !e.id.ignoreMemory).map((e) => e.id))
+          .followedBy(state.inputs.where((e) => e.id.ignoreMemory)),
       failure: () => memory._loadFailure(identifier),
     ));
   }
@@ -74,6 +89,8 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
 
   @override
   Input<I> getInput<I>(InputIdentifier<I> id) {
+    assert(_debugMemorySet, 'Call initMemory before using the memory');
+
     final inputCandidates = state.inputs.where((e) => e.id == id);
     assert(inputCandidates.length <= 1, '${inputCandidates.length} with id: $id');
 
@@ -88,6 +105,8 @@ mixin FormMemoryMixin<T extends FormCubit> on FormCubit {
   }
 
   void sync() {
+    assert(_debugMemorySet, 'Call initMemory before using the memory');
+
     memory.saveAndNotify(identifier, state.inputs, state.failure);
   }
 }

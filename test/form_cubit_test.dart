@@ -4,14 +4,9 @@ import 'package:formz_test/formz_test.dart';
 
 class TestMemoryFormCubit extends FormCubit with FormMemoryMixin {
   @override
-  final FormMemory memory;
-
-  @override
   final String identifier = 'cubit';
 
-  TestMemoryFormCubit({required this.memory, required FormState state}) : super(state) {
-    initMemory();
-  }
+  TestMemoryFormCubit({required FormState state}) : super(state);
 }
 
 void main() {
@@ -30,17 +25,15 @@ void main() {
     memory.save(input2);
 
     cubit = TestMemoryFormCubit(
-      memory: memory,
       state: FormState([createInput<String>((v) => true, id: inputId1, value: '')]),
-    );
+    )..initMemory(memory);
   });
 
   group('with memory', () {
     test('should add all inputs from the memory to the state when no filter is passed in', () {
       final cubit = TestMemoryFormCubit(
-        memory: memory,
         state: FormState([createInput<String>((v) => true, id: inputId1, value: '')]),
-      );
+      )..initMemory(memory);
       final result = cubit.state.getInput(inputId1);
 
       expect(result.value, equals(input1.value));

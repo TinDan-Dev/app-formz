@@ -26,6 +26,15 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
   Iterable<Input> get inputs => state.inputs;
 
   @override
+  Stream<FormState> get stream => super.stream.where((e) => !e.synchronization).distinct();
+
+  void synchronized(void action()) {
+    emit(state.copyWith(synchronization: true));
+    action();
+    emit(state.copyWith(synchronization: false));
+  }
+
+  @override
   void replaceInput(Input input) {
     emit(state.copyWith(inputs: [input]));
   }
@@ -58,6 +67,8 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
 
   Future<Result<void>> submit(FutureOr<Result<void>> action()) async {
     assert(!state.submission, 'Another submission is currently in progress');
+    assert(!state.synchronization, 'Do not submit during synchronization');
+
     unfocusAll();
 
     emit(state.copyWith(submission: true, failure: () => null));

@@ -345,7 +345,8 @@ class FormzRouterDelegate with ChangeNotifier {
 
   Widget _getWidgetsOnPath(BuildContext context, Widget child) {
     final builders = onPaths
-        .map((e) => e.entries.where((e) => e.key <= currentPath).sortedBy<num>((e) => e.key.length).map((e) => e.value))
+        .map(
+            (e) => e.entries.where((e) => e.key <= currentPath).sortedBy<num>((e) => -e.key.length).map((e) => e.value))
         .flattened;
 
     for (final builder in builders) {

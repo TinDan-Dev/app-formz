@@ -17,7 +17,7 @@ class MemoryProvider extends StatefulWidget {
     required Path path,
     required this.child,
     this.initMemory,
-  }) : super(key: ValueKey(path));
+  }) : super(key: ValueKey('MEMORY:$path'));
 
   @override
   State<MemoryProvider> createState() => _MemoryProviderState();
