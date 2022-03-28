@@ -15,6 +15,7 @@ class FormState extends Equatable with InputContainer {
 
   final Failure? failure;
   final bool submission;
+  final bool synchronization;
 
   late final Lazy<bool> _pure;
   late final Lazy<bool> _valid;
@@ -23,6 +24,7 @@ class FormState extends Equatable with InputContainer {
     this._inputs, {
     this.failure,
     this.submission = false,
+    this.synchronization = false,
     Map<String, Object> properties = const {},
     List<bool Function(FormState state)> criteria = const [],
   })  : _properties = properties,
@@ -38,7 +40,7 @@ class FormState extends Equatable with InputContainer {
   }
 
   @override
-  List<Object?> get props => [submission, failure, ..._inputs, ..._properties.values];
+  List<Object?> get props => [submission, synchronization, failure, ..._inputs, ..._properties.values];
 
   @override
   Iterable<Input> get inputs => _inputs;
@@ -65,6 +67,7 @@ class FormState extends Equatable with InputContainer {
     Iterable<Input> inputs = const [],
     Map<String, Object> properties = const {},
     bool? submission,
+    bool? synchronization,
     Failure? failure()?,
   }) {
     assert(
@@ -86,6 +89,7 @@ class FormState extends Equatable with InputContainer {
       criteria: _criteria,
       failure: failure.fold(() => this.failure, (some) => some()),
       submission: submission ?? this.submission,
+      synchronization: synchronization ?? this.synchronization,
     );
   }
 }

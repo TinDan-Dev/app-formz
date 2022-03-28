@@ -28,19 +28,10 @@ class _MemoryProviderState extends State<MemoryProvider> {
 
   @override
   void initState() {
-    print('Memory created: ${widget.key}');
-
     memory = FormMemory();
     widget.initMemory.let((some) => some(memory));
 
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    print('Memory destroyed: ${widget.key}');
-
-    super.dispose();
   }
 
   @override
