@@ -49,6 +49,8 @@ class Mutex {
     }
   }
 
+  Future<void> awaitRelease() => _currentLock?._completer.future ?? Future.value(null);
+
   Future<void> dispose() => _debounceSubject.close();
 }
 
