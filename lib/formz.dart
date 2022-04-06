@@ -10,7 +10,7 @@ export 'src/form_cubit.dart';
 export 'src/form_memory.dart';
 export 'src/form_state.dart';
 export 'src/functional/dynamic_content_loader/dynamic_content_loader.dart'
-    show DynamicContentLoader, Content, LoadDirection, LoadFunction, LoadContext;
+    show DynamicContentLoader, Content, LoadDirection, LoadFunction, LoadContext, UpdateContext, PivotType;
 export 'src/functional/either/either.dart';
 export 'src/functional/enum.dart' show Enum;
 export 'src/functional/loader/loader.dart' show Loader, DelegatingLoader;

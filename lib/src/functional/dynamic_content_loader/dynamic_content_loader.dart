@@ -13,6 +13,7 @@ part 'dynamic_content_loader_context.dart';
 
 const _defaultContainerSize = 200;
 const _defaultPivotIndex = 0;
+const _defaultPivotType = PivotType.min;
 const _defaultAllowDeletion = false;
 
 typedef LoadFunction<T> = FutureOr<Stream<Iterable<Content<T>>>> Function(
@@ -28,6 +29,18 @@ enum LoadDirection {
 
   /// Decreases the index to load more elements.
   minus,
+}
+
+/// The type of the pivot for a [DynamicContentLoader].
+enum PivotType {
+  /// Only fetches entries with lower values.
+  max,
+
+  /// Only fetches bot directions, will also create two containers on creation.
+  center,
+
+  /// Only fetches entries with higher values.
+  min,
 }
 
 /// Loads content dynamically from a source.
@@ -46,6 +59,11 @@ class DynamicContentLoader<T> with ChangeNotifier {
   ///
   /// Must be aligned with the container size.
   final int pivotIndex;
+
+  /// The pivot type.
+  ///
+  /// Determines the initial loading behavior.
+  final PivotType pivotType;
 
   /// If this is set to a direction, new content in this direction will be loaded
   /// automatically.
@@ -82,6 +100,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
 
   DynamicContentLoader._({
     required this.load,
+    this.pivotType = _defaultPivotType,
     this.allowDeletion = _defaultAllowDeletion,
     this.containerSize = _defaultContainerSize,
     this.pivotIndex = _defaultPivotIndex,
@@ -93,8 +112,29 @@ class DynamicContentLoader<T> with ChangeNotifier {
         _disposed = false,
         assert(pivotIndex % containerSize == 0, 'The pivot index must be aligned with the container size'),
         assert(watchDirection == null || watchDirection != prefetchDirection),
-        assert(prefetchDirection == null || prefetchDirection != watchDirection) {
-    _initFuture = _loadContainer(null, pivotIndex);
+        assert(prefetchDirection == null || prefetchDirection != watchDirection),
+        assert(pivotType != PivotType.min || watchDirection != LoadDirection.minus),
+        assert(pivotType != PivotType.max || watchDirection != LoadDirection.plus),
+        assert(pivotType != PivotType.min || prefetchDirection != LoadDirection.minus),
+        assert(pivotType != PivotType.max || prefetchDirection != LoadDirection.plus) {
+    _loadInitContainers();
+  }
+
+  void _loadInitContainers() {
+    switch (pivotType) {
+      case PivotType.max:
+        _initFuture = _loadContainer(null, LoadDirection.minus, pivotIndex - containerSize);
+        break;
+      case PivotType.center:
+        final initPlus = _loadContainer(null, LoadDirection.plus, pivotIndex);
+        final initMinus = _loadContainer(null, LoadDirection.minus, pivotIndex - containerSize);
+
+        _initFuture = Future.wait([initPlus, initMinus]).then((value) => value.reduce((v, e) => e && v));
+        break;
+      case PivotType.min:
+        _initFuture = _loadContainer(null, LoadDirection.plus, pivotIndex);
+        break;
+    }
   }
 
   /// Creates a new loader instance and loads the container at the pivot index.
@@ -102,6 +142,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     required LoadFunction<T> load,
     int containerSize = _defaultContainerSize,
     int pivotIndex = _defaultPivotIndex,
+    PivotType pivotType = _defaultPivotType,
     bool allowDeletion = true,
     LoadDirection? watchDirection,
     LoadDirection? prefetchDirection,
@@ -109,6 +150,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
           load: load,
           containerSize: containerSize,
           pivotIndex: pivotIndex,
+          pivotType: pivotType,
           allowDeletion: allowDeletion,
           watchDirection: watchDirection,
           prefetchDirection: prefetchDirection,
@@ -117,12 +159,14 @@ class DynamicContentLoader<T> with ChangeNotifier {
   /// Creates a new loader instance over a specified source.
   ///
   /// If the source stream is update all containers will be informed about the
-  /// change. But a static source (e.g. Stream.value([...])) is also valid.
-  factory DynamicContentLoader.overSource(
-    Stream<Iterable<Content<T>>> source, {
+  /// change, with regard to the UpdateContext. But a static source
+  /// (e.g. Stream.value([...])) is also valid.
+  factory DynamicContentLoader.overScopedSource(
+    Stream<UpdateContext<T>> source, {
     int containerSize = _defaultContainerSize,
     int pivotIndex = _defaultPivotIndex,
-    bool allowDeletion = false,
+    PivotType pivotType = _defaultPivotType,
+    bool allowDeletion = _defaultAllowDeletion,
     LoadDirection? watchDirection,
     LoadDirection? prefetchDirection,
   }) {
@@ -130,17 +174,46 @@ class DynamicContentLoader<T> with ChangeNotifier {
     final subscription = replay.connect();
 
     Stream<Iterable<Content<T>>> loadFunction(LoadContext<T> _, int startIndex, int endIndex) {
-      return replay.map((event) => event.where((element) => element.index >= startIndex && element.index <= endIndex));
+      return replay.transform(StreamTransformer.fromHandlers(handleData: (data, sink) {
+        if (data.max != null && data.max! < startIndex) {
+          return;
+        }
+        if (data.min != null && data.min! > endIndex) {
+          return;
+        }
+
+        sink.add(data.values.where((e) => e.index >= startIndex && e.index <= endIndex));
+      }));
     }
 
     return DynamicContentLoader<T>._(
       load: loadFunction,
       containerSize: containerSize,
       pivotIndex: pivotIndex,
+      pivotType: pivotType,
       prefetchDirection: prefetchDirection,
       watchDirection: watchDirection,
       sourceSubscription: subscription,
       allowDeletion: allowDeletion,
+    );
+  }
+
+  /// Like overScopedSource but defaults to an unbound UpdateContext.
+  factory DynamicContentLoader.overSource(
+    Stream<Iterable<Content<T>>> source, {
+    int containerSize = _defaultContainerSize,
+    int pivotIndex = _defaultPivotIndex,
+    bool allowDeletion = _defaultAllowDeletion,
+    LoadDirection? watchDirection,
+    LoadDirection? prefetchDirection,
+  }) {
+    return DynamicContentLoader.overScopedSource(
+      source.map((e) => UpdateContext(e)),
+      containerSize: containerSize,
+      pivotIndex: pivotIndex,
+      allowDeletion: allowDeletion,
+      watchDirection: watchDirection,
+      prefetchDirection: prefetchDirection,
     );
   }
 
@@ -222,14 +295,14 @@ class DynamicContentLoader<T> with ChangeNotifier {
         final end = _endContainer!;
 
         if (end.isFullInDirection(LoadDirection.plus) && index > end.endIndex - 3) {
-          _loadContainer(end, end.endIndex + 1);
+          _loadContainer(end, LoadDirection.plus, end.endIndex + 1);
         }
         break;
       case LoadDirection.minus:
         final start = _startContainer!;
 
         if (start.isFullInDirection(LoadDirection.minus) && index < start.startIndex + 3) {
-          _loadContainer(start, start.startIndex - containerSize);
+          _loadContainer(start, LoadDirection.minus, start.startIndex - containerSize);
         }
         break;
       default:
@@ -240,7 +313,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     return (index / containerSize).floor();
   }
 
-  Future<bool> _loadContainer(Container<T>? precedingContainer, int startIndex) {
+  Future<bool> _loadContainer(Container<T>? precedingContainer, LoadDirection direction, int startIndex) {
     assert(startIndex % containerSize == 0, 'The start index must be aligned with the container size');
 
     final endIndex = startIndex + containerSize - 1;
@@ -248,15 +321,8 @@ class DynamicContentLoader<T> with ChangeNotifier {
 
     final LoadContext<T> context;
     if (precedingContainer == null) {
-      context = LoadContext<T>.empty();
+      context = LoadContext(direction: direction, precedingValue: null);
     } else {
-      final LoadDirection direction;
-      if (precedingContainer.startIndex < startIndex) {
-        direction = LoadDirection.plus;
-      } else {
-        direction = LoadDirection.minus;
-      }
-
       final T? precedingValue;
       switch (direction) {
         case LoadDirection.plus:
@@ -294,7 +360,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     }
 
     if (end.isFullInDirection(LoadDirection.plus)) {
-      _loadContainer(end, end.endIndex + 1);
+      _loadContainer(end, LoadDirection.plus, end.endIndex + 1);
     }
   }
 
@@ -305,13 +371,11 @@ class DynamicContentLoader<T> with ChangeNotifier {
     }
 
     if (start.isFullInDirection(LoadDirection.minus)) {
-      _loadContainer(start, start.startIndex - containerSize);
+      _loadContainer(start, LoadDirection.minus, start.startIndex - containerSize);
     }
   }
 
-  void _onContainerUpdate(int startIndex, int endIndex) {
-    notifyListeners();
-
+  void _watch() {
     switch (watchDirection) {
       case LoadDirection.plus:
         _watchPlus(startIndex, endIndex);
@@ -321,6 +385,12 @@ class DynamicContentLoader<T> with ChangeNotifier {
         break;
       default:
     }
+  }
+
+  void _onContainerUpdate(int startIndex, int endIndex) {
+    notifyListeners();
+
+    _watch();
   }
 
   /// Loads new content in a specified direction.
@@ -334,7 +404,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     await _initFuture;
 
     if (containerCount == 0) {
-      _initFuture = _loadContainer(null, pivotIndex);
+      _initFuture = _loadContainer(null, direction, pivotIndex);
       return _initFuture;
     }
 
@@ -366,7 +436,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
         break;
     }
 
-    return _loadContainer(precedingContainer, containerStartIndex).timeout(timeout, onTimeout: () => false);
+    return _loadContainer(precedingContainer, direction, containerStartIndex).timeout(timeout, onTimeout: () => false);
   }
 
   /// Resets the loader.
@@ -382,7 +452,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     }
     _containers.clear();
 
-    _initFuture = _loadContainer(null, pivotIndex);
+    _loadInitContainers();
     return _initFuture;
   }
 
