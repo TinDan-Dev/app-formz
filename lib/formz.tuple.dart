@@ -1,11 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+import 'package:equatable/equatable.dart';
+
 // **************************************************************************
 // TupleGenerator
 // **************************************************************************
 
 import 'annotation.dart';
-import 'package:equatable/equatable.dart';
 
 class Tuple<A, B> extends Equatable {
   const Tuple({required this.first, required this.second});
