@@ -44,8 +44,6 @@ class LoaderResult {
   }
 
   LoaderResult addConfigs(Map<String, Object?> configs) {
-    assert(configs.keys.none((key) => _configs.contains(key)), 'Do not override old results');
-
     return LoaderResult._(_results, _configs.insertAll(configs));
   }
 }

@@ -99,6 +99,15 @@ class TreeMap<K extends Comparable, V> {
     }
   }
 
+  TreeMap<K, V> insertAll(Map<K, V> map) {
+    var m = this;
+    for (final entry in map.entries) {
+      m = m.insert(entry.key, entry.value);
+    }
+
+    return m;
+  }
+
   /// Deletes a key from the map in O(log n).
   ///
   /// If the key was not present in the map the delete will be ignored.

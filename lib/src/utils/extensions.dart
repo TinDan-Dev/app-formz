@@ -30,3 +30,19 @@ extension BoolExtension on bool {
 
   T? ifFalse<T>(T? value) => this ? null : value;
 }
+
+int _defaultHash(Object? obj) => obj.hashCode;
+
+extension IterableExtension<T> on Iterable<T> {
+  Iterable<T> unique([int hash(T element) = _defaultHash]) sync* {
+    final hashes = <int>{};
+
+    for (final element in this) {
+      final h = hash(element);
+      if (hashes.contains(h)) continue;
+
+      hashes.add(h);
+      yield element;
+    }
+  }
+}
