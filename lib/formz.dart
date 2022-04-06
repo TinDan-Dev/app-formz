@@ -9,6 +9,8 @@ export 'src/attachments.dart';
 export 'src/form_cubit.dart';
 export 'src/form_memory.dart';
 export 'src/form_state.dart';
+export 'src/functional/dynamic_content_loader/dynamic_content_loader.dart'
+    show DynamicContentLoader, Content, LoadDirection, LoadFunction, LoadContext;
 export 'src/functional/either/either.dart';
 export 'src/functional/enum.dart' show Enum;
 export 'src/functional/loader/loader.dart' show Loader, DelegatingLoader;
@@ -37,6 +39,7 @@ export 'src/nav/router_dialog.dart' show DialogReturnScope;
 export 'src/nav/router_widget.dart' show FormzRouterWidget;
 export 'src/utils/after_init.dart';
 export 'src/utils/cancellation_token.dart';
+export 'src/utils/extensions.dart' show IterableExtension;
 export 'src/utils/lazy.dart';
 export 'src/utils/methods.dart';
 export 'src/utils/mutex.dart';
