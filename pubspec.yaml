@@ -15,7 +15,7 @@ dependencies:
   flutter_lints: '>=1.0.4'
   
   # for state management
-  flutter_bloc: ^7.0.0
+  flutter_bloc: ^8.0.1
   equatable: ^2.0.3
   freezed_annotation: ^1.0.0
 
@@ -35,7 +35,7 @@ dev_dependencies:
   source_gen: ^1.1.0
   code_builder: ^4.0.0
 
-  bloc_test: ^8.1.0
+  bloc_test: ^9.0.3
   mockito: ^5.0.10
 
   formz_test:

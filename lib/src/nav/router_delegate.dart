@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide Path;
 
 import '../utils/extensions.dart';
 import 'path.dart';
+import 'router_arguments.dart';
 import 'router_dialog.dart';
 
 typedef OnPathBuilder = Widget Function(BuildContext context, Widget child);
@@ -11,7 +12,7 @@ typedef OnPathBuilder = Widget Function(BuildContext context, Widget child);
 /// ignore: must_be_immutable
 class FormzRouterPage<T> extends Page<T> {
   /// Stores a reference to the current route.
-  Route<T>? currentRoute;
+  Route<T>? route;
 
   /// Builds the [Widget] for this page.
   final WidgetBuilder builder;
@@ -19,24 +20,29 @@ class FormzRouterPage<T> extends Page<T> {
   /// The path of the current route.
   final Path path;
 
+  /// The arguments for this page.
+  ///
+  /// This just casts the default arguments attribute.
+  Arguments get pageArguments => arguments as Arguments;
+
   FormzRouterPage({
     required this.path,
     required this.builder,
-    Object? arguments,
+    Arguments? arguments,
   }) : super(
           name: path.toString(),
-          arguments: arguments,
+          arguments: arguments ?? Arguments.empty,
           key: ValueKey(path),
         );
 
   @override
   Route<T> createRoute(BuildContext context) {
-    currentRoute = MaterialPageRoute(
+    route = MaterialPageRoute(
       builder: builder,
       settings: this,
     );
 
-    return currentRoute!;
+    return route!;
   }
 }
 
@@ -72,7 +78,7 @@ class FormzRouterDelegate with ChangeNotifier {
   Path get currentPath => _pages.last.path;
 
   /// The [Route] attached  current to the page.
-  Route? get currentRoute => _pages.last.currentRoute;
+  FormzRouterPage get currentPage => _pages.last;
 
   FormzRouterDelegate({
     required this.routes,
@@ -103,7 +109,7 @@ class FormzRouterDelegate with ChangeNotifier {
   }
 
   /// Helper function to create a page from a route.
-  FormzRouterPage _pageFromRoute(Path path, {Object? arguments}) {
+  FormzRouterPage _pageFromRoute(Path path, {Arguments? arguments}) {
     assert(routes.containsKey(path), '$path is not a known route');
 
     return FormzRouterPage(
@@ -129,7 +135,7 @@ class FormzRouterDelegate with ChangeNotifier {
   Future<bool> shouldPopApp() async {
     if (_navigationBlocked) return false;
 
-    final shouldPopNav = currentRoute.fold(
+    final shouldPopNav = currentPage.route.fold(
       () => false,
       (some) => !some.isCurrent,
     );
@@ -138,7 +144,7 @@ class FormzRouterDelegate with ChangeNotifier {
       return false;
     }
     if (_pages.length == 1) {
-      final result = await _pages[0].currentRoute?.willPop() ?? RoutePopDisposition.bubble;
+      final result = await _pages[0].route?.willPop() ?? RoutePopDisposition.bubble;
       return result != RoutePopDisposition.doNotPop;
     }
 
@@ -156,7 +162,7 @@ class FormzRouterDelegate with ChangeNotifier {
   bool pop() {
     if (_navigationBlocked) return false;
 
-    final shouldPopNav = currentRoute.fold(
+    final shouldPopNav = currentPage.route.fold(
       () => false,
       (some) => !some.isCurrent,
     );
@@ -205,7 +211,7 @@ class FormzRouterDelegate with ChangeNotifier {
   }
 
   /// {@macro nav_push}
-  bool pushNamed(List<String> stack, {Object? argument, List<Object>? arguments}) =>
+  bool pushNamed(List<String> stack, {Arguments? argument, List<Arguments>? arguments}) =>
       push(stack.map((e) => Path(e)).toList(), argument: argument, arguments: arguments);
 
   /// {@template nav_push}
@@ -218,7 +224,7 @@ class FormzRouterDelegate with ChangeNotifier {
   /// Returns true when the request could be executed successfully. If the
   /// navigation is currently block, the call is ignored and returns false.
   /// {@endtemplate}
-  bool push(List<Path> stack, {Object? argument, List<Object>? arguments}) {
+  bool push(List<Path> stack, {Arguments? argument, List<Arguments>? arguments}) {
     if (_navigationBlocked) return false;
 
     assert(argument == null || arguments == null, 'argument and arguments can not both be not null');
@@ -246,7 +252,7 @@ class FormzRouterDelegate with ChangeNotifier {
   }
 
   /// {@macro nav_replace}
-  bool replaceNamed(List<String> stack, {Object? argument, List<Object>? arguments}) =>
+  bool replaceNamed(List<String> stack, {Arguments? argument, List<Arguments>? arguments}) =>
       replace(stack.map((e) => Path(e)).toList(), argument: argument, arguments: arguments);
 
   /// {@template nav_replace}
@@ -255,7 +261,7 @@ class FormzRouterDelegate with ChangeNotifier {
   ///
   /// If the navigation is currently block, the call is ignored and returns false.
   /// {@endtemplate}
-  bool replace(List<Path> stack, {Object? argument, List<Object>? arguments}) {
+  bool replace(List<Path> stack, {Arguments? argument, List<Arguments>? arguments}) {
     if (_navigationBlocked) return false;
 
     _pages.clear();

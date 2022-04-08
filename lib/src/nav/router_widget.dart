@@ -41,7 +41,7 @@ class _FormzRouterWidgetState extends State<FormzRouterWidget> {
         if (widget.delegate.isNavigationBlocked) return false;
         if (await widget.delegate.shouldPopApp()) return true;
 
-        final shouldPopNav = widget.delegate.currentRoute.fold(
+        final shouldPopNav = widget.delegate.currentPage.route.fold(
           () => false,
           (some) => !some.isCurrent,
         );

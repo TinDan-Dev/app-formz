@@ -127,6 +127,10 @@ extension EitherMapExtension<L, R> on Either<L, R> {
   Either<void, R> discardLeft() => mapLeft((_) {});
 
   Either<L, void> discardRight() => mapRight((_) {});
+
+  Either<S, R> castLeft<S>() => mapLeft((value) => value as S);
+
+  Either<L, S> castRight<S>() => mapRight((value) => value as S);
 }
 
 extension FutureOfEitherMapExtension<L, R> on FutureOr<Either<L, R>> {
@@ -166,4 +170,8 @@ extension FutureOfEitherMapExtension<L, R> on FutureOr<Either<L, R>> {
   Future<Either<void, R>> discardLeft() async => (await this).discardLeft();
 
   Future<Either<L, void>> discardRight() async => (await this).discardRight();
+
+  Future<Either<S, R>> castLeft<S>() async => (await this).castLeft<S>();
+
+  Future<Either<L, S>> castRight<S>() async => (await this).castRight<S>();
 }

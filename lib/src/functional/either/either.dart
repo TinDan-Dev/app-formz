@@ -109,9 +109,9 @@ extension FutureOfEitherExtension<L, R> on FutureOr<Either<L, R>> {
 
   Future<Either<L, R>> invoke() async => (await this).invoke();
 
-  Future<T?> onLeft<T>(T onLeft(L value)) async => (await this).onLeft(onLeft);
+  Future<T?> onLeft<T>(FutureOr<T> onLeft(L value)) async => (await this).onLeft<FutureOr<T>>(onLeft);
 
-  Future<T?> onRight<T>(T onRight(R value)) async => (await this).onRight(onRight);
+  Future<T?> onRight<T>(FutureOr<T> onRight(R value)) async => (await this).onRight<FutureOr<T>>(onRight);
 
   Future<L> leftOr(L fallback()) async => (await this).leftOr(fallback);
 
