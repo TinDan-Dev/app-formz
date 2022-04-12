@@ -35,7 +35,7 @@ export 'src/input/input.dart';
 export 'src/matcher/joined.dart';
 export 'src/nav/path.dart' show Path;
 export 'src/nav/router_arguments.dart' show Arguments, ArgumentsExtension, ArgumentIdentifier;
-export 'src/nav/router_delegate.dart' show FormzRouterDelegate, OnPathBuilder;
+export 'src/nav/router_delegate.dart' show FormzRouterPage, FormzRouterDelegate, OnPathBuilder;
 export 'src/nav/router_dialog.dart' show DialogReturnScope;
 export 'src/nav/router_widget.dart' show FormzRouterWidget;
 export 'src/utils/after_init.dart';

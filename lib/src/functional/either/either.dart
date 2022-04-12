@@ -7,6 +7,7 @@ export 'either_iterable.dart';
 export 'either_join.dart';
 export 'either_map.dart';
 export 'either_stream.dart';
+export 'either_tap.dart';
 
 abstract class Either<L, R> {
   const factory Either.left(L value) = _Left<L, R>;
@@ -60,25 +61,12 @@ extension EitherExtension<L, R> on Either<L, R> {
 
   bool get right => consume(onLeft: (_) => false, onRight: (_) => true);
 
-  Either<L, R> tap(void action(Either<L, R> value)) {
-    action(this);
-    return this;
-  }
-
-  Either<L, R> tapLeft(void action(L value)) {
-    consume(onRight: (_) {}, onLeft: action);
-    return this;
-  }
-
-  Either<L, R> tapRight(void action(R value)) {
-    consume(onRight: action, onLeft: (_) {});
-    return this;
-  }
-
   Either<L, R> invoke() => consume(onRight: (value) => Either.right(value), onLeft: (value) => Either.left(value));
 
+  @Deprecated('Use tap functions')
   T? onLeft<T>(T onLeft(L value)) => consume(onLeft: onLeft, onRight: (_) => null);
 
+  @Deprecated('Use tap functions')
   T? onRight<T>(T onRight(R value)) => consume(onLeft: (_) => null, onRight: onRight);
 
   L leftOr(L fallback()) => consume(onLeft: (value) => value, onRight: (_) => fallback());
@@ -115,16 +103,12 @@ extension FutureOfEitherExtension<L, R> on FutureOr<Either<L, R>> {
 
   Future<bool> get right async => (await this).right;
 
-  Future<Either<L, R>> tap(void action(Either<L, R> value)) async => (await this).tap(action);
-
-  Future<Either<L, R>> tapLeft(void action(L value)) async => (await this).tapLeft(action);
-
-  Future<Either<L, R>> tapRight(void action(R value)) async => (await this).tapRight(action);
-
   Future<Either<L, R>> invoke() async => (await this).invoke();
 
+  @Deprecated('Use tap functions')
   Future<T?> onLeft<T>(FutureOr<T> onLeft(L value)) async => (await this).onLeft<FutureOr<T>>(onLeft);
 
+  @Deprecated('Use tap functions')
   Future<T?> onRight<T>(FutureOr<T> onRight(R value)) async => (await this).onRight<FutureOr<T>>(onRight);
 
   Future<L> leftOr(L fallback()) async => (await this).leftOr(fallback);
