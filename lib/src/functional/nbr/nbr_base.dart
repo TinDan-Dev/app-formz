@@ -9,6 +9,10 @@ import '../result/result.dart';
 import '../result/result_state.dart';
 import 'nbr.dart';
 
+typedef ResourceLoadFunc<T> = FutureOr<Result<T>> Function();
+typedef ResourceSaveFunc<T> = FutureOr<void> Function(T value);
+typedef ResourceStreamFunc<T> = ResourceLoadFunc<Stream<T?>>;
+
 /// Handles the loading cycle of remote resources.
 ///
 /// The current state of the resources is exposed as a stream and the resource can also be consumed via a [Either].
@@ -16,10 +20,10 @@ import 'nbr.dart';
 abstract class NBRBase<T, Local, Remote> extends NBR<T> {
   final BehaviorSubject<ResultState<T>> _subject;
 
-  final FutureOr<Result<Local>> Function() fetchLocal;
-  final FutureOr<Result<Remote>> Function() fetchRemote;
-  final FutureOr<void> Function(T value) saveLocal;
-  final FutureOr<Result<Stream<Local?>>> Function()? fetchLocalStream;
+  final ResourceLoadFunc<Local> fetchLocal;
+  final ResourceLoadFunc<Remote> fetchRemote;
+  final ResourceSaveFunc<T> saveLocal;
+  final ResourceStreamFunc<Local>? fetchLocalStream;
 
   bool _disposed;
 

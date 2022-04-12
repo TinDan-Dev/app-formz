@@ -16,12 +16,17 @@ export 'src/functional/enum.dart' show Enum;
 export 'src/functional/loader/loader.dart' show Loader, DelegatingLoader;
 export 'src/functional/loader/loader_emitter.dart' show LoaderEmitter;
 export 'src/functional/loader/loader_result.dart' show LoaderResult;
+export 'src/functional/nbr/nbr.dart' show NBR;
+export 'src/functional/nbr/nbr_base.dart' show NBRBase, ResourceLoadFunc, ResourceSaveFunc, ResourceStreamFunc;
+export 'src/functional/nbr/nbr_pool.dart' show NBRPool;
 export 'src/functional/parser/exception.dart';
 export 'src/functional/parser/manual.dart';
 export 'src/functional/parser/validator.dart';
 export 'src/functional/result/result.dart';
 export 'src/functional/result/result_extension.dart';
 export 'src/functional/result/result_iterable.dart';
+export 'src/functional/result/result_state.dart'
+    show ResultState, ResultStateSuccess, ResultStateError, ResultStateLoading;
 export 'src/functional/structures/object_comparable.dart' show ObjectComparable;
 export 'src/functional/structures/tree_map.dart' show TreeMap;
 export 'src/functional/structures/tree_set.dart' show TreeSet;
