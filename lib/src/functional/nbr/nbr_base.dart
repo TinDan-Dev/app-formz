@@ -6,6 +6,7 @@ import '../../../formz.tuple.dart';
 import '../../utils/extensions.dart';
 import '../either/either.dart';
 import '../result/result.dart';
+import '../result/result_failures.dart';
 import '../result/result_state.dart';
 import 'nbr.dart';
 
@@ -156,15 +157,15 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
           error: (_) => true,
         ),
         orElse: () => ResultState.error(
-          Failure(
-            message: 'stream was closed before a valid state was published',
+          UnexpectedFailure(
+            'stream was closed before a valid state was published',
             trace: invocationTrace,
           ),
         ),
       );
     } catch (e, s) {
       return ResultState.error(
-        Failure(message: 'Unexpected error', trace: s, cause: e).prependStackTrace(invocationTrace),
+        UnexpectedFailure('error on stream', trace: s, cause: e).prependStackTrace(invocationTrace),
       );
     }
   }

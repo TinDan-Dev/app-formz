@@ -24,6 +24,7 @@ export 'src/functional/parser/manual.dart';
 export 'src/functional/parser/validator.dart';
 export 'src/functional/result/result.dart';
 export 'src/functional/result/result_extension.dart';
+export 'src/functional/result/result_failures.dart';
 export 'src/functional/result/result_iterable.dart';
 export 'src/functional/result/result_state.dart'
     show ResultState, ResultStateSuccess, ResultStateError, ResultStateLoading;
@@ -55,5 +56,8 @@ export 'src/widgets/form_error_builder.dart';
 export 'src/widgets/form_input_builder.dart';
 export 'src/widgets/form_submit_builder.dart';
 export 'src/widgets/form_widget.dart';
+export 'src/widgets/functional/nbr.dart' show NBRWidget;
+export 'src/widgets/functional/result_state.dart' show ResultStateWidget;
+export 'src/widgets/functional/result_stream.dart' show ResultStreamWidget;
 export 'src/widgets/loader_widget.dart' show LoaderWidget;
 export 'src/widgets/memory_provider.dart' show MemoryProvider;
