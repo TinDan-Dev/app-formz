@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../utils/extensions.dart';
 import 'result.dart';
 
 part 'result_state.freezed.dart';
@@ -20,7 +21,7 @@ class ResultState<T> with _$ResultState<T> implements Result<T> {
   /// The loading state.
   ///
   /// If the task for the result is currently running or waiting.
-  const factory ResultState.loading() = ResultStateLoading;
+  const factory ResultState.loading([T? value]) = ResultStateLoading;
 
   /// The success state.
   ///
@@ -40,7 +41,10 @@ class ResultState<T> with _$ResultState<T> implements Result<T> {
     required S onLeft(Failure value),
   }) {
     return when(
-      loading: () => onLeft(ResultStateFailure('Result $T is loading')),
+      loading: (value) => value.fold(
+        () => onLeft(ResultStateFailure('Result $T is loading without a value')),
+        onRight,
+      ),
       success: onRight,
       error: onLeft,
     );

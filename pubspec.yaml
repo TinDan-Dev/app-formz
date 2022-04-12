@@ -23,6 +23,7 @@ dependencies:
   rxdart: ^0.27.1
   
   matcher: ^0.12.11
+  stack_trace: ^1.10.0
 
 dev_dependencies:
   flutter_test:

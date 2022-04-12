@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:stack_trace/stack_trace.dart';
+
 import '../../utils/extensions.dart';
 import '../either/either.dart';
 
@@ -48,6 +50,21 @@ class Failure<R> implements Result<R> {
 
   @override
   T consume<T>({required T onRight(R _), required T onLeft(Failure value)}) => onLeft(this);
+}
+
+extension CombineTraceExtension on Failure {
+  Failure prependStackTrace(StackTrace invocationTrace) => copyWith(
+        trace: () {
+          if (trace == null) {
+            return invocationTrace;
+          }
+
+          final firstTrace = Trace.from(invocationTrace);
+          final secondTrace = Trace.from(trace!);
+
+          return Trace(secondTrace.frames + firstTrace.frames);
+        },
+      );
 }
 
 Result<T> runCatching<T>({

@@ -76,7 +76,7 @@ class _LoaderWidgetState extends State<LoaderWidget> {
           return snapshot.data.fold(
             () => widget.onLoading(context),
             (some) => some.when(
-              loading: () => widget.onLoading(context),
+              loading: (_) => widget.onLoading(context),
               success: (result) => widget.onSuccess(context, result, widget._updateMutex),
               error: (failure) => widget.onError(context, failure, () => setState(_load)),
             ),

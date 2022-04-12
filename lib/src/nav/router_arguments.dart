@@ -57,6 +57,9 @@ class Arguments {
 
     return _args.find(key).castRight<T>();
   }
+
+  @override
+  String toString() => _args.entries.map((e) => '${e.key._identifier}: ${e.value}').join(', ');
 }
 
 extension ArgumentsExtension on BuildContext {

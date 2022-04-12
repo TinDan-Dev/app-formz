@@ -46,3 +46,13 @@ extension IterableExtension<T> on Iterable<T> {
     }
   }
 }
+
+extension StreamNotNullExtension<T> on Stream<T?> {
+  Stream<T> whereNotNull() async* {
+    await for (final e in this) {
+      if (e != null) {
+        yield e;
+      }
+    }
+  }
+}
