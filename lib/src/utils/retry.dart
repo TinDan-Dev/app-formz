@@ -6,7 +6,20 @@ import 'cancellation_token.dart';
 
 bool _defaultShouldContinue(_) => true;
 
+Result<T> _errorToFailureWrapper<T>(
+  Object? error,
+  StackTrace? trace,
+  Failure errorToFailure(Object? error, StackTrace? trace),
+) {
+  if (error is Failure) {
+    return Result<T>.left(error);
+  } else {
+    return Result<T>.left(errorToFailure(error, trace));
+  }
+}
+
 /// Global configuration for all [Retry] objects
+@Deprecated('Use ActionExecutor')
 abstract class Retries {
   /// The maximum amount of attempts the action is tried by the retry object.
   static int retryAttempts = 2;
@@ -24,6 +37,7 @@ abstract class Retries {
 
 /// Wraps a function and applies retry logic to it. Thus the function is called multiple times if it throws a exception.
 /// Make sure there are no side effects when calling the function multiple times.
+@Deprecated('Use ActionExecutor')
 class Retry<T> extends ResultFuture<T> {
   final _completer = Completer<Result<T>>();
 
@@ -56,7 +70,7 @@ class Retry<T> extends ResultFuture<T> {
     bool shouldContinue(Failure failure) = _defaultShouldContinue,
   }) : this.explicit(
           action: action,
-          errorToResult: (error, trace, _) => Result<T>.left(errorToFailure(error, trace)),
+          errorToResult: (error, trace, _) => _errorToFailureWrapper(error, trace, errorToFailure),
           shouldContinue: shouldContinue,
         );
 
@@ -79,7 +93,7 @@ class Retry<T> extends ResultFuture<T> {
     final cancellationToken = CancellationToken();
 
     Result<T>? result;
-    for (var i = 0; i <= attempts; i++) {
+    for (var i = 0; i < attempts; i++) {
       try {
         result = Result.right(await action());
         break;

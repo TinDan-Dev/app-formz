@@ -1,10 +1,14 @@
 import '../../../formz.dart';
 
-class NullFailure<R> extends Failure<R> {
+class NullFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
   NullFailure(
     String sourceDescription, {
     Object? cause,
     StackTrace? trace,
+    this.shouldRetry = true,
   }) : super(
           message: 'The value of $sourceDescription was null or not found',
           cause: cause,
@@ -12,11 +16,15 @@ class NullFailure<R> extends Failure<R> {
         );
 }
 
-class UnexpectedFailure<R> extends Failure<R> {
+class UnexpectedFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
   UnexpectedFailure(
     String stateDescription, {
     Object? cause,
     StackTrace? trace,
+    this.shouldRetry = true,
   }) : super(
           message: 'This was not expected: $stateDescription',
           cause: cause,
@@ -24,10 +32,14 @@ class UnexpectedFailure<R> extends Failure<R> {
         );
 }
 
-class ExceptionFailure<R> extends Failure<R> {
+class ExceptionFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
   ExceptionFailure(
     Object cause, {
     StackTrace? trace,
+    this.shouldRetry = true,
   }) : super(
           message: 'Failure cause by: ${cause.runtimeType}',
           cause: cause,
@@ -35,12 +47,18 @@ class ExceptionFailure<R> extends Failure<R> {
         );
 }
 
-class TimeoutFailure<R> extends Failure<R> {
+class TimeoutFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
+  final Duration duration;
+
   TimeoutFailure(
     String msg, {
-    required Duration duration,
+    required this.duration,
     Object? cause,
     StackTrace? trace,
+    this.shouldRetry = true,
   }) : super(
           message: 'Timeout after $duration: $msg',
           cause: cause,
@@ -48,13 +66,36 @@ class TimeoutFailure<R> extends Failure<R> {
         );
 }
 
-class IOFailure<R> extends Failure<R> {
+class IOFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
   IOFailure(
     String msg, {
     Object? cause,
     StackTrace? trace,
+    this.shouldRetry = true,
   }) : super(
           message: 'IO operation failed: $msg',
+          cause: cause,
+          trace: trace ?? StackTrace.current,
+        );
+}
+
+class PermissionFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
+  final bool permanently;
+
+  PermissionFailure(
+    String msg, {
+    this.permanently = false,
+    Object? cause,
+    StackTrace? trace,
+    this.shouldRetry = false,
+  }) : super(
+          message: 'Permission denied${permanently ? ' permanently' : ''}: $msg',
           cause: cause,
           trace: trace ?? StackTrace.current,
         );

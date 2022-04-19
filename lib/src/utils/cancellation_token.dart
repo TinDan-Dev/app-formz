@@ -1,8 +1,4 @@
-import 'retry.dart';
-
 /// Used by cancellable actions.
-///
-/// Like the a [Retry].
 class CancellationToken {
   /// Whether the token has been canceled or not.
   bool get canceled => _canceled;

@@ -23,6 +23,7 @@ export 'src/functional/parser/exception.dart';
 export 'src/functional/parser/manual.dart';
 export 'src/functional/parser/validator.dart';
 export 'src/functional/result/result.dart';
+export 'src/functional/result/result_action.dart' show ActionExecutor, ActionFailure;
 export 'src/functional/result/result_extension.dart';
 export 'src/functional/result/result_failures.dart';
 export 'src/functional/result/result_iterable.dart';
