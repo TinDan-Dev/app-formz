@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'result.dart';
+import 'result_failures.dart';
 
 Duration _timeInterpolation({
   required int maxRetries,
@@ -52,15 +55,15 @@ abstract class ActionExecutor {
     for (var retry = 0; retry < _retries; retry++) {
       try {
         return Result.right(await action().timeout(_timeout));
+      } on TimeoutException {
+        failure = TimeoutFailure('action', duration: timeout);
+      } on Failure catch (e) {
+        failure = e;
       } catch (e, s) {
-        if (e is Failure) {
-          failure = e;
-        } else {
-          failure = onError(e, s);
-        }
-
-        if (failure is ActionFailure && !failure.shouldRetry) break;
+        failure = onError(e, s);
       }
+
+      if (failure is ActionFailure && !failure.shouldRetry) break;
 
       await Future.delayed(_timeInterpolation(maxRetries: _retries, retry: retry, delay: _delay));
     }

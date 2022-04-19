@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../../utils/delegate/delegating_future.dart';
 import 'either.dart';
@@ -72,9 +73,11 @@ class _EitherToEitherFuture<L, R> extends EitherFuture<L, R> {
 }
 
 extension EitherToEitherFutureExtension<L, R> on Either<L, R> {
+  @useResult
   EitherFuture<L, R> get future => _EitherToEitherFuture(source: this);
 }
 
 extension FutureOfEitherToEitherFutureExtension<L, R> on FutureOr<Either<L, R>> {
+  @useResult
   EitherFuture<L, R> get future => _EitherToEitherFuture(source: this);
 }

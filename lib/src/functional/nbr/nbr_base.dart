@@ -80,7 +80,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
       return const Result.right(null);
     }
 
-    final remoteResult = fetchRemote().mapRightFlatAsync(fromRemote);
+    final remoteResult = fetchRemote().mapRightAsyncFlat(fromRemote);
 
     return remoteResult.consume(
       onRight: (parsedRemote) async {
@@ -104,7 +104,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
   }
 
   Future<Result<void>> _loadWithoutLocal() async {
-    final remoteResult = fetchRemote().mapRightFlatAsync(fromRemote);
+    final remoteResult = fetchRemote().mapRightAsyncFlat(fromRemote);
 
     return remoteResult.tapRightAsync((parsedRemote) async {
       _addStatus(ResultState.success(parsedRemote));
@@ -114,7 +114,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
   }
 
   Future<void> _load(StackTrace invocationTrace) async {
-    final localResult = fetchLocal().mapRightFlatAsync(
+    final localResult = fetchLocal().mapRightAsyncFlat(
       (local) => fromLocal(local).mapRight((localParsed) => Tuple(first: local, second: localParsed)),
     );
 

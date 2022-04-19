@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../../../formz.tuple.dart';
 import '../../utils/lazy.dart';
@@ -61,7 +62,7 @@ class _JoinRightEither<S, L, R> extends Equatable implements Either<L, Tuple<R, 
 /// Joins the left side of one [Either] (L) with the left side of another
 /// [Future<Either>] (S). The other Either is only invoked if the first one is left.
 class _JoinAsyncLeftEither<S, L, R> extends EitherFuture<Tuple<L, S>, R> {
-  final Either<L, R> source;
+  final FutureOr<Either<L, R>> source;
   final LazyFuture<Either<S, R>> _joiningLazy;
 
   _JoinAsyncLeftEither({
@@ -87,7 +88,7 @@ class _JoinAsyncLeftEither<S, L, R> extends EitherFuture<Tuple<L, S>, R> {
 /// Joins the right side of one [Either] (R) with the right side of another
 /// [Future<Either>] (S). The other Either is only invoked if the first one is right.
 class _JoinAsyncRightEither<S, L, R> extends EitherFuture<L, Tuple<R, S>> {
-  final Either<L, R> source;
+  final FutureOr<Either<L, R>> source;
   final LazyFuture<Either<L, S>> _joiningLazy;
 
   _JoinAsyncRightEither({
@@ -117,6 +118,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
+  @useResult
   Either<Tuple<L, S>, R> joinLeft<S>(Either<S, R> other()) => _JoinLeftEither(source: this, joining: other);
 
   /// Joins the right side of one [Either] (R) with the right side of another
@@ -125,6 +127,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
+  @useResult
   Either<L, Tuple<R, S>> joinRight<S>(Either<L, S> other()) => _JoinRightEither(source: this, joining: other);
 
   /// Joins the left side of one [Either] (L) with the left side of another
@@ -133,6 +136,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
+  @useResult
   Future<Either<Tuple<L, S>, R>> joinLeftAsync<S>(FutureOr<Either<S, R>> other()) =>
       _JoinAsyncLeftEither(source: this, joining: other);
 
@@ -142,6 +146,7 @@ extension EitherJoiningExtension<L, R> on Either<L, R> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
+  @useResult
   Future<Either<L, Tuple<R, S>>> joinRightAsync<S>(FutureOr<Either<L, S>> other()) =>
       _JoinAsyncRightEither(source: this, joining: other);
 }
@@ -153,7 +158,9 @@ extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  Future<Either<Tuple<L, S>, R>> joinLeft<S>(Either<S, R> other()) async => (await this).joinLeft(other);
+  @useResult
+  Future<Either<Tuple<L, S>, R>> joinLeft<S>(Either<S, R> other()) =>
+      _JoinAsyncLeftEither(source: this, joining: other);
 
   /// Joins the right side of one [Either] (R) with the right side of another
   /// [Either] (S). The other Either is only invoked if the first one is right.
@@ -161,7 +168,9 @@ extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  Future<Either<L, Tuple<R, S>>> joinRight<S>(Either<L, S> other()) async => (await this).joinRight(other);
+  @useResult
+  Future<Either<L, Tuple<R, S>>> joinRight<S>(Either<L, S> other()) =>
+      _JoinAsyncRightEither(source: this, joining: other);
 
   /// Joins the left side of one [Either] (L) with the left side of another
   /// [Future<Either>] (S). The other Either is only invoked if the first one is left.
@@ -169,8 +178,9 @@ extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  Future<Either<Tuple<L, S>, R>> joinLeftAsync<S>(FutureOr<Either<S, R>> other()) async =>
-      (await this).joinLeftAsync(other);
+  @useResult
+  Future<Either<Tuple<L, S>, R>> joinLeftAsync<S>(FutureOr<Either<S, R>> other()) =>
+      _JoinAsyncLeftEither(source: this, joining: other);
 
   /// Joins the right side of one [Either] (R) with the right side of another
   /// [Future<Either>] (S). The other Either is only invoked if the first one is right.
@@ -178,6 +188,7 @@ extension FutureOfEitherJoiningExtension<L, R> on FutureOr<Either<L, R>> {
   /// The [other] function is only invoked once to create or get the [Either]
   /// the result is then stored and used again when the joined [Either] is
   /// consumed again.
-  Future<Either<L, Tuple<R, S>>> joinRightAsync<S>(FutureOr<Either<L, S>> other()) async =>
-      (await this).joinRightAsync(other);
+  @useResult
+  Future<Either<L, Tuple<R, S>>> joinRightAsync<S>(FutureOr<Either<L, S>> other()) =>
+      _JoinAsyncRightEither(source: this, joining: other);
 }

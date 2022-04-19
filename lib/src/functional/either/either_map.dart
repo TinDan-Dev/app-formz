@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../../utils/lazy.dart';
 import 'either.dart';
@@ -30,9 +31,9 @@ class _MapAsyncFlatEither<S, K, L, R> extends EitherFuture<S, K> {
   final LazyFuture<Either<S, K>> _lazyMap;
 
   _MapAsyncFlatEither({
-    required Either<L, R> source,
+    required FutureOr<Either<L, R>> source,
     required FutureOr<Either<S, K>> map(Either<L, R> value),
-  }) : _lazyMap = LazyFuture(() => map(source));
+  }) : _lazyMap = LazyFuture(() async => map(await source));
 
   @override
   Future<T> consume<T>({
@@ -45,6 +46,7 @@ class _MapAsyncFlatEither<S, K, L, R> extends EitherFuture<S, K> {
 
 extension EitherMapExtension<L, R> on Either<L, R> {
   /// Maps the left side of this [Either] (L) to a new value (S).
+  @useResult
   Either<S, R> mapLeft<S>(S map(L value)) => _MapFlatEither<S, R, L, R>(
         source: this,
         map: (value) => value.consume(
@@ -54,6 +56,7 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the right side of this [Either] (R) to a new value (S).
+  @useResult
   Either<L, S> mapRight<S>(S map(R value)) => _MapFlatEither<L, S, L, R>(
         source: this,
         map: (value) => value.consume(
@@ -63,10 +66,12 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the this [Either] (L, R) to a new [Either] (S, K).
+  @useResult
   Either<S, K> mapFlat<S, K>(Either<S, K> map(Either<L, R> value)) =>
       _MapFlatEither<S, K, L, R>(source: this, map: map);
 
   /// Maps the left side of this [Either] (L) to a new [Either] (S, R).
+  @useResult
   Either<S, R> mapLeftFlat<S>(Either<S, R> map(L value)) => _MapFlatEither<S, R, L, R>(
         source: this,
         map: (value) => value.consume(
@@ -76,6 +81,7 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the right side of this [Either] (R) to a new [Either] (L, S).
+  @useResult
   Either<L, S> mapRightFlat<S>(Either<L, S> map(R value)) => _MapFlatEither<L, S, L, R>(
         source: this,
         map: (value) => value.consume(
@@ -85,7 +91,8 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the left side of this [Either] (L) async to a new value (S).
-  Future<Either<S, R>> mapAsyncLeft<S>(FutureOr<S> map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
+  @useResult
+  Future<Either<S, R>> mapLeftAsync<S>(FutureOr<S> map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
         source: this,
         map: (value) => value.consume(
           onRight: (value) => EitherFuture<S, R>.right(value),
@@ -94,7 +101,8 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the right side of this [Either] (R) async to a new value (S).
-  Future<Either<L, S>> mapAsyncRight<S>(FutureOr<S> map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
+  @useResult
+  Future<Either<L, S>> mapRightAsync<S>(FutureOr<S> map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
         source: this,
         map: (value) => value.consume(
           onRight: (value) => EitherFuture<L, S>.right(map(value)),
@@ -103,10 +111,12 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the this [Either] (L, R) async to a new [Either] (S, K).
+  @useResult
   Future<Either<S, K>> mapAsyncFlat<S, K>(FutureOr<Either<S, K>> map(Either<L, R> value)) =>
       _MapAsyncFlatEither<S, K, L, R>(source: this, map: map);
 
   /// Maps the left side of this [Either] (L) async to a new [Either] (S, R).
+  @useResult
   Future<Either<S, R>> mapLeftAsyncFlat<S>(FutureOr<Either<S, R>> map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
         source: this,
         map: (value) => value.consume(
@@ -116,6 +126,7 @@ extension EitherMapExtension<L, R> on Either<L, R> {
       );
 
   /// Maps the right side of this [Either] (R) async to a new [Either] (L, S).
+  @useResult
   Future<Either<L, S>> mapRightAsyncFlat<S>(FutureOr<Either<L, S>> map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
         source: this,
         map: (value) => value.consume(
@@ -124,54 +135,119 @@ extension EitherMapExtension<L, R> on Either<L, R> {
         ),
       );
 
+  @useResult
   Either<void, R> discardLeft() => mapLeft((_) {});
 
+  @useResult
   Either<L, void> discardRight() => mapRight((_) {});
 
+  @useResult
   Either<S, R> castLeft<S>() => mapLeft((value) => value as S);
 
+  @useResult
   Either<L, S> castRight<S>() => mapRight((value) => value as S);
 }
 
 extension FutureOfEitherMapExtension<L, R> on FutureOr<Either<L, R>> {
   /// Maps the left side of this [Either] (L) to a new value (S).
-  Future<Either<S, R>> mapLeft<S>(S map(L value)) async => (await this).mapLeft(map);
+  @useResult
+  Future<Either<S, R>> mapLeft<S>(S map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onLeft: (value) => Either<S, R>.left(map(value)),
+          onRight: (value) => Either<S, R>.right(value),
+        ),
+      );
 
   /// Maps the right side of this [Either] (R) to a new value (S).
-  Future<Either<L, S>> mapRight<S>(S map(R value)) async => (await this).mapRight(map);
+  @useResult
+  Future<Either<L, S>> mapRight<S>(S map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onLeft: (value) => Either<L, S>.left(value),
+          onRight: (value) => Either<L, S>.right(map(value)),
+        ),
+      );
 
   /// Maps the this [Either] (L, R) to a new [Either] (S, K).
-  Future<Either<S, K>> mapFlat<S, K>(Either<S, K> map(Either<L, R> value)) async => (await this).mapFlat(map);
+  @useResult
+  Future<Either<S, K>> mapFlat<S, K>(Either<S, K> map(Either<L, R> value)) =>
+      _MapAsyncFlatEither<S, K, L, R>(source: this, map: map);
 
   /// Maps the left side of this [Either] (L) to a new [Either] (S, R).
-  Future<Either<S, R>> mapLeftFlat<S>(Either<S, R> map(L value)) async => (await this).mapLeftFlat(map);
+  @useResult
+  Future<Either<S, R>> mapLeftFlat<S>(Either<S, R> map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onLeft: (value) => map(value),
+          onRight: (value) => Either<S, R>.right(value),
+        ),
+      );
 
   /// Maps the right side of this [Either] (R) to a new [Either] (L, S).
-  Future<Either<L, S>> mapRightFlat<S>(Either<L, S> map(R value)) async => (await this).mapRightFlat(map);
+  @useResult
+  Future<Either<L, S>> mapRightFlat<S>(Either<L, S> map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onLeft: (value) => Either<L, S>.left(value),
+          onRight: (value) => map(value),
+        ),
+      );
 
   /// Maps the left side of this [Either] (L) async to a new value (S).
-  Future<Either<S, R>> mapLeftAsync<S>(FutureOr<S> map(L value)) async => (await this).mapAsyncLeft(map);
+  @useResult
+  Future<Either<S, R>> mapLeftAsync<S>(FutureOr<S> map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onRight: (value) => EitherFuture<S, R>.right(value),
+          onLeft: (value) => EitherFuture<S, R>.left(map(value)),
+        ),
+      );
 
   /// Maps the right side of this [Either] (R) async to a new value (S).
-  Future<Either<L, S>> mapRightAsync<S>(FutureOr<S> map(R value)) async => (await this).mapAsyncRight(map);
+  @useResult
+  Future<Either<L, S>> mapRightAsync<S>(FutureOr<S> map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onRight: (value) => EitherFuture<L, S>.right(map(value)),
+          onLeft: (value) => EitherFuture<L, S>.left(value),
+        ),
+      );
 
   /// Maps the this [Either] (L, R) async to a new [Either] (S, K).
-  Future<Either<S, K>> mapFlatAsync<S, K>(FutureOr<Either<S, K>> map(Either<L, R> value)) async =>
-      (await this).mapAsyncFlat(map);
+  @useResult
+  Future<Either<S, K>> mapAsyncFlat<S, K>(FutureOr<Either<S, K>> map(Either<L, R> value)) =>
+      _MapAsyncFlatEither<S, K, L, R>(source: this, map: map);
 
   /// Maps the left side of this [Either] (L) async to a new [Either] (S, R).
-  Future<Either<S, R>> mapLeftFlatAsync<S>(FutureOr<Either<S, R>> map(L value)) async =>
-      (await this).mapLeftAsyncFlat(map);
+  @useResult
+  Future<Either<S, R>> mapLeftAsyncFlat<S>(FutureOr<Either<S, R>> map(L value)) => _MapAsyncFlatEither<S, R, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onLeft: (value) => map(value),
+          onRight: (value) => EitherFuture<S, R>.right(value),
+        ),
+      );
 
   /// Maps the right side of this [Either] (R) async to a new [Either] (L, S).
-  Future<Either<L, S>> mapRightFlatAsync<S>(FutureOr<Either<L, S>> map(R value)) async =>
-      (await this).mapRightAsyncFlat(map);
+  @useResult
+  Future<Either<L, S>> mapRightAsyncFlat<S>(FutureOr<Either<L, S>> map(R value)) => _MapAsyncFlatEither<L, S, L, R>(
+        source: this,
+        map: (value) => value.consume(
+          onLeft: (value) => EitherFuture<L, S>.left(value),
+          onRight: (value) => map(value),
+        ),
+      );
 
-  Future<Either<void, R>> discardLeft() async => (await this).discardLeft();
+  @useResult
+  Future<Either<void, R>> discardLeft() => mapLeft((_) {});
 
-  Future<Either<L, void>> discardRight() async => (await this).discardRight();
+  @useResult
+  Future<Either<L, void>> discardRight() => mapRight((_) {});
 
-  Future<Either<S, R>> castLeft<S>() async => (await this).castLeft<S>();
+  @useResult
+  Future<Either<S, R>> castLeft<S>() => mapLeft((value) => value as S);
 
-  Future<Either<L, S>> castRight<S>() async => (await this).castRight<S>();
+  @useResult
+  Future<Either<L, S>> castRight<S>() => mapRight((value) => value as S);
 }

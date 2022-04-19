@@ -24,6 +24,7 @@ dependencies:
   
   matcher: ^0.12.11
   stack_trace: ^1.10.0
+  meta: ^1.7.0
 
 dev_dependencies:
   flutter_test:
@@ -40,6 +41,6 @@ dev_dependencies:
   mockito: ^5.0.10
 
   formz_test:
-#    path: ../app-formz-test
-    git: https://git@github.com/TinDan-Dev/app-formz-test.git
+    path: ../app-formz-test
+#    git: https://git@github.com/TinDan-Dev/app-formz-test.git
 
