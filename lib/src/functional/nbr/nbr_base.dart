@@ -150,19 +150,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
     final invocationTrace = StackTrace.current;
 
     try {
-      return stream.firstWhere(
-        (element) => element.map(
-          loading: (_) => false,
-          success: (_) => true,
-          error: (_) => true,
-        ),
-        orElse: () => ResultState.error(
-          UnexpectedFailure(
-            'stream was closed before a valid state was published',
-            trace: invocationTrace,
-          ),
-        ),
-      );
+      return stream.firstWhere((e) => e is! ResultStateLoading);
     } catch (e, s) {
       return ResultState.error(
         UnexpectedFailure('error on stream', trace: s, cause: e).prependStackTrace(invocationTrace),
@@ -176,6 +164,10 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
 
     if (_disposed) return;
     _disposed = true;
+
+    if (_subject.value is ResultStateLoading) {
+      _subject.add(ResultState.error(UnexpectedFailure('NBR was disposed during loading')));
+    }
 
     _subject.close();
   }

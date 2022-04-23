@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../functional/loader/loader.dart';
-import '../functional/loader/loader_result.dart';
-import '../functional/result/result.dart';
-import '../functional/result/result_state.dart';
-import '../utils/extensions.dart';
-import '../utils/mutex.dart';
+import '../../functional/loader/loader.dart';
+import '../../functional/loader/loader_result.dart';
+import '../../functional/result/result.dart';
+import '../../functional/result/result_state.dart';
+import '../../utils/extensions.dart';
+import '../../utils/mutex.dart';
 
 class LoaderWidgetFailure<T> extends Failure<T> {
   LoaderWidgetFailure(Object? cause)

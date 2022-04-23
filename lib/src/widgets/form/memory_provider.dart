@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart' hide Path;
 
-import '../form_memory.dart';
-import '../nav/path.dart';
-import '../utils/extensions.dart';
+import '../../form_memory.dart';
+import '../../nav/path.dart';
+import '../../utils/extensions.dart';
 
 class MemoryProvider extends StatefulWidget {
   static FormMemory? of(BuildContext context) {

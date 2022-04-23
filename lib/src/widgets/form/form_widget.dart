@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../attachments.dart';
-import '../form_cubit.dart';
-import '../form_memory.dart';
+import '../../attachments.dart';
+import '../../form_cubit.dart';
+import '../../form_memory.dart';
 import 'memory_provider.dart';
 
 class FormWidget<Cubit extends FormCubit> extends StatefulWidget {

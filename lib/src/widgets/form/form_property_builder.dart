@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide FormState;
 
-import '../form_cubit.dart';
-import '../form_state.dart';
+import '../../form_cubit.dart';
+import '../../form_state.dart';
 import 'form_builder.dart';
 
 class FormPropertyBuilder<Cubit extends FormCubit, T> extends StatelessWidget {

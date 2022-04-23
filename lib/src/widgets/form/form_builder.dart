@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart' hide FormState;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../form_cubit.dart';
-import '../form_state.dart';
+import '../../form_cubit.dart';
+import '../../form_state.dart';
 
 typedef FormStateBuilderCondition = List<Object?> Function(FormState state);
 

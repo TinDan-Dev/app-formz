@@ -1,16 +1,34 @@
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 import '../result/result_state.dart';
 import 'nbr.dart';
 
-class _NBRPoolEntry<T extends NBR> {
+class _PoolKey implements Comparable<_PoolKey> {
+  final Object key;
   final DateTime insertionTime;
-  final T value;
 
-  const _NBRPoolEntry({
-    required this.insertionTime,
-    required this.value,
-  });
+  _PoolKey(this.key, this.insertionTime);
+
+  @override
+  int compareTo(_PoolKey other) => insertionTime.compareTo(other.insertionTime);
+
+  @override
+  int get hashCode => key.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! _PoolKey) return false;
+
+    return key == other.key;
+  }
+}
+
+class _PoolValue<T> {
+  final T value;
+  final DateTime insertionTime;
+
+  _PoolValue(this.value, this.insertionTime);
 }
 
 class NBRPool<T extends NBR> {
@@ -18,9 +36,10 @@ class NBRPool<T extends NBR> {
   static const defaultInvalidationTime = Duration(seconds: 30);
 
   /// The default minimum size the pool has to reach to run a cleaning sweep.
-  static const defaultMinSweepSize = 500;
+  static const defaultMaxSize = 500;
 
-  final Map<Object, _NBRPoolEntry<T>> _pool;
+  final Map<Object, _PoolValue<T>> _pool;
+  final PriorityQueue<_PoolKey> _queue;
 
   /// The duration after which a network bound resource is invalidated.
   ///
@@ -30,43 +49,61 @@ class NBRPool<T extends NBR> {
   /// The minimum size the pool has to reach to run a cleaning sweep.
   ///
   /// Defaults to [defaultMinSweepSize].
-  final int minSweepSize;
+  final int maxSize;
 
   NBRPool({
     this.invalidationTime = defaultInvalidationTime,
-    this.minSweepSize = defaultMinSweepSize,
-  }) : _pool = {};
+    this.maxSize = defaultMaxSize,
+  })  : _pool = {},
+        _queue = PriorityQueue();
 
   int get currentSize => _pool.keys.length;
 
-  T _create(Object key, DateTime now, T create()) {
+  T _insert(Object key, DateTime now, T create()) {
+    final oldEntry = _pool[key];
+    if (oldEntry != null) {
+      oldEntry.value.dispose();
+    }
+
     final entry = create();
-    _pool[key] = _NBRPoolEntry(insertionTime: now, value: entry);
+    _pool[key] = _PoolValue(entry, now);
+    _queue.add(_PoolKey(key, now));
 
     return entry;
   }
 
-  _NBRPoolEntry<T>? _validate(
-    _NBRPoolEntry<T>? entry, {
+  @visibleForTesting
+  void sweep(DateTime now) {
+    while (_queue.isNotEmpty &&
+        (now.difference(_queue.first.insertionTime) > invalidationTime || _queue.length > maxSize)) {
+      final key = _queue.removeFirst();
+      final value = _pool[key.key];
+
+      if (value == null) continue;
+
+      assert(value.insertionTime.isAfter(key.insertionTime) || value.insertionTime.isAtSameMomentAs(key.insertionTime));
+      if (value.insertionTime.isAtSameMomentAs(key.insertionTime)) {
+        value.value.dispose();
+        _pool.remove(key.key);
+      }
+    }
+  }
+
+  bool _validate(
+    _PoolValue<T>? value, {
     required DateTime now,
     required bool outdatedOk,
     required bool failedOk,
   }) {
-    if (entry == null) {
-      return null;
-    }
+    if (value == null) return false;
 
-    final outdated = now.difference(entry.insertionTime) > invalidationTime;
-    if (outdated && !outdatedOk) {
-      return null;
-    }
+    final outdated = now.difference(value.insertionTime) > invalidationTime;
+    if (outdated && !outdatedOk) return false;
 
-    final failed = entry.value.currentState is ResultStateError;
-    if (failed && !failedOk) {
-      return null;
-    }
+    final failed = value.value.currentState is ResultStateError;
+    if (failed && !failedOk) return false;
 
-    return entry;
+    return true;
   }
 
   T _get(
@@ -76,18 +113,19 @@ class NBRPool<T extends NBR> {
     required bool outdatedOk,
     required bool failedOk,
   }) {
-    final validatedEntry = _validate(
-      _pool[key],
+    final value = _pool[key];
+    final valid = _validate(
+      value,
       now: now,
       outdatedOk: outdatedOk,
       failedOk: failedOk,
     );
 
-    if (validatedEntry == null) {
-      return _create(key, now, create);
+    if (valid) {
+      return value!.value;
+    } else {
+      return _insert(key, now, create);
     }
-
-    return validatedEntry.value;
   }
 
   T request(
@@ -105,7 +143,7 @@ class NBRPool<T extends NBR> {
       failedOk: failedOk,
     );
 
-    _sweep(now);
+    sweep(now);
 
     return entry;
   }
@@ -129,46 +167,39 @@ class NBRPool<T extends NBR> {
         )
         .toList();
 
-    _sweep(now);
+    sweep(now);
 
     return entries;
   }
 
-  void _sweep(DateTime now) {
-    // remove every element that is older then the valid time
-    if (_pool.length >= minSweepSize) {
-      _pool.removeWhere((key, value) => now.difference(value.insertionTime) > invalidationTime);
-    }
-
-    // if there are still more elements in the pool, remove the oldest ones
-    if (_pool.length > minSweepSize) {
-      final entries = _pool.entries.sorted(
-        (a, b) => a.value.insertionTime.difference(b.value.insertionTime).inMilliseconds,
-      );
-
-      for (final entry in entries.take(_pool.length - minSweepSize)) {
-        _pool.remove(entry.key);
-      }
-    }
-  }
-
   T? tryGet(Object key, {required DateTime now, bool outdatedOk = false, bool failedOk = false}) {
-    final validatedEntry = _validate(
-      _pool[key],
+    final value = _pool[key];
+    final valid = _validate(
+      value,
       now: now,
       outdatedOk: outdatedOk,
       failedOk: failedOk,
     );
 
-    return validatedEntry?.value;
+    if (valid) {
+      return value?.value;
+    } else {
+      return null;
+    }
   }
 
   void add(Object key, {required DateTime now, required T value}) {
-    _create(key, now, () => value);
-    _sweep(now);
+    _insert(key, now, () => value);
+    sweep(now);
   }
 
-  void dispose() {
+  void clear() {
+    for (final value in _pool.values) {
+      value.value.dispose();
+    }
     _pool.clear();
+    _queue.clear();
   }
+
+  void dispose() => clear();
 }
