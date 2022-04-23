@@ -1,11 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formz/src/functional/nbr/nbr.dart';
-import 'package:formz/src/functional/nbr/nbr_pool.dart';
 import 'package:formz_test/formz_test.dart';
 import 'package:mockito/mockito.dart';
 
 class InvocationVerifier extends Mock {
   void invoke([dynamic input]) => super.noSuchMethod(Invocation.method(#invoke, [input]));
+}
+
+class FakeNBR extends NBR<String> {
+  final InvocationVerifier disposeVerifier;
+
+  FakeNBR()
+      : disposeVerifier = InvocationVerifier(),
+        super('fake');
+
+  @override
+  ResultState<String> get currentState => const ResultState.success('fake');
+
+  @override
+  Stream<ResultState<String>> get stream => Stream.value(currentState);
+
+  @override
+  Future<ResultState<String>> get toFuture => Future.value(currentState);
+
+  @override
+  void dispose() => disposeVerifier.invoke();
 }
 
 void main() {
@@ -34,7 +52,7 @@ void main() {
 
     test('should remove oldest entries when adding new ones', () {
       var time = now;
-      final pool = NBRPool<NBR<String>>(minSweepSize: 10);
+      final pool = NBRPool<NBR<String>>(maxSize: 10);
 
       const oldestKey = '-2';
       pool.add(oldestKey, now: time, value: nbrSuccess);
@@ -59,8 +77,8 @@ void main() {
       expect(pool.tryGet(oldKey, now: time), equals(nbrSuccess));
     });
 
-    test('should remove elements to keep pool <= minSweepSize', () {
-      final pool = NBRPool<NBR<String>>(minSweepSize: 10);
+    test('should remove elements to keep pool <= maxSize', () {
+      final pool = NBRPool<NBR<String>>(maxSize: 10);
 
       for (int i = 0; i < 10; i++) {
         pool.add(i.toString(), now: now, value: nbrSuccess);
@@ -76,7 +94,7 @@ void main() {
 
     test('should remove elements that are outdated', () {
       var time = now;
-      final pool = NBRPool<NBR<String>>(minSweepSize: 10);
+      final pool = NBRPool<NBR<String>>(maxSize: 10);
 
       for (int i = 0; i < 10; i++) {
         pool.add(i.toString(), now: time, value: nbrSuccess);
@@ -322,6 +340,50 @@ void main() {
 
       expect(pool.tryGet(key, now: time), isNull);
       expect(pool.tryGet(key, now: time, outdatedOk: true), equals(nbrSuccess));
+    });
+  });
+
+  group('dispose', () {
+    test('should dispose nbr that are removed from the pool', () {
+      final nbr = FakeNBR();
+
+      var time = now;
+      pool.add(key, now: time, value: nbr);
+
+      time = time.add(const Duration(minutes: 1));
+      pool.sweep(time);
+
+      verify(nbr.disposeVerifier.invoke()).called(1);
+    });
+
+    test('should dispose old nbr on request', () {
+      final nbr1 = FakeNBR();
+      final nbr2 = FakeNBR();
+
+      var time = now;
+      pool.add(key, now: time, value: nbr1);
+
+      time = time.add(const Duration(minutes: 1));
+      pool.request(key, create: () => nbr2, now: time);
+
+      verify(nbr1.disposeVerifier.invoke()).called(1);
+      verifyNever(nbr2.disposeVerifier.invoke());
+    });
+
+    test('should ignore orphaned heap elements', () {
+      final nbrs = List.generate(10, (index) => FakeNBR());
+
+      var time = now;
+      for (final nbr in nbrs) {
+        pool.add(key, now: time, value: nbr);
+      }
+
+      time = time.add(const Duration(minutes: 1));
+      pool.sweep(time);
+
+      for (final nbr in nbrs) {
+        verify(nbr.disposeVerifier.invoke()).called(1);
+      }
     });
   });
 }
