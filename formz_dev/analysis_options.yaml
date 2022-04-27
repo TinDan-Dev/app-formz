@@ -1,0 +1,26 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    use_function_type_syntax_for_parameters: false
+    prefer_single_quotes: true
+    prefer_relative_imports: true
+    unawaited_futures: true
+    prefer_typing_uninitialized_variables: false
+    prefer_function_declarations_over_variables: false
+#     no_runtimeType_toString: false
+#     avoid_escaping_inner_quotes: false
+#     avoid_bool_literals_in_conditional_expressions: false
+#     null_check_on_nullable_type_parameter: true
+#     unnecessary_this: true
+#     avoid_positional_boolean_parameters: false
+#     sort_unnamed_constructors_first: false
+
+analyzer:
+  exclude:
+    - lib/core/proto/**
+    - integration_test/manual_test.dart
+    - '**.g.dart'
+    - '**.freezed.dart'
+    - '**.mocks.dart'
+    - '**.auto.dart'
