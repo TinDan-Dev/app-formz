@@ -1,12 +1,12 @@
 builders:
   allAnyGenerator:
-    import: 'package:formz_gen/src/gen/all_any_generator.dart'
+    import: 'package:formz_dev/src/gen/all_any_generator.dart'
     builder_factories: ['builder']
     build_extensions: {'.dart': ['.any_mocks.dart']}
     auto_apply: dependents
     build_to: source
   assetGenerator:
-    import: 'package:formz_gen/src/gen/asset_generator.dart'
+    import: 'package:formz_dev/src/gen/asset_generator.dart'
     builder_factories: ['builder']
     auto_apply: dependents
     build_extensions: {".dart": [".asset.part"]}

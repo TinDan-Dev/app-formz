@@ -353,35 +353,27 @@ class DynamicContentLoader<T> with ChangeNotifier {
     return container.initFuture;
   }
 
-  void _watchPlus(int startIndex, int endIndex) {
-    final end = _endContainer!;
-    if (end.startIndex != startIndex) {
-      return;
-    }
-
-    if (end.isFullInDirection(LoadDirection.plus)) {
-      _loadContainer(end, LoadDirection.plus, end.endIndex + 1);
-    }
-  }
-
-  void _watchMinus(int startIndex, int endIndex) {
-    final start = _startContainer!;
-    if (start.startIndex != startIndex) {
-      return;
-    }
-
-    if (start.isFullInDirection(LoadDirection.minus)) {
-      _loadContainer(start, LoadDirection.minus, start.startIndex - containerSize);
-    }
-  }
-
   void _watch() {
     switch (watchDirection) {
       case LoadDirection.plus:
-        _watchPlus(startIndex, endIndex);
+        final end = _endContainer!;
+        if (end.endIndex != endIndex) {
+          return;
+        }
+
+        if (end.isFullInDirection(LoadDirection.plus)) {
+          _loadContainer(end, LoadDirection.plus, end.endIndex + 1);
+        }
         break;
       case LoadDirection.minus:
-        _watchMinus(startIndex, endIndex);
+        final start = _startContainer!;
+        if (start.startIndex != startIndex) {
+          return;
+        }
+
+        if (start.isFullInDirection(LoadDirection.minus)) {
+          _loadContainer(start, LoadDirection.minus, start.startIndex - containerSize);
+        }
         break;
       default:
     }

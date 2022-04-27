@@ -30,17 +30,34 @@ jobs:
         with:
           flutter-version: '2.8.1'
 
-      - name: Get Dependencies
+      - name: Get dependencies
+        working-directory: ./formz
         run: flutter pub get
 
       - name: Verify formatting
+        working-directory: ./formz
         run: dart format -l 120 --output=none --set-exit-if-changed .
       
       - name: Code generation
+        working-directory: ./formz
         run: flutter pub run build_runner build --delete-conflicting-outputs
         
       - name: Analyze
+        working-directory: ./formz
         run: flutter analyze
 
-      - name: Tests
+      - name: Tests 
+        working-directory: ./formz
         run: flutter test
+
+      - name: Get dev dependencies
+        working-directory: ./formz_dev
+        run: flutter pub get
+
+      - name: Verify dev formatting
+        working-directory: ./formz_dev
+        run: dart format -l 120 --output=none --set-exit-if-changed .
+
+      - name: Analyze dev
+        working-directory: ./formz_dev
+        run: flutter analyze

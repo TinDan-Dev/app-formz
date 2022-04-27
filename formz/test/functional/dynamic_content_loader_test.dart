@@ -64,11 +64,13 @@ void main() {
     int pivotIndex = 0,
     LoadDirection? watchDirection,
     LoadDirection? prefetchDirection,
+    PivotType pivotType = PivotType.min,
   }) {
     final loader = DynamicContentLoader<int>(
       load: (_, startIndex, endIndex) => mockSource.load(startIndex, endIndex),
       containerSize: containerSize,
       pivotIndex: pivotIndex,
+      pivotType: pivotType,
       watchDirection: watchDirection,
       prefetchDirection: prefetchDirection,
     );
@@ -573,24 +575,25 @@ void main() {
       late StreamController<List<Content>> controller;
 
       setUp(() async {
-        controller = setLoadToController(0, 199);
-        loader = createLoader(watchDirection: LoadDirection.minus);
+        controller = setLoadToController(-200, -1);
+        loader = createLoader(watchDirection: LoadDirection.minus, pivotType: PivotType.max);
 
-        controller.add(createContent(1, 198).toList());
+        controller.add(createContent(-199, -2).toList());
         await loader.initFuture;
 
-        verify(mockSource.load(0, 199));
-      });
-      test('should add container when last container is full in minus direction', () async {
-        controller.add(createContent(0, 198).toList());
-        setLoadUnsuccessful();
-
-        await Future.delayed(const Duration(milliseconds: 1));
         verify(mockSource.load(-200, -1));
       });
 
+      test('should add container when last container is full in minus direction', () async {
+        controller.add(createContent(-200, -2).toList());
+        setLoadUnsuccessful();
+
+        await Future.delayed(const Duration(milliseconds: 1));
+        verify(mockSource.load(-400, -201));
+      });
+
       test('should not add container when last container is not full in minus direction', () async {
-        controller.add(createContent(1, 199).toList());
+        controller.add(createContent(-199, -1).toList());
         setLoadUnsuccessful();
 
         await Future.delayed(const Duration(milliseconds: 1));
@@ -665,46 +668,46 @@ void main() {
       late StreamController<List<Content>> controller;
 
       setUp(() async {
-        controller = setLoadToController(0, 199);
-        loader = createLoader(prefetchDirection: LoadDirection.minus);
+        controller = setLoadToController(-200, -1);
+        loader = createLoader(prefetchDirection: LoadDirection.minus, pivotType: PivotType.max);
 
-        verify(mockSource.load(0, 199));
+        verify(mockSource.load(-200, -1));
       });
 
       test('should add container when last container is full in plus direction and request is in range', () async {
-        controller.add(createContent(0, 199).toList());
+        controller.add(createContent(-200, -2).toList());
         await loader.initFuture;
 
-        loader[2];
+        loader[-199];
         await Future.delayed(const Duration(milliseconds: 1));
-        verify(mockSource.load(-200, -1));
+        verify(mockSource.load(-400, -201));
       });
 
       test('should not add container when last container is not full in plus direction and request is in range',
           () async {
-        controller.add(createContent(1, 199).toList());
+        controller.add(createContent(-199, -1).toList());
         await loader.initFuture;
 
-        loader[0];
+        loader[-199];
         await Future.delayed(const Duration(milliseconds: 1));
         verifyNever(mockSource.load(any, any));
       });
 
       test('should not add container when last container is full in plus direction and request is not in range',
           () async {
-        controller.add(createContent(0, 199).toList());
+        controller.add(createContent(-200, -2).toList());
         await loader.initFuture;
 
-        loader[3];
+        loader[-196];
         await Future.delayed(const Duration(milliseconds: 1));
         verifyNever(mockSource.load(any, any));
       });
 
       test('should not load in other direction', () async {
-        controller.add(createContent(0, 199).toList());
+        controller.add(createContent(-200, -1).toList());
         await loader.initFuture;
 
-        loader[199];
+        loader[-1];
         await Future.delayed(const Duration(milliseconds: 1));
         verifyNever(mockSource.load(any, any));
       });

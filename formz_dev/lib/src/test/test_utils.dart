@@ -10,6 +10,6 @@ Future<void> Function() expectNoEmits(Stream stream) {
   return () async {
     await Future.delayed(const Duration(milliseconds: 10));
 
-    subscription.cancel();
+    await subscription.cancel();
   };
 }

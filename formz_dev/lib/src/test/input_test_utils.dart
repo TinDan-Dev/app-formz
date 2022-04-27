@@ -22,10 +22,11 @@ Map<T, InputMatcher> _inputToMatcher<T>(
     key: (key) => key,
     value: (key) {
       final value = inputs[key];
-      if (value is InputMatcher)
+      if (value is InputMatcher) {
         return value;
-      else
+      } else {
         return wrapper(key, value);
+      }
     },
   );
 }

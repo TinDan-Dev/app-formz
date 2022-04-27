@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide FormState;
 
-import '../../../formz.dart';
+import '../../form_cubit.dart';
+import '../../functional/result/result.dart';
 import '../../utils/extensions.dart';
 import 'form_builder.dart';
 
