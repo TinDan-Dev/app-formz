@@ -300,7 +300,7 @@ class FormzRouterDelegate with ChangeNotifier {
   ///
   /// Dialogs are not support within transaction and if the navigation is
   /// currently block, the call is ignored and returns false.
-  Future<T?> pushDialog<T>(WidgetBuilder builder, {Object? arguments}) async {
+  Future<T?> pushDialog<T>(WidgetBuilder builder, {Arguments? arguments}) async {
     assert(!_transactionInProgress, 'A dialog cannot be pushed during a transaction');
 
     if (_navigationBlocked) return null;

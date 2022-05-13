@@ -245,9 +245,11 @@ packages:
   formz_dev:
     dependency: "direct dev"
     description:
-      path: "../formz_dev"
-      relative: true
-    source: path
+      path: formz_dev
+      ref: HEAD
+      resolved-ref: "10a7cb121e410f5e858e0420d78cf2c57c2c5293"
+      url: "https://git@github.com/TinDan-Dev/app-formz.git"
+    source: git
     version: "1.0.0"
   freezed:
     dependency: "direct dev"

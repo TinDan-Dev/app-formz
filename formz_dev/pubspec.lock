@@ -203,10 +203,12 @@ packages:
   formz:
     dependency: "direct main"
     description:
-      path: "../formz"
-      relative: true
-    source: path
-    version: "1.0.11"
+      path: formz
+      ref: HEAD
+      resolved-ref: "10a7cb121e410f5e858e0420d78cf2c57c2c5293"
+      url: "https://git@github.com/TinDan-Dev/app-formz.git"
+    source: git
+    version: "1.0.13"
   freezed_annotation:
     dependency: transitive
     description:

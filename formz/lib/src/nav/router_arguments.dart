@@ -65,7 +65,10 @@ class Arguments {
 extension ArgumentsExtension on BuildContext {
   Arguments get args {
     final route = ModalRoute.of(this)?.settings;
-    assert(route is FormzRouterPage, 'Only use the args property in routes pushed by the formz navigator');
+    assert(
+      route is FormzRouterPage || route?.arguments is Arguments,
+      'Only use the args property in routes pushed by the formz navigator with arguments',
+    );
 
     return route?.arguments as Arguments;
   }
