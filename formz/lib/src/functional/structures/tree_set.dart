@@ -63,4 +63,7 @@ class TreeSet<V extends Comparable> with IterableMixin<V> {
   TreeSet<V> union(TreeSet<V> other) => TreeSet._(avl.union(_root, other._root));
 
   TreeSet<V> minus(TreeSet<V> other) => TreeSet._(avl.minus(_root, other._root));
+
+  @override
+  String toString() => '{${join(', ')}}';
 }

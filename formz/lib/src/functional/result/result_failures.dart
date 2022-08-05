@@ -16,17 +16,49 @@ class NullFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
+class UnsupportedFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
+  UnsupportedFailure(
+    String description, {
+    Object? cause,
+    StackTrace? trace,
+    this.shouldRetry = false,
+  }) : super(
+          message: 'Unsupported: $description',
+          cause: cause,
+          trace: trace ?? StackTrace.current,
+        );
+}
+
+class InvalidFailure<R> extends Failure<R> with ActionFailure<R> {
+  @override
+  final bool shouldRetry;
+
+  InvalidFailure(
+    String description, {
+    Object? cause,
+    StackTrace? trace,
+    this.shouldRetry = true,
+  }) : super(
+          message: 'Invalid: $description',
+          cause: cause,
+          trace: trace ?? StackTrace.current,
+        );
+}
+
 class UnexpectedFailure<R> extends Failure<R> with ActionFailure<R> {
   @override
   final bool shouldRetry;
 
   UnexpectedFailure(
-    String stateDescription, {
+    String description, {
     Object? cause,
     StackTrace? trace,
     this.shouldRetry = true,
   }) : super(
-          message: 'This was not expected: $stateDescription',
+          message: 'Unexpected: $description',
           cause: cause,
           trace: trace ?? StackTrace.current,
         );

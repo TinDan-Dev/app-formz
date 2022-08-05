@@ -134,4 +134,7 @@ class TreeMap<K extends Comparable, V> {
 
     return _root.find(key).right;
   }
+
+  @override
+  String toString() => '[${entries.map((e) => '${e.key}: ${e.value}').join(', ')}]';
 }
