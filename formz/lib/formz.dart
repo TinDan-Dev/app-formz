@@ -29,6 +29,7 @@ export 'src/functional/result/result_failures.dart';
 export 'src/functional/result/result_iterable.dart';
 export 'src/functional/result/result_state.dart'
     show ResultState, ResultStateSuccess, ResultStateError, ResultStateLoading;
+export 'src/functional/structures/hash_map.dart' show HashMap;
 export 'src/functional/structures/object_comparable.dart' show ObjectComparable;
 export 'src/functional/structures/tree_map.dart' show TreeMap;
 export 'src/functional/structures/tree_set.dart' show TreeSet;

@@ -6,21 +6,21 @@ import '../result/result.dart';
 part 'loader_emitter.freezed.dart';
 
 @freezed
-class EmitterUpdate<T> with _$EmitterUpdate<T> {
-  const factory EmitterUpdate.result(T value) = EmitterUpdateResult;
+class EmitterUpdate with _$EmitterUpdate {
+  const factory EmitterUpdate.result(Type key, dynamic value) = EmitterUpdateResult;
 
   const factory EmitterUpdate.error(Failure failure) = EmitterUpdateError;
 
   const factory EmitterUpdate.config(Map<String, Object?> configs) = EmitterUpdateConfig;
 }
 
-class LoaderEmitter<T> {
-  final PublishSubject<EmitterUpdate<T>> _subject;
+class LoaderEmitter {
+  final PublishSubject<EmitterUpdate> _subject;
   final List<void Function()> _onDoneCallbacks;
 
   bool get done => _subject.isClosed;
 
-  Stream<EmitterUpdate<T>> get stream => _subject;
+  Stream<EmitterUpdate> get stream => _subject;
 
   LoaderEmitter()
       : _subject = PublishSubject(),
@@ -36,10 +36,10 @@ class LoaderEmitter<T> {
     }
   }
 
-  void addValue(T value) {
+  void addValue<T>(T value) {
     if (_subject.isClosed) return;
 
-    _subject.add(EmitterUpdate.result(value));
+    _subject.add(EmitterUpdate.result(T, value));
   }
 
   void addError(Failure failure) {

@@ -1,55 +1,56 @@
 part of 'loader.dart';
 
-class _ConfigLoader extends Loader<void> {
+class _ConfigLoader extends Loader {
   final Map<String, Object?> config;
 
   const _ConfigLoader(this.config, {Loader? child}) : super(child: child);
 
   @override
-  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter<void> emitter) {
+  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter emitter) {
     emitter.addConfig(config);
   }
 }
 
-class _DelegatingLoader<T> extends Loader<T> {
-  final LoadCallback<T> callback;
+class _DelegatingLoader extends Loader {
+  final LoadCallback callback;
 
   const _DelegatingLoader(this.callback, {Loader? child}) : super(child: child);
 
   @override
-  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter<T> emitter) {
-    return callback(previousResult, emitter);
-  }
+  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter emitter) => callback(previousResult, emitter);
 }
 
-class _InstanceLoader<T> extends Loader<T> {
+class _InstanceLoader<T> extends Loader {
   final FutureOr<T> Function() create;
   final void Function(T instance)? dispose;
 
   const _InstanceLoader({required this.create, this.dispose, Loader? child}) : super(child: child);
 
   @override
-  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter<T> emitter) async {
+  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter emitter) async {
     final result = await create();
 
-    emitter.addValue(result);
+    emitter.addValue<T>(result);
     emitter.onDone(() => dispose?.call(result));
   }
 }
 
-abstract class DelegatingLoader<T> extends Loader<T> {
-  late final Lazy<Loader<T>> _loader;
+abstract class DelegatingLoader extends Loader {
+  late final Lazy<Loader> _loader;
 
   DelegatingLoader() {
     _loader = Lazy(() => loader);
   }
 
-  Loader<T> get loader;
+  Loader get loader;
 
   @override
   @nonVirtual
-  FutureOr<void> load(LoaderResult previousResult, LoaderEmitter<T> emitter) => throw UnimplementedError();
+  Loader get child => _loader.value;
 
   @override
-  Stream<ResultState<LoaderResult>> invoke(LoaderResult previousResult) => _loader.value.invoke(previousResult);
+  @nonVirtual
+  FutureOr<void> load(LoaderResult result, LoaderEmitter emitter) {
+    emitter.addValue(null);
+  }
 }

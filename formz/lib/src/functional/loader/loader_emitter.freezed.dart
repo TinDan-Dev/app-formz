@@ -17,20 +17,21 @@ final _privateConstructorUsedError = UnsupportedError(
 class _$EmitterUpdateTearOff {
   const _$EmitterUpdateTearOff();
 
-  EmitterUpdateResult<T> result<T>(T value) {
-    return EmitterUpdateResult<T>(
+  EmitterUpdateResult result(Type key, dynamic value) {
+    return EmitterUpdateResult(
+      key,
       value,
     );
   }
 
-  EmitterUpdateError<T> error<T>(Failure<dynamic> failure) {
-    return EmitterUpdateError<T>(
+  EmitterUpdateError error(Failure<dynamic> failure) {
+    return EmitterUpdateError(
       failure,
     );
   }
 
-  EmitterUpdateConfig<T> config<T>(Map<String, Object?> configs) {
-    return EmitterUpdateConfig<T>(
+  EmitterUpdateConfig config(Map<String, Object?> configs) {
+    return EmitterUpdateConfig(
       configs,
     );
   }
@@ -40,24 +41,24 @@ class _$EmitterUpdateTearOff {
 const $EmitterUpdate = _$EmitterUpdateTearOff();
 
 /// @nodoc
-mixin _$EmitterUpdate<T> {
+mixin _$EmitterUpdate {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(T value) result,
+    required TResult Function(Type key, dynamic value) result,
     required TResult Function(Failure<dynamic> failure) error,
     required TResult Function(Map<String, Object?> configs) config,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
     required TResult orElse(),
@@ -65,130 +66,148 @@ mixin _$EmitterUpdate<T> {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(EmitterUpdateResult<T> value) result,
-    required TResult Function(EmitterUpdateError<T> value) error,
-    required TResult Function(EmitterUpdateConfig<T> value) config,
+    required TResult Function(EmitterUpdateResult value) result,
+    required TResult Function(EmitterUpdateError value) error,
+    required TResult Function(EmitterUpdateConfig value) config,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $EmitterUpdateCopyWith<T, $Res> {
-  factory $EmitterUpdateCopyWith(EmitterUpdate<T> value, $Res Function(EmitterUpdate<T>) then) =
-      _$EmitterUpdateCopyWithImpl<T, $Res>;
+abstract class $EmitterUpdateCopyWith<$Res> {
+  factory $EmitterUpdateCopyWith(
+          EmitterUpdate value, $Res Function(EmitterUpdate) then) =
+      _$EmitterUpdateCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class _$EmitterUpdateCopyWithImpl<T, $Res> implements $EmitterUpdateCopyWith<T, $Res> {
+class _$EmitterUpdateCopyWithImpl<$Res>
+    implements $EmitterUpdateCopyWith<$Res> {
   _$EmitterUpdateCopyWithImpl(this._value, this._then);
 
-  final EmitterUpdate<T> _value;
+  final EmitterUpdate _value;
   // ignore: unused_field
-  final $Res Function(EmitterUpdate<T>) _then;
+  final $Res Function(EmitterUpdate) _then;
 }
 
 /// @nodoc
-abstract class $EmitterUpdateResultCopyWith<T, $Res> {
-  factory $EmitterUpdateResultCopyWith(EmitterUpdateResult<T> value, $Res Function(EmitterUpdateResult<T>) then) =
-      _$EmitterUpdateResultCopyWithImpl<T, $Res>;
-  $Res call({T value});
+abstract class $EmitterUpdateResultCopyWith<$Res> {
+  factory $EmitterUpdateResultCopyWith(
+          EmitterUpdateResult value, $Res Function(EmitterUpdateResult) then) =
+      _$EmitterUpdateResultCopyWithImpl<$Res>;
+  $Res call({Type key, dynamic value});
 }
 
 /// @nodoc
-class _$EmitterUpdateResultCopyWithImpl<T, $Res> extends _$EmitterUpdateCopyWithImpl<T, $Res>
-    implements $EmitterUpdateResultCopyWith<T, $Res> {
-  _$EmitterUpdateResultCopyWithImpl(EmitterUpdateResult<T> _value, $Res Function(EmitterUpdateResult<T>) _then)
-      : super(_value, (v) => _then(v as EmitterUpdateResult<T>));
+class _$EmitterUpdateResultCopyWithImpl<$Res>
+    extends _$EmitterUpdateCopyWithImpl<$Res>
+    implements $EmitterUpdateResultCopyWith<$Res> {
+  _$EmitterUpdateResultCopyWithImpl(
+      EmitterUpdateResult _value, $Res Function(EmitterUpdateResult) _then)
+      : super(_value, (v) => _then(v as EmitterUpdateResult));
 
   @override
-  EmitterUpdateResult<T> get _value => super._value as EmitterUpdateResult<T>;
+  EmitterUpdateResult get _value => super._value as EmitterUpdateResult;
 
   @override
   $Res call({
+    Object? key = freezed,
     Object? value = freezed,
   }) {
-    return _then(EmitterUpdateResult<T>(
+    return _then(EmitterUpdateResult(
+      key == freezed
+          ? _value.key
+          : key // ignore: cast_nullable_to_non_nullable
+              as Type,
       value == freezed
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
-              as T,
+              as dynamic,
     ));
   }
 }
 
 /// @nodoc
 
-class _$EmitterUpdateResult<T> implements EmitterUpdateResult<T> {
-  const _$EmitterUpdateResult(this.value);
+class _$EmitterUpdateResult implements EmitterUpdateResult {
+  const _$EmitterUpdateResult(this.key, this.value);
 
   @override
-  final T value;
+  final Type key;
+  @override
+  final dynamic value;
 
   @override
   String toString() {
-    return 'EmitterUpdate<$T>.result(value: $value)';
+    return 'EmitterUpdate.result(key: $key, value: $value)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is EmitterUpdateResult<T> &&
-            (identical(other.value, value) || const DeepCollectionEquality().equals(other.value, value)));
+        (other is EmitterUpdateResult &&
+            (identical(other.key, key) ||
+                const DeepCollectionEquality().equals(other.key, key)) &&
+            (identical(other.value, value) ||
+                const DeepCollectionEquality().equals(other.value, value)));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode ^ const DeepCollectionEquality().hash(value);
+  int get hashCode =>
+      runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(key) ^
+      const DeepCollectionEquality().hash(value);
 
   @JsonKey(ignore: true)
   @override
-  $EmitterUpdateResultCopyWith<T, EmitterUpdateResult<T>> get copyWith =>
-      _$EmitterUpdateResultCopyWithImpl<T, EmitterUpdateResult<T>>(this, _$identity);
+  $EmitterUpdateResultCopyWith<EmitterUpdateResult> get copyWith =>
+      _$EmitterUpdateResultCopyWithImpl<EmitterUpdateResult>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(T value) result,
+    required TResult Function(Type key, dynamic value) result,
     required TResult Function(Failure<dynamic> failure) error,
     required TResult Function(Map<String, Object?> configs) config,
   }) {
-    return result(value);
+    return result(key, value);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
   }) {
-    return result?.call(value);
+    return result?.call(key, value);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
     required TResult orElse(),
   }) {
     if (result != null) {
-      return result(value);
+      return result(key, value);
     }
     return orElse();
   }
@@ -196,9 +215,9 @@ class _$EmitterUpdateResult<T> implements EmitterUpdateResult<T> {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(EmitterUpdateResult<T> value) result,
-    required TResult Function(EmitterUpdateError<T> value) error,
-    required TResult Function(EmitterUpdateConfig<T> value) config,
+    required TResult Function(EmitterUpdateResult value) result,
+    required TResult Function(EmitterUpdateError value) error,
+    required TResult Function(EmitterUpdateConfig value) config,
   }) {
     return result(this);
   }
@@ -206,9 +225,9 @@ class _$EmitterUpdateResult<T> implements EmitterUpdateResult<T> {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
   }) {
     return result?.call(this);
   }
@@ -216,9 +235,9 @@ class _$EmitterUpdateResult<T> implements EmitterUpdateResult<T> {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
     required TResult orElse(),
   }) {
     if (result != null) {
@@ -228,35 +247,41 @@ class _$EmitterUpdateResult<T> implements EmitterUpdateResult<T> {
   }
 }
 
-abstract class EmitterUpdateResult<T> implements EmitterUpdate<T> {
-  const factory EmitterUpdateResult(T value) = _$EmitterUpdateResult<T>;
+abstract class EmitterUpdateResult implements EmitterUpdate {
+  const factory EmitterUpdateResult(Type key, dynamic value) =
+      _$EmitterUpdateResult;
 
-  T get value => throw _privateConstructorUsedError;
+  Type get key => throw _privateConstructorUsedError;
+  dynamic get value => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $EmitterUpdateResultCopyWith<T, EmitterUpdateResult<T>> get copyWith => throw _privateConstructorUsedError;
+  $EmitterUpdateResultCopyWith<EmitterUpdateResult> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $EmitterUpdateErrorCopyWith<T, $Res> {
-  factory $EmitterUpdateErrorCopyWith(EmitterUpdateError<T> value, $Res Function(EmitterUpdateError<T>) then) =
-      _$EmitterUpdateErrorCopyWithImpl<T, $Res>;
+abstract class $EmitterUpdateErrorCopyWith<$Res> {
+  factory $EmitterUpdateErrorCopyWith(
+          EmitterUpdateError value, $Res Function(EmitterUpdateError) then) =
+      _$EmitterUpdateErrorCopyWithImpl<$Res>;
   $Res call({Failure<dynamic> failure});
 }
 
 /// @nodoc
-class _$EmitterUpdateErrorCopyWithImpl<T, $Res> extends _$EmitterUpdateCopyWithImpl<T, $Res>
-    implements $EmitterUpdateErrorCopyWith<T, $Res> {
-  _$EmitterUpdateErrorCopyWithImpl(EmitterUpdateError<T> _value, $Res Function(EmitterUpdateError<T>) _then)
-      : super(_value, (v) => _then(v as EmitterUpdateError<T>));
+class _$EmitterUpdateErrorCopyWithImpl<$Res>
+    extends _$EmitterUpdateCopyWithImpl<$Res>
+    implements $EmitterUpdateErrorCopyWith<$Res> {
+  _$EmitterUpdateErrorCopyWithImpl(
+      EmitterUpdateError _value, $Res Function(EmitterUpdateError) _then)
+      : super(_value, (v) => _then(v as EmitterUpdateError));
 
   @override
-  EmitterUpdateError<T> get _value => super._value as EmitterUpdateError<T>;
+  EmitterUpdateError get _value => super._value as EmitterUpdateError;
 
   @override
   $Res call({
     Object? failure = freezed,
   }) {
-    return _then(EmitterUpdateError<T>(
+    return _then(EmitterUpdateError(
       failure == freezed
           ? _value.failure
           : failure // ignore: cast_nullable_to_non_nullable
@@ -267,7 +292,7 @@ class _$EmitterUpdateErrorCopyWithImpl<T, $Res> extends _$EmitterUpdateCopyWithI
 
 /// @nodoc
 
-class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
+class _$EmitterUpdateError implements EmitterUpdateError {
   const _$EmitterUpdateError(this.failure);
 
   @override
@@ -275,28 +300,30 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
 
   @override
   String toString() {
-    return 'EmitterUpdate<$T>.error(failure: $failure)';
+    return 'EmitterUpdate.error(failure: $failure)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is EmitterUpdateError<T> &&
-            (identical(other.failure, failure) || const DeepCollectionEquality().equals(other.failure, failure)));
+        (other is EmitterUpdateError &&
+            (identical(other.failure, failure) ||
+                const DeepCollectionEquality().equals(other.failure, failure)));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode ^ const DeepCollectionEquality().hash(failure);
+  int get hashCode =>
+      runtimeType.hashCode ^ const DeepCollectionEquality().hash(failure);
 
   @JsonKey(ignore: true)
   @override
-  $EmitterUpdateErrorCopyWith<T, EmitterUpdateError<T>> get copyWith =>
-      _$EmitterUpdateErrorCopyWithImpl<T, EmitterUpdateError<T>>(this, _$identity);
+  $EmitterUpdateErrorCopyWith<EmitterUpdateError> get copyWith =>
+      _$EmitterUpdateErrorCopyWithImpl<EmitterUpdateError>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(T value) result,
+    required TResult Function(Type key, dynamic value) result,
     required TResult Function(Failure<dynamic> failure) error,
     required TResult Function(Map<String, Object?> configs) config,
   }) {
@@ -306,7 +333,7 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
   }) {
@@ -316,7 +343,7 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
     required TResult orElse(),
@@ -330,9 +357,9 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(EmitterUpdateResult<T> value) result,
-    required TResult Function(EmitterUpdateError<T> value) error,
-    required TResult Function(EmitterUpdateConfig<T> value) config,
+    required TResult Function(EmitterUpdateResult value) result,
+    required TResult Function(EmitterUpdateError value) error,
+    required TResult Function(EmitterUpdateConfig value) config,
   }) {
     return error(this);
   }
@@ -340,9 +367,9 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
   }) {
     return error?.call(this);
   }
@@ -350,9 +377,9 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
     required TResult orElse(),
   }) {
     if (error != null) {
@@ -362,35 +389,40 @@ class _$EmitterUpdateError<T> implements EmitterUpdateError<T> {
   }
 }
 
-abstract class EmitterUpdateError<T> implements EmitterUpdate<T> {
-  const factory EmitterUpdateError(Failure<dynamic> failure) = _$EmitterUpdateError<T>;
+abstract class EmitterUpdateError implements EmitterUpdate {
+  const factory EmitterUpdateError(Failure<dynamic> failure) =
+      _$EmitterUpdateError;
 
   Failure<dynamic> get failure => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $EmitterUpdateErrorCopyWith<T, EmitterUpdateError<T>> get copyWith => throw _privateConstructorUsedError;
+  $EmitterUpdateErrorCopyWith<EmitterUpdateError> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $EmitterUpdateConfigCopyWith<T, $Res> {
-  factory $EmitterUpdateConfigCopyWith(EmitterUpdateConfig<T> value, $Res Function(EmitterUpdateConfig<T>) then) =
-      _$EmitterUpdateConfigCopyWithImpl<T, $Res>;
+abstract class $EmitterUpdateConfigCopyWith<$Res> {
+  factory $EmitterUpdateConfigCopyWith(
+          EmitterUpdateConfig value, $Res Function(EmitterUpdateConfig) then) =
+      _$EmitterUpdateConfigCopyWithImpl<$Res>;
   $Res call({Map<String, Object?> configs});
 }
 
 /// @nodoc
-class _$EmitterUpdateConfigCopyWithImpl<T, $Res> extends _$EmitterUpdateCopyWithImpl<T, $Res>
-    implements $EmitterUpdateConfigCopyWith<T, $Res> {
-  _$EmitterUpdateConfigCopyWithImpl(EmitterUpdateConfig<T> _value, $Res Function(EmitterUpdateConfig<T>) _then)
-      : super(_value, (v) => _then(v as EmitterUpdateConfig<T>));
+class _$EmitterUpdateConfigCopyWithImpl<$Res>
+    extends _$EmitterUpdateCopyWithImpl<$Res>
+    implements $EmitterUpdateConfigCopyWith<$Res> {
+  _$EmitterUpdateConfigCopyWithImpl(
+      EmitterUpdateConfig _value, $Res Function(EmitterUpdateConfig) _then)
+      : super(_value, (v) => _then(v as EmitterUpdateConfig));
 
   @override
-  EmitterUpdateConfig<T> get _value => super._value as EmitterUpdateConfig<T>;
+  EmitterUpdateConfig get _value => super._value as EmitterUpdateConfig;
 
   @override
   $Res call({
     Object? configs = freezed,
   }) {
-    return _then(EmitterUpdateConfig<T>(
+    return _then(EmitterUpdateConfig(
       configs == freezed
           ? _value.configs
           : configs // ignore: cast_nullable_to_non_nullable
@@ -401,7 +433,7 @@ class _$EmitterUpdateConfigCopyWithImpl<T, $Res> extends _$EmitterUpdateCopyWith
 
 /// @nodoc
 
-class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
+class _$EmitterUpdateConfig implements EmitterUpdateConfig {
   const _$EmitterUpdateConfig(this.configs);
 
   @override
@@ -409,28 +441,30 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
 
   @override
   String toString() {
-    return 'EmitterUpdate<$T>.config(configs: $configs)';
+    return 'EmitterUpdate.config(configs: $configs)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is EmitterUpdateConfig<T> &&
-            (identical(other.configs, configs) || const DeepCollectionEquality().equals(other.configs, configs)));
+        (other is EmitterUpdateConfig &&
+            (identical(other.configs, configs) ||
+                const DeepCollectionEquality().equals(other.configs, configs)));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode ^ const DeepCollectionEquality().hash(configs);
+  int get hashCode =>
+      runtimeType.hashCode ^ const DeepCollectionEquality().hash(configs);
 
   @JsonKey(ignore: true)
   @override
-  $EmitterUpdateConfigCopyWith<T, EmitterUpdateConfig<T>> get copyWith =>
-      _$EmitterUpdateConfigCopyWithImpl<T, EmitterUpdateConfig<T>>(this, _$identity);
+  $EmitterUpdateConfigCopyWith<EmitterUpdateConfig> get copyWith =>
+      _$EmitterUpdateConfigCopyWithImpl<EmitterUpdateConfig>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(T value) result,
+    required TResult Function(Type key, dynamic value) result,
     required TResult Function(Failure<dynamic> failure) error,
     required TResult Function(Map<String, Object?> configs) config,
   }) {
@@ -440,7 +474,7 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
   }) {
@@ -450,7 +484,7 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(T value)? result,
+    TResult Function(Type key, dynamic value)? result,
     TResult Function(Failure<dynamic> failure)? error,
     TResult Function(Map<String, Object?> configs)? config,
     required TResult orElse(),
@@ -464,9 +498,9 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(EmitterUpdateResult<T> value) result,
-    required TResult Function(EmitterUpdateError<T> value) error,
-    required TResult Function(EmitterUpdateConfig<T> value) config,
+    required TResult Function(EmitterUpdateResult value) result,
+    required TResult Function(EmitterUpdateError value) error,
+    required TResult Function(EmitterUpdateConfig value) config,
   }) {
     return config(this);
   }
@@ -474,9 +508,9 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
   }) {
     return config?.call(this);
   }
@@ -484,9 +518,9 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(EmitterUpdateResult<T> value)? result,
-    TResult Function(EmitterUpdateError<T> value)? error,
-    TResult Function(EmitterUpdateConfig<T> value)? config,
+    TResult Function(EmitterUpdateResult value)? result,
+    TResult Function(EmitterUpdateError value)? error,
+    TResult Function(EmitterUpdateConfig value)? config,
     required TResult orElse(),
   }) {
     if (config != null) {
@@ -496,10 +530,12 @@ class _$EmitterUpdateConfig<T> implements EmitterUpdateConfig<T> {
   }
 }
 
-abstract class EmitterUpdateConfig<T> implements EmitterUpdate<T> {
-  const factory EmitterUpdateConfig(Map<String, Object?> configs) = _$EmitterUpdateConfig<T>;
+abstract class EmitterUpdateConfig implements EmitterUpdate {
+  const factory EmitterUpdateConfig(Map<String, Object?> configs) =
+      _$EmitterUpdateConfig;
 
   Map<String, Object?> get configs => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $EmitterUpdateConfigCopyWith<T, EmitterUpdateConfig<T>> get copyWith => throw _privateConstructorUsedError;
+  $EmitterUpdateConfigCopyWith<EmitterUpdateConfig> get copyWith =>
+      throw _privateConstructorUsedError;
 }

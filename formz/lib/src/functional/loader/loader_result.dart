@@ -26,8 +26,22 @@ class LoaderResult {
     return _results[T] as T;
   }
 
+  T? getResultOpt<T>() {
+    final result = _results[T];
+
+    if (result != null) {
+      assert(result is T, 'Result of type ${_results[T].runtimeType} found, but expected type $T');
+      return result as T;
+    } else {
+      return null;
+    }
+  }
+
   LoaderResult addResults(Map<Type, Object?> results) {
-    assert(results.keys.none((key) => _results.contains(key)), 'Do not override old results');
+    assert(
+      results.keys.none((key) => _results.contains(key)),
+      'Do not override old results, already contains: ${results.keys.firstWhere((key) => _results.contains(key))}',
+    );
 
     return LoaderResult._(_results.insertAll(results), _configs);
   }
