@@ -74,6 +74,14 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
     _subject.add(status);
   }
 
+  Future<void> _saveLocal(T value) async {
+    try {
+      await saveLocal(value);
+    } catch (e, s) {
+      assert(false, 'Failed to save $runtimeType: $e\n$s');
+    }
+  }
+
   Future<Result<void>> _loadWithLocal(Local local, T parsedLocal) async {
     _addStatus(ResultState.loading(parsedLocal));
 
@@ -89,7 +97,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
         final combined = await combine(parsedLocal, parsedRemote);
         _addStatus(ResultState.success(combined));
 
-        await saveLocal(combined);
+        await _saveLocal(combined);
 
         return const Result.right(null);
       },
@@ -111,7 +119,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
     return remoteResult.tapRightAsync((parsedRemote) async {
       _addStatus(ResultState.success(parsedRemote));
 
-      await saveLocal(parsedRemote);
+      await _saveLocal(parsedRemote);
     });
   }
 

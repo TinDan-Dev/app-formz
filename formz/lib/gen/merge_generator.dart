@@ -7,6 +7,14 @@ import 'tuple_generator.dart';
 Builder mergeGeneratorBuilder(BuilderOptions options) =>
     LibraryBuilder(MergeGenerator(), generatedExtension: '.merge.dart');
 
+String enclose(String left, String inner, String right, bool apply) {
+  if (apply) {
+    return '$left$inner$right';
+  } else {
+    return inner;
+  }
+}
+
 class MergeGenerator extends Generator {
   final emitter = DartEmitter();
 
@@ -15,35 +23,54 @@ class MergeGenerator extends Generator {
     final buffer = StringBuffer();
 
     buffer.write('''
+import 'dart:async';
 import 'formz.tuple.dart';
 import 'src/functional/either/either.dart';
     ''');
 
     for (int i = 2; i <= 9; i++) {
-      buffer.writeln(mergeRight(i).accept(emitter));
-      buffer.writeln(mergeLeft(i).accept(emitter));
+      buffer.writeln(merge(i, true, true).accept(emitter));
+      buffer.writeln(merge(i, true, false).accept(emitter));
+      buffer.writeln(merge(i, false, true).accept(emitter));
+      buffer.writeln(merge(i, false, false).accept(emitter));
     }
 
     return buffer.toString();
   }
 
-  Method mergeRight(int i) {
+  Method merge(int i, bool right, bool async) {
     final method = Method((builder) {
-      builder.name = 'mergeRight${TupleGenerator.suffixes[i - 2]}';
-      builder.returns = refer('Either<T, ${TupleGenerator.getTupleName(i)}>');
+      builder.name = 'merge${right ? 'Right' : 'Left'}${async ? 'Async' : ''}${TupleGenerator.suffixes[i - 2]}';
       builder.types.add(refer('T'));
+
+      if (right) {
+        builder.returns = refer(enclose('Future<', 'Either<T, ${TupleGenerator.getTupleName(i)}>', '>', async));
+      } else {
+        builder.returns = refer(enclose('Future<', 'Either<${TupleGenerator.getTupleName(i)}, T>', '>', async));
+      }
 
       for (int k = 0; k < i; k++) {
         builder.types.add(refer(TupleGenerator.generics[k]));
+
+        final String returnType;
+        if (right) {
+          returnType = enclose('FutureOr<', 'Either<T, ${TupleGenerator.generics[k]}>', '>', async);
+        } else {
+          returnType = enclose('FutureOr<', 'Either<${TupleGenerator.generics[k]}, T>', '>', async);
+        }
 
         builder.optionalParameters.add(Parameter((builder) => builder
           ..name = TupleGenerator.fields[k]
           ..named = true
           ..required = true
-          ..type = FunctionType((builder) => builder.returnType = refer('Either<T, ${TupleGenerator.generics[k]}>'))));
+          ..type = FunctionType((builder) => builder.returnType = refer(returnType))));
       }
 
-      builder.body = Code('return ${buildMergeRight(0, i)};');
+      if (right) {
+        builder.body = Code('return ${buildMergeRight(0, i)};');
+      } else {
+        builder.body = Code('return ${buildMergeLeft(0, i)};');
+      }
     });
 
     return method;
@@ -60,28 +87,6 @@ $name().consume(
   onLeft: (value) => Either.left(value),
 )
   ''';
-  }
-
-  Method mergeLeft(int i) {
-    final method = Method((builder) {
-      builder.name = 'mergeLeft${TupleGenerator.suffixes[i - 2]}';
-      builder.returns = refer('Either<${TupleGenerator.getTupleName(i)}, T>');
-      builder.types.add(refer('T'));
-
-      for (int k = 0; k < i; k++) {
-        builder.types.add(refer(TupleGenerator.generics[k]));
-
-        builder.optionalParameters.add(Parameter((builder) => builder
-          ..name = TupleGenerator.fields[k]
-          ..named = true
-          ..required = true
-          ..type = FunctionType((builder) => builder.returnType = refer('Either<${TupleGenerator.generics[k]}, T>'))));
-      }
-
-      builder.body = Code('return ${buildMergeLeft(0, i)};');
-    });
-
-    return method;
   }
 
   String buildMergeLeft(int lvl, int maxLvl) {
