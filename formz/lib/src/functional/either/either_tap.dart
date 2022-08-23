@@ -120,3 +120,147 @@ extension FutureOfEitherTapExtension<L, R> on FutureOr<Either<L, R>> {
         tap: (value) => value.consume(onRight: action, onLeft: (_) {}),
       );
 }
+
+class _TapFlatRightEither<L, R> implements Either<L, R> {
+  final Either<L, R> source;
+  final Either<L, void> Function(R value) tap;
+
+  Either<L, void>? result;
+
+  _TapFlatRightEither({
+    required this.source,
+    required this.tap,
+  });
+
+  @override
+  T consume<T>({
+    required T onLeft(L value),
+    required T onRight(R value),
+  }) {
+    result ??= source.consume(onRight: tap, onLeft: (_) => const Either.right(null));
+
+    return result!.consume(
+      onRight: (_) => source.consume(onRight: onRight, onLeft: onLeft),
+      onLeft: onLeft,
+    );
+  }
+}
+
+class _TapFlatLeftEither<L, R> implements Either<L, R> {
+  final Either<L, R> source;
+  final Either<void, R> Function(L value) tap;
+
+  Either<void, R>? result;
+
+  _TapFlatLeftEither({
+    required this.source,
+    required this.tap,
+  });
+
+  @override
+  T consume<T>({
+    required T onLeft(L value),
+    required T onRight(R value),
+  }) {
+    result ??= source.consume(onRight: (_) => const Either.left(null), onLeft: tap);
+
+    return result!.consume(
+      onRight: onRight,
+      onLeft: (_) => source.consume(onRight: onRight, onLeft: onLeft),
+    );
+  }
+}
+
+class _TapAsyncFlatRightEither<L, R> extends EitherFuture<L, R> {
+  final FutureOr<Either<L, R>> source;
+  final FutureOr<Either<L, void>> Function(R value) tap;
+  final Mutex mutex;
+
+  Either<L, void>? result;
+
+  _TapAsyncFlatRightEither({
+    required this.source,
+    required this.tap,
+  }) : mutex = Mutex();
+
+  @override
+  Future<T> consume<T>({
+    required FutureOr<T> onLeft(L value),
+    required FutureOr<T> onRight(R value),
+  }) async {
+    if (result == null) {
+      await mutex.scope(() async {
+        result = await source.consume(onRight: tap, onLeft: (_) => const Either.right(null));
+      });
+    }
+
+    return result!.consume(
+      onRight: (_) => source.consume(onRight: onRight, onLeft: onLeft),
+      onLeft: onLeft,
+    );
+  }
+}
+
+class _TapAsyncFlatLeftEither<L, R> extends EitherFuture<L, R> {
+  final FutureOr<Either<L, R>> source;
+  final FutureOr<Either<void, R>> Function(L value) tap;
+  final Mutex mutex;
+
+  Either<void, R>? result;
+
+  _TapAsyncFlatLeftEither({
+    required this.source,
+    required this.tap,
+  }) : mutex = Mutex();
+
+  @override
+  Future<T> consume<T>({
+    required FutureOr<T> onLeft(L value),
+    required FutureOr<T> onRight(R value),
+  }) async {
+    if (result == null) {
+      await mutex.scope(() async {
+        result = await source.consume(onRight: (_) => const Either.left(null), onLeft: tap);
+      });
+    }
+
+    return result!.consume(
+      onRight: onRight,
+      onLeft: (_) => source.consume(onRight: onRight, onLeft: onLeft),
+    );
+  }
+}
+
+extension EitherTapFlatExtension<L, R> on Either<L, R> {
+  @useResult
+  Either<L, R> tapLeftFlat(Either<void, R> action(L value)) => _TapFlatLeftEither(source: this, tap: action);
+
+  @useResult
+  Either<L, R> tapRightFlat(Either<L, void> action(R value)) => _TapFlatRightEither(source: this, tap: action);
+
+  @useResult
+  Future<Either<L, R>> tapLeftAsyncFlat(FutureOr<Either<void, R>> action(L value)) =>
+      _TapAsyncFlatLeftEither(source: this, tap: action);
+
+  @useResult
+  Future<Either<L, R>> tapRightAsync(FutureOr<Either<L, void>> action(R value)) =>
+      _TapAsyncFlatRightEither(source: this, tap: action);
+}
+
+extension FutureOfEitherTapFlatExtension<L, R> on FutureOr<Either<L, R>> {
+  @useResult
+  Future<Either<L, R>> tapLeftFlat(Either<void, R> action(L value)) =>
+      _TapAsyncFlatLeftEither(source: this, tap: action);
+
+  @useResult
+  Future<Either<L, R>> tapRightFlat(Either<L, void> action(R value)) =>
+      _TapAsyncFlatRightEither(source: this, tap: action);
+
+  @useResult
+  Future<Either<L, R>> tapLeftAsyncFlat(FutureOr<Either<void, R>> action(L value)) =>
+      _TapAsyncFlatLeftEither(source: this, tap: action);
+
+  @useResult
+  Future<Either<L, R>> tapRightAsyncFlat(FutureOr<Either<L, void>> action(R value)) =>
+      _TapAsyncFlatRightEither(source: this, tap: action);
+}
