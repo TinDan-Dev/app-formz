@@ -29,10 +29,12 @@ export 'src/functional/result/result_failures.dart';
 export 'src/functional/result/result_iterable.dart';
 export 'src/functional/result/result_state.dart'
     show ResultState, ResultStateSuccess, ResultStateError, ResultStateLoading;
+export 'src/functional/result/result_stream.dart' show ResultStream, ResultStreamSubject, ResultStreamMixin;
 export 'src/functional/structures/hash_map.dart' show HashMap;
 export 'src/functional/structures/object_comparable.dart' show ObjectComparable;
 export 'src/functional/structures/tree_map.dart' show TreeMap;
 export 'src/functional/structures/tree_set.dart' show TreeSet;
+export 'src/functional/task/task_stream.dart' show TaskStream;
 export 'src/functional/widgets/either_builder.dart';
 export 'src/functional/widgets/result_widgets.dart';
 export 'src/input/impl/check_box_input.dart';

@@ -51,7 +51,3 @@ class _NBRError<T> extends NBR<T> {
   @override
   void dispose() {}
 }
-
-// typedef ResourceLoadFunc<T> = FutureOr<Result<T>> Function();
-// typedef ResourceSaveFunc<T> = FutureOr<void> Function(T value);
-// typedef ResourceStreamFunc<T> = ResourceLoadFunc<Stream<T?>>;
