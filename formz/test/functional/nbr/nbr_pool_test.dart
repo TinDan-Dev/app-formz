@@ -1,12 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formz/formz.dart';
+import 'package:formz/src/functional/result/result_stream.dart';
 import 'package:mockito/mockito.dart';
 
 class InvocationVerifier extends Mock {
   void invoke([dynamic input]) => super.noSuchMethod(Invocation.method(#invoke, [input]));
 }
 
-class FakeNBR extends NBR<String> {
+class FakeNBR extends NBR<String> with ResultStreamValueMixin {
   final InvocationVerifier disposeVerifier;
 
   FakeNBR()
@@ -14,16 +15,10 @@ class FakeNBR extends NBR<String> {
         super('fake');
 
   @override
-  ResultState<String> get currentState => const ResultState.success('fake');
-
-  @override
-  Stream<ResultState<String>> get stream => Stream.value(currentState);
-
-  @override
-  Future<ResultState<String>> get toFuture => Future.value(currentState);
-
-  @override
   void dispose() => disposeVerifier.invoke();
+
+  @override
+  Result<String> get value => const Result.right('success');
 }
 
 void main() {
@@ -34,7 +29,7 @@ void main() {
     for (int i = 0; i < 10; i++) i.toString(),
   ];
 
-  const nbrSuccess = NBR.success('', value: 'value');
+  final nbrSuccess = NBR.success('', value: 'value');
   final nbrError = NBR<String>.error('', failure: Failure(message: 'msg'));
 
   late NBRPool<NBR<String>> pool;

@@ -33,7 +33,7 @@ class NBRWidget<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<ResultState<T>>(
       stream: nbr,
-      initialData: nbr.currentState,
+      initialData: nbr.currentResult,
       builder: (context, snapshot) {
         final data = snapshot.data;
 

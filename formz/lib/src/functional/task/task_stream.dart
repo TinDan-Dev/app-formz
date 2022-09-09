@@ -52,4 +52,9 @@ class TaskStream<In, Out> extends Stream<ResultState<Out>> {
     );
     _currentToken = null;
   }
+
+  Future<void> close() async {
+    _currentToken?.cancel();
+    await _subject.close();
+  }
 }

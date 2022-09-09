@@ -54,7 +54,6 @@ export 'src/utils/extensions.dart' show IterableExtension;
 export 'src/utils/lazy.dart';
 export 'src/utils/methods.dart';
 export 'src/utils/mutex.dart';
-export 'src/utils/retry.dart';
 export 'src/widgets/form/form_builder.dart';
 export 'src/widgets/form/form_error_builder.dart';
 export 'src/widgets/form/form_input_builder.dart';

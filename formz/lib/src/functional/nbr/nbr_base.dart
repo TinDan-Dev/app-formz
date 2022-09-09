@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:rxdart/rxdart.dart';
-
 import '../../../formz.tuple.dart';
 import '../../utils/extensions.dart';
 import '../either/either.dart';
 import '../result/result.dart';
 import '../result/result_failures.dart';
 import '../result/result_state.dart';
+import '../result/result_stream.dart';
 import 'nbr.dart';
 
 typedef ResourceLoadFunc<T> = FutureOr<Result<T>> Function();
@@ -18,9 +17,7 @@ typedef ResourceStreamFunc<T> = ResourceLoadFunc<Stream<T?>>;
 ///
 /// The current state of the resources is exposed as a stream and the resource can also be consumed via a [Either].
 /// The resource is considered successful when it's either successful or offline.
-abstract class NBRBase<T, Local, Remote> extends NBR<T> {
-  final BehaviorSubject<ResultState<T>> _subject;
-
+abstract class NBRBase<T, Local, Remote> extends NBR<T> with ResultStreamMixin<T> {
   final ResourceLoadFunc<Local> fetchLocal;
   final ResourceLoadFunc<Remote> fetchRemote;
   final ResourceSaveFunc<T> saveLocal;
@@ -36,14 +33,10 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
     required this.fetchRemote,
     required this.saveLocal,
     this.fetchLocalStream,
-  })  : _subject = BehaviorSubject.seeded(const ResultState.loading()),
-        _disposed = false,
+  })  : _disposed = false,
         super(id) {
     _load(StackTrace.current);
   }
-
-  @override
-  ResultState<T> get currentState => _subject.value;
 
   /// Converts the resource from the locally stored format to the runtime format.
   FutureOr<Result<T>> fromLocal(Local local);
@@ -65,13 +58,10 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
   /// Defaults to only keeping the remote version.
   FutureOr<T> combine(T local, T remote) => remote;
 
-  @override
-  Stream<ResultState<T>> get stream => _subject.stream;
-
   void _addStatus(ResultState<T> status) {
     if (_disposed) return;
 
-    _subject.add(status);
+    add(status);
   }
 
   Future<void> _saveLocal(T value) async {
@@ -136,7 +126,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
     await result.consume(
       onLeft: (failure) async {
         _addStatus(ResultState.error(failure.prependStackTrace(invocationTrace)));
-        await _subject.close();
+        await close();
       },
       onRight: (_) async {
         final localStream = await fetchLocalStream?.call().rightOrNull();
@@ -149,25 +139,12 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
               .whereRight()
               .map((event) => ResultState.success(event));
 
-          _subscription = parsedStream.listen(_subject.add);
+          _subscription = parsedStream.listen(add);
         } else {
-          await _subject.close();
+          await close();
         }
       },
     );
-  }
-
-  @override
-  Future<ResultState<T>> get toFuture async {
-    final invocationTrace = StackTrace.current;
-
-    try {
-      return stream.firstWhere((e) => e is! ResultStateLoading);
-    } catch (e, s) {
-      return ResultState.error(
-        UnexpectedFailure('error on stream', trace: s, cause: e).prependStackTrace(invocationTrace),
-      );
-    }
   }
 
   @override
@@ -177,11 +154,11 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> {
     if (_disposed) return;
     _disposed = true;
 
-    if (_subject.value is ResultStateLoading) {
-      _subject.add(ResultState.error(UnexpectedFailure('NBR was disposed during loading')));
+    if (currentResult is ResultStateLoading) {
+      add(ResultState.error(UnexpectedFailure('NBR was disposed during loading')));
     }
 
     await _subscription?.cancel();
-    await _subject.close();
+    await close();
   }
 }

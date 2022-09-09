@@ -18,6 +18,11 @@ class ResultStateFailure<T> extends Failure<T> {
 class ResultState<T> with _$ResultState<T> implements Result<T> {
   const ResultState._();
 
+  factory ResultState.from(Result<T> result) => result.consume(
+        onRight: (v) => ResultState.success(v),
+        onLeft: (v) => ResultState.error(v),
+      );
+
   /// The loading state.
   ///
   /// If the task for the result is currently running or waiting.
@@ -34,6 +39,10 @@ class ResultState<T> with _$ResultState<T> implements Result<T> {
   /// If the task for the result could not be completed successfully. Contains
   /// the failure that caused the error.
   const factory ResultState.error(Failure failure) = ResultStateError;
+
+  bool get isLoading => whenOrNull(loading: (_) => true) ?? false;
+  bool get isSuccess => whenOrNull(success: (_) => true) ?? false;
+  bool get isError => whenOrNull(error: (_) => true) ?? false;
 
   @override
   S consume<S>({

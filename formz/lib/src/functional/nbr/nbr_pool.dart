@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
-import '../result/result_state.dart';
 import 'nbr.dart';
 
 class _PoolKey implements Comparable<_PoolKey> {
@@ -100,7 +99,7 @@ class NBRPool<T extends NBR> {
     final outdated = now.difference(value.insertionTime) > invalidationTime;
     if (outdated && !outdatedOk) return false;
 
-    final failed = value.value.currentState is ResultStateError;
+    final failed = value.value.currentResult.isError;
     if (failed && !failedOk) return false;
 
     return true;

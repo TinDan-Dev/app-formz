@@ -1,52 +1,39 @@
-import '../either/either.dart';
 import '../result/result.dart';
-import '../result/result_state.dart';
+import '../result/result_stream.dart';
 
-abstract class NBR<T> extends EitherStream<ResultState<T>> {
+abstract class NBR<T> extends ResultStream<T> {
   final String id;
 
-  const NBR(this.id);
+  NBR(this.id);
 
-  const factory NBR.success(String id, {required T value}) = _NBRSuccess<T>;
+  factory NBR.success(String id, {required T value}) = _NBRSuccess<T>;
 
-  const factory NBR.error(String id, {required Failure failure}) = _NBRError<T>;
+  factory NBR.error(String id, {required Failure failure}) = _NBRError<T>;
 
-  ResultState<T> get currentState;
+  Future<Result<T>> get result => lastResult;
 
   void dispose();
 }
 
-class _NBRSuccess<T> extends NBR<T> {
-  final T value;
-
-  const _NBRSuccess(String id, {required this.value}) : super(id);
-
+class _NBRSuccess<T> extends NBR<T> with ResultStreamValueMixin<T> {
   @override
-  ResultState<T> get currentState => ResultState.success(value);
+  final Result<T> value;
 
-  @override
-  Stream<ResultState<T>> get stream => Stream.value(currentState);
-
-  @override
-  Future<ResultState<T>> get toFuture => Future.value(currentState);
+  _NBRSuccess(String id, {required T value})
+      : value = Result.right(value),
+        super(id);
 
   @override
   void dispose() {}
 }
 
-class _NBRError<T> extends NBR<T> {
-  final Failure failure;
-
-  const _NBRError(String id, {required this.failure}) : super(id);
-
+class _NBRError<T> extends NBR<T> with ResultStreamValueMixin<T> {
   @override
-  ResultState<T> get currentState => ResultState.error(failure);
+  final Result<T> value;
 
-  @override
-  Stream<ResultState<T>> get stream => Stream.value(currentState);
-
-  @override
-  Future<ResultState<T>> get toFuture => Future.value(currentState);
+  _NBRError(String id, {required Failure failure})
+      : value = Result.left(failure),
+        super(id);
 
   @override
   void dispose() {}
