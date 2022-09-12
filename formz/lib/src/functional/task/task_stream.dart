@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:rxdart/subjects.dart';
 
-import '../../utils/cancellation_token.dart';
-import '../result/result.dart';
 import '../result/result_state.dart';
-
-typedef Task<In, Out> = FutureOr<Result<Out>> Function(In input, CancellationReceiver receiver);
+import 'cancellation_token.dart';
+import 'task.dart';
 
 class TaskStream<In, Out> extends Stream<ResultState<Out>> {
   final BehaviorSubject<ResultState<Out>> _subject;
@@ -17,6 +15,8 @@ class TaskStream<In, Out> extends Stream<ResultState<Out>> {
   TaskStream(this._task) : _subject = BehaviorSubject.seeded(const ResultState.loading());
 
   ResultState<Out> get state => _subject.value;
+
+  bool get idle => _currentToken == null;
 
   @override
   StreamSubscription<ResultState<Out>> listen(
@@ -37,7 +37,7 @@ class TaskStream<In, Out> extends Stream<ResultState<Out>> {
     );
 
     final token = CancellationToken();
-    final future = Future.microtask(() => _task(input, token));
+    final future = Future.microtask(() => _task.execute(input, token));
 
     _currentToken = token;
 
@@ -50,6 +50,11 @@ class TaskStream<In, Out> extends Stream<ResultState<Out>> {
       onRight: (value) => _subject.add(ResultState.success(value)),
       onLeft: (failure) => _subject.add(ResultState.error(failure)),
     );
+    _currentToken = null;
+  }
+
+  void cancel() {
+    _currentToken?.cancel();
     _currentToken = null;
   }
 

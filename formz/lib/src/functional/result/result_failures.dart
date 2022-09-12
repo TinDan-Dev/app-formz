@@ -1,6 +1,7 @@
-import '../../../formz.dart';
+import '../result/result.dart';
+import '../task/task.dart';
 
-class NullFailure<R> extends Failure<R> with ActionFailure<R> {
+class NullFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -16,7 +17,7 @@ class NullFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class UnsupportedFailure<R> extends Failure<R> with ActionFailure<R> {
+class UnsupportedFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -32,7 +33,7 @@ class UnsupportedFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class InvalidFailure<R> extends Failure<R> with ActionFailure<R> {
+class InvalidFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -48,7 +49,7 @@ class InvalidFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class UnexpectedFailure<R> extends Failure<R> with ActionFailure<R> {
+class UnexpectedFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -64,7 +65,7 @@ class UnexpectedFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class ExceptionFailure<R> extends Failure<R> with ActionFailure<R> {
+class ExceptionFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -79,7 +80,7 @@ class ExceptionFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class TimeoutFailure<R> extends Failure<R> with ActionFailure<R> {
+class TimeoutFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -98,7 +99,7 @@ class TimeoutFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class IOFailure<R> extends Failure<R> with ActionFailure<R> {
+class IOFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -114,7 +115,7 @@ class IOFailure<R> extends Failure<R> with ActionFailure<R> {
         );
 }
 
-class PermissionFailure<R> extends Failure<R> with ActionFailure<R> {
+class PermissionFailure<R> extends Failure<R> with TaskFailure<R> {
   @override
   final bool shouldRetry;
 
@@ -131,4 +132,19 @@ class PermissionFailure<R> extends Failure<R> with ActionFailure<R> {
           cause: cause,
           trace: trace ?? StackTrace.current,
         );
+}
+
+class CanceledFailure<R> extends Failure<R> with TaskFailure<R> {
+  CanceledFailure(
+    String msg, {
+    Object? cause,
+    StackTrace? trace,
+  }) : super(
+          message: 'Operation was canceled: $msg',
+          cause: cause,
+          trace: trace ?? StackTrace.current,
+        );
+
+  @override
+  bool get shouldRetry => false;
 }

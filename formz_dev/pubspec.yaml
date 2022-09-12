@@ -16,7 +16,7 @@ dependencies:
 
   source_gen: ^1.0.0
   code_builder: ^4.1.0
-  analyzer: ^2.1.0
+  analyzer: ^4.7.0
   dart_style: ^2.2.1
 
   flutter_bloc: ^8.0.1

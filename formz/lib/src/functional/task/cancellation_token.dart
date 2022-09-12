@@ -1,7 +1,16 @@
 /// Used by actions that can be cancelled.
 abstract class CancellationReceiver {
+  const factory CancellationReceiver.unused() = _UnusedCancellationReceiver;
+
   /// Whether the action should stop executing.
   bool get canceled;
+}
+
+class _UnusedCancellationReceiver implements CancellationReceiver {
+  const _UnusedCancellationReceiver();
+
+  @override
+  bool get canceled => false;
 }
 
 /// Used to cancel an ongoing action.
