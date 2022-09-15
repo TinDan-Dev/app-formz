@@ -22,9 +22,7 @@ dependencies:
   flutter_bloc: ^8.0.1
 
   formz:
-    git: 
-      url: https://git@github.com/TinDan-Dev/app-formz.git
-      path: formz
+    path: ../formz
 
 dev_dependencies:
   flutter_test:
