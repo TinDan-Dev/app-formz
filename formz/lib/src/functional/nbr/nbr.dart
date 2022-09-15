@@ -10,8 +10,6 @@ abstract class NBR<T> extends ResultStream<T> {
 
   factory NBR.error(String id, {required Failure failure}) = _NBRError<T>;
 
-  Future<Result<T>> get result => lastResult;
-
   void dispose();
 }
 

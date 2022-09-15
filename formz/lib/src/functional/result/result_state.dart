@@ -44,6 +44,8 @@ class ResultState<T> with _$ResultState<T> implements Result<T> {
   bool get isSuccess => whenOrNull(success: (_) => true) ?? false;
   bool get isError => whenOrNull(error: (_) => true) ?? false;
 
+  bool get hasValue => whenOrNull(loading: (v) => v != null, success: (_) => true) ?? false;
+
   @override
   S consume<S>({
     required S onRight(T value),

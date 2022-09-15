@@ -4,38 +4,31 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
+import '../../utils/delegate/delegating_stream.dart';
 import 'result.dart';
-import 'result_failures.dart';
 import 'result_state.dart';
 
-abstract class ResultStream<T> extends Stream<ResultState<T>> {
-  ResultState<T> get currentResult;
+abstract class ResultStream<T> with DelegatingStream<ResultState<T>> {
+  final BehaviorSubject<Result<T>> _result;
 
-  Future<Result<T>> get nextResult async {
-    await for (final result in this) {
-      if (result.isLoading) continue;
+  ResultState<T>? _state;
 
-      return result;
-    }
+  ResultStream() : _result = BehaviorSubject() {
+    stream.listen(
+      (e) {
+        _state = e;
 
-    return UnexpectedFailure('Stream was closed before next result was published');
+        if (e.hasValue) {
+          _result.add(e);
+        }
+      },
+      onDone: () => _result.close(),
+    );
   }
 
-  Future<Result<T>> get lastResult async {
-    Result<T>? buffer;
+  ResultState<T> get state => _state ?? const ResultState.loading();
 
-    await for (final result in this) {
-      if (result.isLoading) continue;
-
-      buffer = result;
-    }
-
-    if (buffer != null) {
-      return buffer;
-    } else {
-      return UnexpectedFailure('Stream was closed before a result was published');
-    }
-  }
+  Future<Result<T>> get result => _result.first;
 }
 
 class ResultStreamSubject<T> extends ResultStream<T> {
@@ -43,37 +36,19 @@ class ResultStreamSubject<T> extends ResultStream<T> {
 
   ResultStreamSubject() : _subject = BehaviorSubject.seeded(const ResultState.loading());
 
-  @override
-  ResultState<T> get currentResult => _subject.value;
-
-  @override
-  StreamSubscription<ResultState<T>> listen(
-    void onData(ResultState<T> event)?, {
-    Function? onError,
-    void onDone()?,
-    bool? cancelOnError,
-  }) =>
-      _subject.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
-
   void add(Result<T> result) => _subject.add(result.consume(onRight: ResultState.success, onLeft: ResultState.error));
 
   Future<void> close() => _subject.close();
+
+  @override
+  Stream<ResultState<T>> get stream => _subject;
 }
 
 mixin ResultStreamMixin<T> on ResultStream<T> {
   final _subject = ResultStreamSubject<T>();
 
   @override
-  StreamSubscription<ResultState<T>> listen(
-    void onData(ResultState<T> event)?, {
-    Function? onError,
-    void onDone()?,
-    bool? cancelOnError,
-  }) =>
-      _subject.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
-
-  @override
-  ResultState<T> get currentResult => _subject.currentResult;
+  Stream<ResultState<T>> get stream => _subject;
 
   @protected
   void add(Result<T> result) => _subject.add(result);
@@ -86,15 +61,6 @@ mixin ResultStreamValueMixin<T> on ResultStream<T> {
   Result<T> get value;
 
   @override
-  ResultState<T> get currentResult => ResultState.from(value);
-
-  @override
-  StreamSubscription<ResultState<T>> listen(
-    void onData(ResultState<T> event)?, {
-    Function? onError,
-    void onDone()?,
-    bool? cancelOnError,
-  }) =>
-      Stream<ResultState<T>>.value(value.consume(onRight: ResultState.success, onLeft: ResultState.error))
-          .listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  Stream<ResultState<T>> get stream =>
+      Stream<ResultState<T>>.value(value.consume(onRight: ResultState.success, onLeft: ResultState.error));
 }

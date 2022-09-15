@@ -99,7 +99,7 @@ class NBRPool<T extends NBR> {
     final outdated = now.difference(value.insertionTime) > invalidationTime;
     if (outdated && !outdatedOk) return false;
 
-    final failed = value.value.currentResult.isError;
+    final failed = value.value.state.isError;
     if (failed && !failedOk) return false;
 
     return true;

@@ -154,7 +154,7 @@ abstract class NBRBase<T, Local, Remote> extends NBR<T> with ResultStreamMixin<T
     if (_disposed) return;
     _disposed = true;
 
-    if (currentResult is ResultStateLoading) {
+    if (state.isLoading) {
       add(ResultState.error(UnexpectedFailure('NBR was disposed during loading')));
     }
 

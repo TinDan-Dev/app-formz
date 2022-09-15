@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:meta/meta.dart';
+
 mixin DelegatingFuture<T> implements Future<T> {
+  @protected
   Future<T> get future;
 
   @override
