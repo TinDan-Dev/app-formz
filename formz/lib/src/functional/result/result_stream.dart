@@ -6,6 +6,7 @@ import 'package:rxdart/subjects.dart';
 
 import '../../utils/delegate/delegating_stream.dart';
 import 'result.dart';
+import 'result_failures.dart';
 import 'result_state.dart';
 
 abstract class ResultStream<T> with DelegatingStream<ResultState<T>> {
@@ -28,7 +29,13 @@ abstract class ResultStream<T> with DelegatingStream<ResultState<T>> {
 
   ResultState<T> get state => _state ?? const ResultState.loading();
 
-  Future<Result<T>> get result => _result.first;
+  Future<Result<T>> get result async {
+    await for (final result in _result) {
+      return result;
+    }
+
+    return UnexpectedFailure('No result was published');
+  }
 }
 
 class ResultStreamSubject<T> extends ResultStream<T> {
