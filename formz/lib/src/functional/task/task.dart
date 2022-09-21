@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import '../../utils/extensions.dart';
 import '../either/either.dart';
 import '../result/result.dart';
 import '../result/result_failures.dart';
@@ -107,31 +106,6 @@ class _TaskTimeout<In, Out> extends Task<In, Out> {
   }
 }
 
-class _RetryFailure<R> extends Failure<R> {
-  static String _createMessage(_RetryFailure? next, Failure? cause) {
-    if (next == null) {
-      return 'No more retires ' + cause.fold(() => '', (some) => '(${some.message})');
-    } else {
-      return 'Retry failed ' +
-          cause.fold(() => '', (some) => '(${some.message})') +
-          '\n' +
-          _createMessage(next.next, next.cause as Failure?);
-    }
-  }
-
-  final _RetryFailure? next;
-
-  _RetryFailure(
-    this.next, {
-    Failure? cause,
-    StackTrace? trace,
-  }) : super(
-          message: _createMessage(next, cause),
-          cause: cause,
-          trace: trace ?? StackTrace.current,
-        );
-}
-
 class _TaskRetry<In, Out> extends Task<In, Out> {
   final Task<In, Out> task;
   final int _retries;
@@ -146,21 +120,21 @@ class _TaskRetry<In, Out> extends Task<In, Out> {
       _try(input, receiver, 0);
 
   Future<Result<Out>> _try(In input, CancellationReceiver receiver, int retry) async {
-    if (retry >= _retries) {
-      return _RetryFailure(null);
-    }
     if (receiver.canceled) {
-      return _RetryFailure(null, cause: CanceledFailure('task'));
+      return CanceledFailure('task');
     }
 
     return task.execute(input, receiver).mapLeftAsyncFlat((failure) async {
-      if (failure is TaskFailure && !failure.shouldRetry) {
-        return _RetryFailure(null, cause: failure);
+      final shouldNotRetry = failure is TaskFailure && !failure.shouldRetry;
+      final noMoreRetries = retry >= _retries;
+
+      if (shouldNotRetry || noMoreRetries) {
+        return Result.left(failure);
       }
 
       await Future.delayed(Task.timeInterpolation(maxRetries: _retries, retry: retry, delay: _delay));
 
-      return _try(input, receiver, retry + 1).mapLeft((next) => _RetryFailure(next as _RetryFailure, cause: failure));
+      return _try(input, receiver, retry + 1);
     });
   }
 }
