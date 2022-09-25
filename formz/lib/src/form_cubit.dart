@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meta/meta.dart';
 
 import 'attachments.dart';
 import 'form_state.dart';
@@ -91,6 +92,7 @@ abstract class FormCubit extends Cubit<FormState> with InputContainer, MutableIn
   void setProperty(String key, {required Object value}) => emit(state.copyWith(properties: {key: value}));
 
   @override
+  @mustCallSuper
   Future<void> close() async {
     await super.close();
 

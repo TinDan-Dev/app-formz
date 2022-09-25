@@ -12,9 +12,9 @@ class TaskStream<In, Out> extends Stream<ResultState<Out>> {
 
   CancellationToken? _currentToken;
 
-  TaskStream(this._task) : _subject = BehaviorSubject.seeded(const ResultState.loading());
+  TaskStream(this._task) : _subject = BehaviorSubject();
 
-  ResultState<Out> get state => _subject.value;
+  ResultState<Out> get state => _subject.valueOrNull ?? const ResultState.loading();
 
   bool get idle => _currentToken == null;
 
@@ -32,7 +32,7 @@ class TaskStream<In, Out> extends Stream<ResultState<Out>> {
 
     state.when(
       loading: (_) {},
-      success: (value) => _subject.add(ResultState.success(value)),
+      success: (value) => _subject.add(ResultState.loading(value)),
       error: (_) => _subject.add(const ResultState.loading()),
     );
 
