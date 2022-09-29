@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../utils/mutex.dart';
 import '../either/either.dart';
 import '../result/result.dart';
 import '../result/result_failures.dart';
@@ -41,6 +42,8 @@ abstract class Task<In, Out> {
   Task<In, Out> timeout(Duration timeout) => _TaskTimeout(this, timeout);
 
   Task<In, Out> retry({int? retries, Duration? delay}) => _TaskRetry(this, retries, delay);
+
+  Task<In, Out> synchronized(Mutex mutex) => _TaskSynchronized(this, mutex);
 }
 
 abstract class SimpleTask<In, Out> extends Task<In, Out> {
@@ -57,13 +60,13 @@ abstract class SimpleTask<In, Out> extends Task<In, Out> {
 }
 
 class _Task<In, Out> extends Task<In, Out> {
-  final FutureOr<Result<Out>> Function(In input, CancellationReceiver receiver) _task;
+  final FutureOr<Result<Out>> Function(In input, CancellationReceiver receiver) task;
 
-  const _Task(this._task);
+  const _Task(this.task);
 
   @override
   FutureOr<Result<Out>> execute(In input, [CancellationReceiver receiver = const CancellationReceiver.unused()]) =>
-      _task(input, receiver);
+      task(input, receiver);
 }
 
 class _TaskCatching<In, Out> extends Task<In, Out> {
@@ -120,9 +123,7 @@ class _TaskRetry<In, Out> extends Task<In, Out> {
       _try(input, receiver, 0);
 
   Future<Result<Out>> _try(In input, CancellationReceiver receiver, int retry) async {
-    if (receiver.canceled) {
-      return CanceledFailure('task');
-    }
+    if (receiver.canceled) return CanceledFailure('Task at retry: $retry');
 
     return task.execute(input, receiver).mapLeftAsyncFlat((failure) async {
       final shouldNotRetry = failure is TaskFailure && !failure.shouldRetry;
@@ -135,6 +136,22 @@ class _TaskRetry<In, Out> extends Task<In, Out> {
       await Future.delayed(Task.timeInterpolation(maxRetries: _retries, retry: retry, delay: _delay));
 
       return _try(input, receiver, retry + 1);
+    });
+  }
+}
+
+class _TaskSynchronized<In, Out> extends Task<In, Out> {
+  final Task<In, Out> task;
+  final Mutex mutex;
+
+  _TaskSynchronized(this.task, this.mutex);
+
+  @override
+  Future<Result<Out>> execute(In input, [CancellationReceiver receiver = const CancellationReceiver.unused()]) {
+    return mutex.scope(() async {
+      if (receiver.canceled) return CanceledFailure('Task after mutex acquired');
+
+      return task.execute(input, receiver);
     });
   }
 }

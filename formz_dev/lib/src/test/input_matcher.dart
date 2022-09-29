@@ -8,7 +8,7 @@ Input<String> createTestInput(
   bool valid = true,
   bool pure = false,
 }) =>
-    createInput((_) => valid, value: value, id: id, pure: pure);
+    createSimpleInput((_) => valid, value: value, id: id, pure: pure);
 
 final isPure = pureMatches(isTrue);
 

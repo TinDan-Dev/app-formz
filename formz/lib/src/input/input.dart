@@ -42,6 +42,8 @@ class Input<T> extends Equatable implements Result<T> {
 
   bool get pure => _pure;
 
+  bool get loading => false;
+
   @override
   // uses the final pure to ensure the equality does not change
   List<Object?> get props => [_pure, value, id];
@@ -61,34 +63,25 @@ class Input<T> extends Equatable implements Result<T> {
   }
 }
 
-typedef PureDelegate<T> = bool Function(T? input);
+typedef PureDelegate<T> = bool Function(T value);
 
-class OptionalInput<T> extends Input<T> {
-  final PureDelegate<T?> pureDelegate;
-
-  OptionalInput(
-    ValidationDelegate<T> delegate, {
-    required this.pureDelegate,
-    required InputIdentifier<T> id,
-    required T value,
-    bool pure = true,
-  }) : super(delegate, value: value, pure: pure, id: id);
+mixin PureMixin<T> on Input<T> {
+  PureDelegate<T> get pureDelegate;
 
   @override
   bool get pure => super.pure || pureDelegate(value);
+}
 
+mixin OptionalMixin<T> on PureMixin<T> {
   @override
   bool get optional => true;
+}
+
+typedef LoadingDelegate<T> = bool Function(T value);
+
+mixin LoadingMixin<T> on Input<T> {
+  PureDelegate<T> get loadingDelegate;
 
   @override
-  bool get valid => super.valid || pure;
-
-  @override
-  Input<T> copyWith({required T value, bool pure = false}) => OptionalInput<T>(
-        delegate,
-        pureDelegate: pureDelegate,
-        value: value,
-        pure: pure,
-        id: id,
-      );
+  bool get loading => loadingDelegate(value);
 }

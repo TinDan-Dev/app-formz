@@ -40,6 +40,7 @@ export 'src/functional/task/task_stream.dart' show TaskStream;
 export 'src/functional/widgets/either_builder.dart';
 export 'src/functional/widgets/result_widgets.dart';
 export 'src/input/impl/check_box_input.dart';
+export 'src/input/impl/default_input.dart';
 export 'src/input/impl/result_input.dart';
 export 'src/input/impl/select_input.dart';
 export 'src/input/impl/validator_input.dart';

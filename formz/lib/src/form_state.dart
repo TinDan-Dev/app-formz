@@ -6,7 +6,7 @@ import 'input_container.dart';
 import 'utils/extensions.dart';
 import 'utils/lazy.dart';
 
-// TODO: test cirteria
+// TODO: test cirteria, input loading
 
 class FormState extends Equatable with InputContainer {
   final List<Input> _inputs;
@@ -28,7 +28,11 @@ class FormState extends Equatable with InputContainer {
     Map<String, Object> properties = const {},
     List<bool Function(FormState state)> criteria = const [],
   })  : _properties = properties,
-        _criteria = criteria {
+        _criteria = criteria,
+        assert(
+          _inputs.map((e) => e.id).toSet().length == _inputs.length,
+          'Inputs should not contain any duplicate input identifier',
+        ) {
     _pure = Lazy(_isPure);
     _valid = Lazy(_isValid);
   }
@@ -40,7 +44,7 @@ class FormState extends Equatable with InputContainer {
   }
 
   @override
-  List<Object?> get props => [submission, synchronization, failure, ..._inputs, ..._properties.values];
+  List<Object?> get props => [submission, synchronization, failure, _inputs, _properties.values];
 
   @override
   Iterable<Input> get inputs => _inputs;
@@ -70,6 +74,13 @@ class FormState extends Equatable with InputContainer {
     bool? synchronization,
     Failure? failure()?,
   }) {
+    final mergedInputs = [
+      for (final input in _inputs) inputs.firstWhere((e) => e.id == input.id, orElse: () => input),
+    ];
+
+    final inputLoading = mergedInputs.any((e) => e.loading);
+    final updateLoading = _inputs.any((e) => e.loading) != inputLoading;
+
     assert(
       inputs.every((e) => _inputs.any((o) => o.id == e.id)),
       'Cannot add inputs that where not defined in the constructor',
@@ -78,17 +89,19 @@ class FormState extends Equatable with InputContainer {
       properties.keys.every((e) => _properties.keys.any((o) => o == e)),
       'Cannot add properties that where not defined in the constructor',
     );
+    assert(
+      submission == null || !inputLoading || submission,
+      'Cannot disable submission when an input is loading',
+    );
 
     return FormState(
-      [
-        for (final input in _inputs) inputs.firstWhere((e) => e.id == input.id, orElse: () => input),
-      ],
+      mergedInputs,
       properties: {
         for (final key in _properties.keys) key: properties.containsKey(key) ? properties[key]! : _properties[key]!,
       },
       criteria: _criteria,
       failure: failure.fold(() => this.failure, (some) => some()),
-      submission: submission ?? this.submission,
+      submission: submission ?? (updateLoading ? inputLoading : this.submission),
       synchronization: synchronization ?? this.synchronization,
     );
   }
