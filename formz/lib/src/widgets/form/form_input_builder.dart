@@ -11,12 +11,16 @@ class FormInputState<T> {
   final bool enabled;
   final String? error;
   final bool pure;
+  final bool valid;
+  final bool loading;
 
   FormInputState._({
     required this.value,
     required this.enabled,
     required this.error,
     required this.pure,
+    required this.valid,
+    required this.loading,
   });
 }
 
@@ -44,6 +48,8 @@ class FormInputBuilder<Cubit extends FormCubit, T> extends StatelessWidget {
           enabled: !state.submission,
           error: input.failure.let((some) => mapError?.call(some)),
           pure: input.pure,
+          valid: input.valid,
+          loading: input.loading,
         );
 
         return builder(context, inputState);
