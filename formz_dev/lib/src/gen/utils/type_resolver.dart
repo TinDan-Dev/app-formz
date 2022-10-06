@@ -19,7 +19,8 @@ class TypeResolver {
 
   TypeResolver._(this.typeSystem, this.inputLibraries);
 
-  Reference call(analyzer.DartType type, {bool forceNullable = false}) => resolve(type, forceNullable: forceNullable);
+  Reference call(analyzer.DartType type, {bool forceNullable = false, bool genericTypes = true}) =>
+      resolve(type, forceNullable: forceNullable, genericTypes: genericTypes);
 
   /// Create a reference for [type], properly referencing all attached types.
   ///
@@ -32,14 +33,15 @@ class TypeResolver {
   /// * type aliases (typedefs), both new- and old-style,
   /// * enums,
   /// * type variables.
-  Reference resolve(analyzer.DartType type, {bool forceNullable = false}) {
+  Reference resolve(analyzer.DartType type, {bool forceNullable = false, bool genericTypes = true}) {
     if (type is analyzer.InterfaceType) {
       return TypeReference((b) {
-        b
-          ..symbol = type.element.name
-          ..isNullable = forceNullable || typeSystem.isPotentiallyNullable(type)
-          ..url = _typeImport(type.element)
-          ..types.addAll(type.typeArguments.map(resolve));
+        b.symbol = type.element.name;
+        b.isNullable = forceNullable || typeSystem.isPotentiallyNullable(type);
+        b.url = _typeImport(type.element);
+        if (genericTypes) {
+          b.types.addAll(type.typeArguments.map(resolve));
+        }
       });
     } else if (type is analyzer.FunctionType) {
       final alias = type.alias;

@@ -41,7 +41,7 @@ class MockAnyBuilder implements Builder {
     for (final element in lib.topLevelElements) {
       for (final annotation in element.metadata) {
         if (annotation.element is! ConstructorElement) continue;
-        final annotationClass = annotation.element!.enclosingElement!.name;
+        final annotationClass = annotation.element!.enclosingElement3!.name;
 
         if (annotationClass == 'GenerateMocks') {
           final reader = ConstantReader(annotation.computeConstantValue()!);
@@ -57,10 +57,13 @@ class MockAnyBuilder implements Builder {
 
     final library = Library((builder) {
       for (final target in targets) {
-        final element = (target.element.declaration as ClassElement);
+        final element = (target.element2.declaration as ClassElement);
         final visitor = _ModelVisitor(resolver);
 
         element.visitChildren(visitor);
+        for (final supertype in element.allSupertypes) {
+          supertype.element2.visitChildren(visitor);
+        }
 
         final extension = Extension(
           (builder) => builder
@@ -120,12 +123,19 @@ class _ModelVisitor extends SimpleElementVisitor<void> {
 
   @override
   void visitMethodElement(MethodElement element) {
-    if (element.isPrivate || element.isStatic) return;
+    if (element.isPrivate ||
+        element.isStatic ||
+        element.isOperator ||
+        element.parameters.isEmpty ||
+        element.name == 'noSuchMethod') return;
+
+    final name = '${element.name}AllAny';
+    if (methods.any((e) => e.name == name)) return;
 
     final method = Method(
       (builder) => builder
-        ..name = '${element.name}AllAny'
-        ..returns = resolver(element.returnType)
+        ..name = name
+        ..returns = resolver(element.returnType, genericTypes: false)
         ..optionalParameters.addAll(parameter(element))
         ..body = body(element)
         ..lambda = true,

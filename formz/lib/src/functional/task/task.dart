@@ -120,7 +120,7 @@ class _TaskRetry<In, Out> extends Task<In, Out> {
 
   @override
   Future<Result<Out>> execute(In input, [CancellationReceiver receiver = const CancellationReceiver.unused()]) =>
-      _try(input, receiver, 0);
+      _try(input, receiver, 1);
 
   Future<Result<Out>> _try(In input, CancellationReceiver receiver, int retry) async {
     if (receiver.canceled) return CanceledFailure('Task at retry: $retry');
