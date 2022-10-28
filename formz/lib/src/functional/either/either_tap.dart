@@ -243,7 +243,7 @@ extension EitherTapFlatExtension<L, R> on Either<L, R> {
       _TapAsyncFlatLeftEither(source: this, tap: action);
 
   @useResult
-  Future<Either<L, R>> tapRightAsync(FutureOr<Either<L, void>> action(R value)) =>
+  Future<Either<L, R>> tapRightAsyncFlat(FutureOr<Either<L, void>> action(R value)) =>
       _TapAsyncFlatRightEither(source: this, tap: action);
 }
 

@@ -1,4 +1,33 @@
-extension ObjectExtension<T> on T? {
+import '../functional/result/result.dart';
+import '../functional/result/result_failures.dart';
+
+extension ObjectExtension<T> on T {
+  Future<bool> _tryInvocation(dynamic invocation()) async {
+    try {
+      final result = invocation();
+
+      if (result is Future) {
+        await result;
+      }
+
+      return true;
+    } on NoSuchMethodError catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> invokeDispose() async {
+    final dynamic dynamicThis = this;
+
+    if (await _tryInvocation(() => dynamicThis.disposeEntries())) return true;
+    if (await _tryInvocation(() => dynamicThis.close())) return true;
+    if (await _tryInvocation(() => dynamicThis.cancel())) return true;
+
+    return false;
+  }
+}
+
+extension ObjectNullExtension<T> on T? {
   S fold<S>(S ifNull(), S ifSome(T some)) {
     if (this == null) {
       return ifNull();
@@ -14,45 +43,40 @@ extension ObjectExtension<T> on T? {
       return null;
     }
   }
+
+  Result<T> foldToResult([String name = 'anonymous']) => fold(
+        () => Result.left(NullFailure(name)),
+        (some) => Result.right(some),
+      );
 }
 
 extension BoolNullExtension on bool? {
   T bFold<T>(T ifNull(), {required T ifTrue(), required T ifFalse()}) => fold(
         ifNull,
-        (some) => some.bFold(ifTrue, ifFalse),
+        (some) => some.bFold(ifTrue: ifTrue, ifFalse: ifFalse),
       );
 }
 
 extension BoolExtension on bool {
-  T bFold<T>(T ifTrue(), T ifFalse()) => this ? ifTrue() : ifFalse();
+  T bFold<T>({required T ifTrue(), required T ifFalse()}) => this ? ifTrue() : ifFalse();
 
   T? ifTrue<T>(T? value) => this ? value : null;
 
   T? ifFalse<T>(T? value) => this ? null : value;
 }
 
-int _defaultHash(Object? obj) => obj.hashCode;
-
-extension IterableExtension<T> on Iterable<T> {
-  Iterable<T> unique([int hash(T element) = _defaultHash]) sync* {
-    final hashes = <int>{};
-
-    for (final element in this) {
-      final h = hash(element);
-      if (hashes.contains(h)) continue;
-
-      hashes.add(h);
-      yield element;
-    }
+S foldDynamic<T extends Object, S>(dynamic object, {required S ifNot(), required S ifSome(T some)}) {
+  if (object is T) {
+    return ifSome(object);
+  } else {
+    return ifNot();
   }
 }
 
-extension StreamNotNullExtension<T> on Stream<T?> {
-  Stream<T> whereNotNull() async* {
-    await for (final e in this) {
-      if (e != null) {
-        yield e;
-      }
-    }
+S? letDynamic<T extends Object, S>(dynamic object, {required S ifSome(T some)}) {
+  if (object is T) {
+    return ifSome(object);
+  } else {
+    return null;
   }
 }

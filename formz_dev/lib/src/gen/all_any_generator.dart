@@ -135,7 +135,7 @@ class _ModelVisitor extends SimpleElementVisitor<void> {
     final method = Method(
       (builder) => builder
         ..name = name
-        ..returns = resolver(element.returnType, genericTypes: false)
+        ..returns = refer('dynamic')
         ..optionalParameters.addAll(parameter(element))
         ..body = body(element)
         ..lambda = true,

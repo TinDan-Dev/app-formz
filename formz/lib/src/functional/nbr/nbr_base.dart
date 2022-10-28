@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
+
 import '../../../formz.tuple.dart';
-import '../../utils/extensions.dart';
 import '../either/either.dart';
 import '../result/result.dart';
 import '../result/result_failures.dart';
@@ -17,7 +18,7 @@ typedef ResourceStreamFunc<T> = ResourceLoadFunc<Stream<T?>>;
 ///
 /// The current state of the resources is exposed as a stream and the resource can also be consumed via a [Either].
 /// The resource is considered successful when it's either successful or offline.
-abstract class NBRBase<T, Local, Remote> extends NBR<T> with ResultStreamMixin<T> {
+abstract class NBRBase<T, Local extends Object, Remote extends Object> extends NBR<T> with ResultStreamMixin<T> {
   final ResourceLoadFunc<Local> fetchLocal;
   final ResourceLoadFunc<Remote> fetchRemote;
   final ResourceSaveFunc<T> saveLocal;

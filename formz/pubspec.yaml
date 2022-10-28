@@ -20,7 +20,7 @@ dependencies:
   freezed_annotation: ^2.1.0
 
   # stream utils
-  rxdart: ^0.27.1
+  rxdart: ^0.27.5
   
   matcher: ^0.12.11
   stack_trace: ^1.10.0

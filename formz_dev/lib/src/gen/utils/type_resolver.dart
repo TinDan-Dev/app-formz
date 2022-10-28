@@ -91,37 +91,21 @@ class TypeResolver {
     });
   }
 
-  /// Returns the import URL for [element].
-  ///
-  /// For some types, like `dynamic` and type variables, this may return null.
   String? _typeImport(analyzer.Element? element) {
-    if (element == null) return null;
-
-    // For type variables, no import needed.
-    if (element is analyzer.TypeParameterElement) return null;
+    if (element == null || element is analyzer.TypeParameterElement) return null;
 
     final elementLibrary = element.library;
-
-    // For types like `dynamic`, return null; no import needed.
     if (elementLibrary == null) return null;
 
     if (elementLibrary.isInSdk && !elementLibrary.name.startsWith('dart._')) {
-      // For public SDK libraries, just use the source URI.
       return elementLibrary.source.uri.toString();
     }
     return _findExportOf(element).source.uri.toString();
   }
 
-  /// Returns a library which exports [element], selecting from the imports of
-  /// [inputLibraries] (and all exported libraries).
-  ///
-  /// If [element] is not exported by any libraries in this set, then
-  /// [element]'s declaring library is returned.
   analyzer.LibraryElement _findExportOf(analyzer.Element element) {
     final elementName = element.name;
-    if (elementName == null) {
-      return element.library!;
-    }
+    if (elementName == null) return element.library!;
 
     final libraries = Queue.of([
       for (final library in inputLibraries) ...library.importedLibraries,
@@ -132,6 +116,7 @@ class TypeResolver {
         return library;
       }
     }
+
     return element.library!;
   }
 }

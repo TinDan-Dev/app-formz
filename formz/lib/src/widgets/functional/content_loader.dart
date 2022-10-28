@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../functional/dynamic_content_loader/dynamic_content_loader.dart';
+import '../../functional/content_loader/content_loader.dart';
 import '../util/change_notifier.dart';
 
 const double _defaultRefreshTriggerPullDistance = 100.0;
@@ -8,7 +8,7 @@ const double _defaultRefreshTriggerPullDistance = 100.0;
 class ContentLoaderWidget<T> extends StatefulWidget {
   final ScrollPhysics? physics;
 
-  final DynamicContentLoader<T> loader;
+  final ContentLoader<T> loader;
   final Widget? Function(BuildContext context, int index, T? value) builder;
 
   final Widget? header;
@@ -45,7 +45,7 @@ class _ContentLoaderWidgetState<T> extends State<ContentLoaderWidget<T>> {
             onRefresh: widget.onRefresh,
           ),
         const SliverToBoxAdapter(child: SizedBox(height: 4)),
-        ChangeNotifierWidget<DynamicContentLoader>(
+        ChangeNotifierWidget<ContentLoader>(
           unsubscribe: (notifier) => !notifier.isDisposed,
           notifier: widget.loader,
           builder: (context) {
