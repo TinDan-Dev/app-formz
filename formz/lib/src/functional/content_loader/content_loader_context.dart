@@ -1,4 +1,4 @@
-part of 'dynamic_content_loader.dart';
+part of 'content_loader.dart';
 
 /// A context object that is passed to the load function.
 ///

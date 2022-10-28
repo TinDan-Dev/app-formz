@@ -7,9 +7,9 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../utils/extensions.dart';
 
-part 'dynamic_content_loader_container.dart';
-part 'dynamic_content_loader_content.dart';
-part 'dynamic_content_loader_context.dart';
+part 'content_loader_container.dart';
+part 'content_loader_content.dart';
+part 'content_loader_context.dart';
 
 const _defaultContainerSize = 200;
 const _defaultPivotIndex = 0;
@@ -22,7 +22,7 @@ typedef LoadFunction<T> = FutureOr<Stream<Iterable<Content<T>>>> Function(
   int endIndex,
 );
 
-/// The direction in which the [DynamicContentLoader] should load elements.
+/// The direction in which the [ContentLoader] should load elements.
 enum LoadDirection {
   /// Increases the index to load more elements.
   plus,
@@ -31,12 +31,12 @@ enum LoadDirection {
   minus,
 }
 
-/// The type of the pivot for a [DynamicContentLoader].
+/// The type of the pivot for a [ContentLoader].
 enum PivotType {
   /// Only fetches entries with lower values.
   max,
 
-  /// Only fetches bot directions, will also create two containers on creation.
+  /// Fetches both directions, will also create two containers on creation.
   center,
 
   /// Only fetches entries with higher values.
@@ -48,8 +48,8 @@ enum PivotType {
 /// The content is loaded when explicitly request to be loaded with [loadContent]
 /// or automatically when [watchDirection] or [prefetchDirection] is set. Content
 /// is loaded with the [load] function. To use a list as a source use the
-/// [DynamicContentLoader.overSource] constructor.
-class DynamicContentLoader<T> with ChangeNotifier {
+/// [ContentLoader.overSource] constructor.
+class ContentLoader<T> with ChangeNotifier {
   /// When a request is issued for new content, this many elements will be
   /// requested at once.
   final int containerSize;
@@ -92,13 +92,13 @@ class DynamicContentLoader<T> with ChangeNotifier {
   /// regardless if they appear again in an update or not.
   final bool allowDeletion;
 
-  final Map<int, Container<T>> _containers;
+  final Map<int, _Container<T>> _containers;
 
   late Future<bool> _initFuture;
 
   bool _disposed;
 
-  DynamicContentLoader._({
+  ContentLoader._({
     required this.load,
     this.pivotType = _defaultPivotType,
     this.allowDeletion = _defaultAllowDeletion,
@@ -138,7 +138,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
   }
 
   /// Creates a new loader instance and loads the container at the pivot index.
-  DynamicContentLoader({
+  ContentLoader({
     required LoadFunction<T> load,
     int containerSize = _defaultContainerSize,
     int pivotIndex = _defaultPivotIndex,
@@ -161,7 +161,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
   /// If the source stream is update all containers will be informed about the
   /// change, with regard to the UpdateContext. But a static source
   /// (e.g. Stream.value([...])) is also valid.
-  factory DynamicContentLoader.overScopedSource(
+  factory ContentLoader.overScopedSource(
     Stream<UpdateContext<T>> source, {
     int containerSize = _defaultContainerSize,
     int pivotIndex = _defaultPivotIndex,
@@ -186,7 +186,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
       }));
     }
 
-    return DynamicContentLoader<T>._(
+    return ContentLoader<T>._(
       load: loadFunction,
       containerSize: containerSize,
       pivotIndex: pivotIndex,
@@ -199,7 +199,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
   }
 
   /// Like overScopedSource but defaults to an unbound UpdateContext.
-  factory DynamicContentLoader.overSource(
+  factory ContentLoader.overSource(
     Stream<Iterable<Content<T>>> source, {
     int containerSize = _defaultContainerSize,
     int pivotIndex = _defaultPivotIndex,
@@ -207,7 +207,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     LoadDirection? watchDirection,
     LoadDirection? prefetchDirection,
   }) {
-    return DynamicContentLoader.overScopedSource(
+    return ContentLoader.overScopedSource(
       source.map((e) => UpdateContext(e)),
       containerSize: containerSize,
       pivotIndex: pivotIndex,
@@ -217,25 +217,25 @@ class DynamicContentLoader<T> with ChangeNotifier {
     );
   }
 
-  Container<T>? _containerMin(Container<T>? a, Container<T> b) {
+  _Container<T>? _containerMin(_Container<T>? a, _Container<T> b) {
     if (a == null) return b;
 
     return a.startIndex < b.startIndex ? a : b;
   }
 
-  Container<T>? get _startContainer => _containers.values.fold(null, _containerMin);
+  _Container<T>? get _startContainer => _containers.values.fold(null, _containerMin);
 
-  Container<T>? get _notEmptyStartContainer => _containers.values.where((e) => !e.isEmpty).fold(null, _containerMin);
+  _Container<T>? get _notEmptyStartContainer => _containers.values.where((e) => !e.isEmpty).fold(null, _containerMin);
 
-  Container<T> _containerMax(Container<T>? a, Container<T> b) {
+  _Container<T> _containerMax(_Container<T>? a, _Container<T> b) {
     if (a == null) return b;
 
     return a.startIndex > b.startIndex ? a : b;
   }
 
-  Container<T>? get _endContainer => _containers.values.fold(null, _containerMax);
+  _Container<T>? get _endContainer => _containers.values.fold(null, _containerMax);
 
-  Container<T>? get _notEmptyEndContainer => _containers.values.where((e) => !e.isEmpty).fold(null, _containerMax);
+  _Container<T>? get _notEmptyEndContainer => _containers.values.where((e) => !e.isEmpty).fold(null, _containerMax);
 
   int get length {
     final start = _startContainer;
@@ -313,7 +313,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     return (index / containerSize).floor();
   }
 
-  Future<bool> _loadContainer(Container<T>? precedingContainer, LoadDirection direction, int startIndex) {
+  Future<bool> _loadContainer(_Container<T>? precedingContainer, LoadDirection direction, int startIndex) {
     assert(startIndex % containerSize == 0, 'The start index must be aligned with the container size');
 
     final endIndex = startIndex + containerSize - 1;
@@ -336,7 +336,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
       context = LoadContext(precedingValue: precedingValue, direction: direction);
     }
 
-    final container = Container<T>(
+    final container = _Container<T>(
       load(context, startIndex, endIndex),
       startIndex: startIndex,
       endIndex: endIndex,
@@ -401,7 +401,7 @@ class DynamicContentLoader<T> with ChangeNotifier {
     }
 
     final int containerStartIndex;
-    final Container<T> precedingContainer;
+    final _Container<T> precedingContainer;
 
     switch (direction) {
       case LoadDirection.plus:

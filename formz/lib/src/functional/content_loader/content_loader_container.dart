@@ -1,7 +1,7 @@
-part of 'dynamic_content_loader.dart';
+part of 'content_loader.dart';
 
 /// Keeps track of on content block.
-class Container<T> {
+class _Container<T> {
   /// The start index of the content block represented by this container. (inclusive)
   final int startIndex;
 
@@ -29,7 +29,7 @@ class Container<T> {
   /// If this container was disposed.
   bool _disposed;
 
-  Container(
+  _Container(
     FutureOr<Stream<Iterable<Content<T>>>> stream, {
     required this.onChange,
     required this.startIndex,
