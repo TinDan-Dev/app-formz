@@ -7,12 +7,11 @@ class ChangeNotifierWidget<T extends ChangeNotifier> extends StatefulWidget {
   final Widget Function(BuildContext context) builder;
   final bool Function(T notifier) unsubscribe;
 
-  const ChangeNotifierWidget({
+  ChangeNotifierWidget({
     required this.notifier,
     required this.builder,
     this.unsubscribe = _defaultUnsubscribe,
-    Key? key,
-  }) : super(key: key);
+  }) : super(key: ObjectKey(notifier));
 
   @override
   _ChangeNotifierWidgetState createState() => _ChangeNotifierWidgetState<T>();

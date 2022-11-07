@@ -90,7 +90,7 @@ class Cache<T extends Object> {
     return value;
   }
 
-  void dispose() {
+  void clear() {
     if (disposeEntries) {
       for (final entry in _map.values) {
         entry.value.invokeDispose();
@@ -99,4 +99,6 @@ class Cache<T extends Object> {
 
     _map.clear();
   }
+
+  void dispose() => clear();
 }

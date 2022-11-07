@@ -27,6 +27,8 @@ abstract class DBResource<T extends Object> extends Resource<T> {
           );
         },
       );
+    }).tapLeft((failure) {
+      if (!_completer.isCompleted) _completer.complete(Result.left(failure));
     }).invoke();
   }
 

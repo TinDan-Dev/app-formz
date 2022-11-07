@@ -252,6 +252,10 @@ class ContentLoader<T> with ChangeNotifier {
     }
   }
 
+  bool get isEmpty => length == 0;
+
+  bool get isNotEmpty => !isEmpty;
+
   /// The amount of containers currently used by this loader.
   int get containerCount => _containers.length;
 

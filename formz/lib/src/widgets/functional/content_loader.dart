@@ -14,6 +14,8 @@ class ContentLoaderWidget<T> extends StatefulWidget {
   final Widget? header;
   final Widget? footer;
 
+  final bool footerOnlyWhenEmpty;
+
   final double refreshTriggerPullDistance;
   final Future<void> Function()? onRefresh;
 
@@ -23,6 +25,7 @@ class ContentLoaderWidget<T> extends StatefulWidget {
     this.physics,
     this.header,
     this.footer,
+    this.footerOnlyWhenEmpty = false,
     this.refreshTriggerPullDistance = _defaultRefreshTriggerPullDistance,
     this.onRefresh,
     Key? key,
@@ -33,8 +36,29 @@ class ContentLoaderWidget<T> extends StatefulWidget {
 }
 
 class _ContentLoaderWidgetState<T> extends State<ContentLoaderWidget<T>> {
-  @override
-  Widget build(BuildContext context) {
+  Widget changeNotifier(Widget Function(BuildContext context) builder) {
+    return ChangeNotifierWidget<ContentLoader>(
+        unsubscribe: (notifier) => !notifier.isDisposed, notifier: widget.loader, builder: builder);
+  }
+
+  Widget createList(bool withNotifier) {
+    final buildList = () => SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => widget.builder(context, index, widget.loader[index]),
+            childCount: widget.loader.length,
+          ),
+        );
+
+    if (withNotifier) {
+      return changeNotifier((_) => buildList());
+    } else {
+      return buildList();
+    }
+  }
+
+  Widget createScrollView(bool withContentNotifier) {
+    final footer = widget.footer;
+
     return CustomScrollView(
       physics: widget.physics,
       slivers: [
@@ -45,20 +69,18 @@ class _ContentLoaderWidgetState<T> extends State<ContentLoaderWidget<T>> {
             onRefresh: widget.onRefresh,
           ),
         const SliverToBoxAdapter(child: SizedBox(height: 4)),
-        ChangeNotifierWidget<ContentLoader>(
-          unsubscribe: (notifier) => !notifier.isDisposed,
-          notifier: widget.loader,
-          builder: (context) {
-            return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => widget.builder(context, index, widget.loader[index]),
-                childCount: widget.loader.length,
-              ),
-            );
-          },
-        ),
-        if (widget.footer != null) widget.footer!,
+        createList(withContentNotifier),
+        if (footer != null && (!widget.footerOnlyWhenEmpty || widget.loader.isEmpty)) footer,
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.footerOnlyWhenEmpty && widget.footer != null) {
+      return changeNotifier((_) => createScrollView(false));
+    } else {
+      return createScrollView(true);
+    }
   }
 }
