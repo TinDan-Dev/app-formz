@@ -5,8 +5,6 @@ import 'package:formz/formz.dart';
 // ignore: implementation_imports
 import 'package:test_api/src/expect/async_matcher.dart';
 
-import 'utils.dart';
-
 final isRight = _EitherMatcher(true);
 final isLeft = _EitherMatcher(false);
 
