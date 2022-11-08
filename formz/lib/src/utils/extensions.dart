@@ -65,6 +65,17 @@ extension BoolExtension on bool {
   T? ifFalse<T>(T? value) => this ? null : value;
 }
 
+extension ListExtension<T> on List<T> {
+  Future<void> asyncRemoveWhere(Future<bool> Function(T value) test) async {
+    final toRemove = [
+      for (final value in this)
+        if (await test(value)) value
+    ];
+
+    removeWhere(toRemove.contains);
+  }
+}
+
 S foldDynamic<T extends Object, S>(dynamic object, {required S ifNot(), required S ifSome(T some)}) {
   if (object is T) {
     return ifSome(object);

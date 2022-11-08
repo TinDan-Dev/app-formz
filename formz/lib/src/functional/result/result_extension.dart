@@ -27,9 +27,35 @@ extension ResultExtension<T> on Result<T> {
       return this;
     }
   }
+
+  Result<T> handleFailure<S extends Failure>(Result<T> handler(S failure)) {
+    return mapLeftFlat((failure) {
+      if (failure is S) {
+        return handler(failure);
+      } else {
+        return Result.left(failure);
+      }
+    });
+  }
+
+  Future<Result<T>> handleFailureAsync<S extends Failure>(FutureOr<Result<T>> handler(S failure)) {
+    return mapLeftAsyncFlat((failure) async {
+      if (failure is S) {
+        return handler(failure);
+      } else {
+        return Result.left(failure);
+      }
+    });
+  }
 }
 
 extension FutureResultExtension<T> on FutureOr<Result<T>> {
   Future<Result<T>> cancel(CancellationReceiver receiver, [String msg = 'Result was canceled']) async =>
       (await this).cancel(receiver, msg);
+
+  Future<Result<T>> handleFailure<S extends Failure>(Result<T> handler(S failure)) async =>
+      (await this).handleFailure(handler);
+
+  Future<Result<T>> handleFailureAsync<S extends Failure>(FutureOr<Result<T>> handler(S failure)) async =>
+      (await this).handleFailureAsync(handler);
 }
