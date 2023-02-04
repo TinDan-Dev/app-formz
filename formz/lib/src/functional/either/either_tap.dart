@@ -6,12 +6,15 @@ import '../../../formz.dart';
 import 'either.dart';
 
 class _TapEither<L, R> implements Either<L, R> {
+  final bool opt;
+
   final Either<L, R> source;
   final void Function(Either<L, R> value) tap;
 
   bool executed;
 
   _TapEither({
+    required this.opt,
     required this.source,
     required this.tap,
   }) : executed = false;
@@ -21,7 +24,7 @@ class _TapEither<L, R> implements Either<L, R> {
     required T onLeft(L value),
     required T onRight(R value),
   }) {
-    if (!executed) {
+    if (!executed && opt) {
       executed = true;
       tap(source);
     }
@@ -30,12 +33,15 @@ class _TapEither<L, R> implements Either<L, R> {
 }
 
 class _TapAsyncEither<L, R> extends EitherFuture<L, R> {
+  final bool opt;
+
   final FutureOr<Either<L, R>> source;
   final FutureOr<void> Function(Either<L, R> value) tap;
 
   bool executed;
 
   _TapAsyncEither({
+    required this.opt,
     required this.source,
     required this.tap,
   }) : executed = false;
@@ -47,7 +53,7 @@ class _TapAsyncEither<L, R> extends EitherFuture<L, R> {
   }) async {
     final source = await this.source;
 
-    if (!executed) {
+    if (!executed && opt) {
       executed = true;
       await tap(source);
     }
@@ -57,67 +63,77 @@ class _TapAsyncEither<L, R> extends EitherFuture<L, R> {
 
 extension EitherTapExtension<L, R> on Either<L, R> {
   @useResult
-  Either<L, R> tap(void action(Either<L, R> value)) => _TapEither(source: this, tap: action);
+  Either<L, R> tap(void action(Either<L, R> value), {bool opt = true}) =>
+      _TapEither(source: this, tap: action, opt: opt);
 
   @useResult
-  Either<L, R> tapLeft(void action(L value)) => _TapEither(
+  Either<L, R> tapLeft(void action(L value), {bool opt = true}) => _TapEither(
         source: this,
         tap: (value) => value.consume(onRight: (_) {}, onLeft: action),
+        opt: opt,
       );
 
   @useResult
-  Either<L, R> tapRight(void action(R value)) => _TapEither(
+  Either<L, R> tapRight(void action(R value), {bool opt = true}) => _TapEither(
         source: this,
         tap: (value) => value.consume(onRight: action, onLeft: (_) {}),
+        opt: opt,
       );
 
   @useResult
-  Future<Either<L, R>> tapAsync(FutureOr<void> action(Either<L, R> value)) =>
-      _TapAsyncEither(source: this, tap: action);
+  Future<Either<L, R>> tapAsync(FutureOr<void> action(Either<L, R> value), {bool opt = true}) =>
+      _TapAsyncEither(source: this, tap: action, opt: opt);
 
   @useResult
-  Future<Either<L, R>> tapLeftAsync(FutureOr<void> action(L value)) => _TapAsyncEither(
+  Future<Either<L, R>> tapLeftAsync(FutureOr<void> action(L value), {bool opt = true}) => _TapAsyncEither(
         source: this,
         tap: (value) => value.consume(onRight: (_) {}, onLeft: action),
+        opt: opt,
       );
 
   @useResult
-  Future<Either<L, R>> tapRightAsync(FutureOr<void> action(R value)) => _TapAsyncEither(
+  Future<Either<L, R>> tapRightAsync(FutureOr<void> action(R value), {bool opt = true}) => _TapAsyncEither(
         source: this,
         tap: (value) => value.consume(onRight: action, onLeft: (_) {}),
+        opt: opt,
       );
 }
 
 extension FutureOfEitherTapExtension<L, R> on FutureOr<Either<L, R>> {
   @useResult
-  Future<Either<L, R>> tap(void action(Either<L, R> value)) => _TapAsyncEither(source: this, tap: action);
+  Future<Either<L, R>> tap(void action(Either<L, R> value), {bool opt = true}) =>
+      _TapAsyncEither(source: this, tap: action, opt: opt);
 
   @useResult
-  Future<Either<L, R>> tapLeft(void action(L value)) => _TapAsyncEither(
+  Future<Either<L, R>> tapLeft(void action(L value), {bool opt = true}) => _TapAsyncEither(
         source: this,
         tap: (value) => value.consume(onRight: (_) {}, onLeft: action),
+        opt: opt,
       );
 
   @useResult
-  Future<Either<L, R>> tapRight(void action(R value)) => _TapAsyncEither(
+  Future<Either<L, R>> tapRight(void action(R value), {bool opt = true}) => _TapAsyncEither(
         source: this,
         tap: (value) => value.consume(onRight: action, onLeft: (_) {}),
+        opt: opt,
       );
 
   @useResult
-  Future<Either<L, R>> tapAsync(FutureOr<void> action(Either<L, R> value)) =>
-      _TapAsyncEither(source: this, tap: action);
+  Future<Either<L, R>> tapAsync(FutureOr<void> action(Either<L, R> value), {bool opt = true}) =>
+      _TapAsyncEither(source: this, tap: action, opt: opt);
 
   @useResult
-  Future<Either<L, R>> tapLeftAsync(FutureOr<void> action(L value)) => _TapAsyncEither(
+  Future<Either<L, R>> tapLeftAsync(FutureOr<void> action(L value), {bool opt = true}) => _TapAsyncEither(
         source: this,
         tap: (value) => value.consume(onRight: (_) {}, onLeft: action),
+        opt: opt,
       );
 
   @useResult
-  Future<Either<L, R>> tapRightAsync(FutureOr<void> action(R value)) => _TapAsyncEither(
+  Future<Either<L, R>> tapRightAsync(FutureOr<void> action(R value), {bool opt = true}) => _TapAsyncEither(
         source: this,
         tap: (value) => value.consume(onRight: action, onLeft: (_) {}),
+        opt: opt,
       );
 }
 
