@@ -13,6 +13,8 @@ abstract class Either<L, R> {
 
   const factory Either.right(R value) = _Right<L, R>;
 
+  static Either<L, void> success<L>() => const Either.right(null);
+
   T consume<T>({required T onRight(R value), required T onLeft(L value)});
 }
 
