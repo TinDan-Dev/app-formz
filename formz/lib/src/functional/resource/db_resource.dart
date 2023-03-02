@@ -1,11 +1,11 @@
 part of 'resource.dart';
 
-abstract class DBResource<T extends Object> extends Resource<T> {
+abstract class DBResource<T extends Object, Id extends Object> extends Resource<T, Id> {
   StreamSubscription? _streamSubscription;
 
   final Completer<Result<T?>> _completer;
 
-  DBResource(Object identifier)
+  DBResource(Id identifier)
       : _completer = Completer(),
         super._(identifier);
 

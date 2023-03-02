@@ -1,20 +1,21 @@
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
-import 'package:rxdart/subjects.dart';
 
+import '../../../formz.tuple.dart';
 import '../../utils/extensions.dart';
 import '../either/either.dart';
 import '../result/result.dart';
 import '../result/result_extension.dart';
 import '../result/result_failures.dart';
 import '../task/cancellation_token.dart';
+import '../task/task.dart';
 
 part 'db_resource.dart';
 part 'nb_resource.dart';
 
-abstract class Resource<T extends Object> {
-  final Object identifier;
+abstract class Resource<T extends Object, Id extends Object> {
+  final Id identifier;
 
   final BehaviorSubject<Result<T>> _subject;
   final CancellationToken _cancellationToken;

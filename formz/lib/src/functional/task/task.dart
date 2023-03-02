@@ -25,7 +25,7 @@ abstract class Task<In, Out> {
     FutureOr<T> task(), {
     FutureOr<Failure?> onError(Object? error, StackTrace? trace)?,
   }) async =>
-      Task.catching((_, __) => task(), onError: onError).retry().execute(null);
+      Task.catching((_, __) => task(), onError: (_, e, s) => onError?.call(e, s)).retry().execute(null);
 
   static int retries = 3;
   static Duration retryDelay = const Duration(seconds: 2);
@@ -35,7 +35,7 @@ abstract class Task<In, Out> {
   const factory Task.from(FutureOr<Result<Out>> task(In input, CancellationReceiver receiver)) = _Task;
 
   const factory Task.catching(FutureOr<Out> task(In input, CancellationReceiver receiver),
-      {FutureOr<Failure?> onError(Object? error, StackTrace? trace)?}) = _TaskCatching;
+      {FutureOr<Failure?> onError(In input, Object? error, StackTrace? trace)?}) = _TaskCatching;
 
   FutureOr<Result<Out>> execute(In input, [CancellationReceiver receiver = const CancellationReceiver.unused()]);
 
@@ -47,7 +47,7 @@ abstract class Task<In, Out> {
 
   Task<In, Out> listen({
     void onExecute(In input)?,
-    void onResult(Result<Out> result, bool cancelled)?,
+    void onResult(In input, Result<Out> result, bool cancelled)?,
   }) =>
       _TaskListener(this, onExecute: onExecute, onResult: onResult);
 }
@@ -77,7 +77,7 @@ class _Task<In, Out> extends Task<In, Out> {
 
 class _TaskCatching<In, Out> extends Task<In, Out> {
   final FutureOr<Out> Function(In input, CancellationReceiver receiver) task;
-  final FutureOr<Failure?> Function(Object? error, StackTrace? trace)? onError;
+  final FutureOr<Failure?> Function(In input, Object? error, StackTrace? trace)? onError;
 
   const _TaskCatching(this.task, {this.onError});
 
@@ -88,7 +88,7 @@ class _TaskCatching<In, Out> extends Task<In, Out> {
     } on Failure catch (e) {
       return Result.left(e);
     } catch (e, s) {
-      final error = await onError?.call(e, s);
+      final error = await onError?.call(input, e, s);
 
       if (error != null) {
         return Result.left(error);
@@ -166,7 +166,7 @@ class _TaskListener<In, Out> extends Task<In, Out> {
   final Task<In, Out> task;
 
   final void Function(In input)? onExecute;
-  final void Function(Result<Out> result, bool cancelled)? onResult;
+  final void Function(In input, Result<Out> result, bool cancelled)? onResult;
 
   _TaskListener(this.task, {this.onExecute, this.onResult});
 
@@ -175,7 +175,7 @@ class _TaskListener<In, Out> extends Task<In, Out> {
     onExecute?.call(input);
 
     final result = await task.execute(input, receiver);
-    onResult?.call(result, receiver.canceled);
+    onResult?.call(input, result, receiver.canceled);
 
     return result;
   }

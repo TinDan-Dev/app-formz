@@ -6,7 +6,7 @@ import '../../utils/extensions.dart';
 import 'either_widget.dart';
 
 class ResourceWidget<T extends Object> extends StatelessWidget {
-  final Resource<T> resource;
+  final Resource<T, dynamic> resource;
 
   final Widget Function(BuildContext context) onLoading;
 

@@ -1,46 +1,52 @@
 part of 'resource.dart';
 
-abstract class NBResource<T extends Object> extends Resource<T> {
+class NBResource<T extends Object, Id extends Object> extends Resource<T, Id> {
   StreamSubscription? _streamSubscription;
 
-  NBResource(Object identifier) : super._(identifier);
+  final Task<Id, T>? fetchLocal;
+  final Task<Id, Stream<Result<T>>>? streamLocal;
 
-  FutureOr<Either<Result<T>, Result<Stream<Result<T?>>>>> fetchLocal();
+  final bool localSufficient;
 
-  FutureOr<Result<void>> saveLocal(T result);
+  final Task<Id, T> fetchRemote;
+  final Task<Tuple<Id, T>, void> saveLocal;
 
-  FutureOr<Result<T>> fetchRemote();
+  NBResource(
+    Id identifier, {
+    this.fetchLocal,
+    this.streamLocal,
+    required this.fetchRemote,
+    required this.saveLocal,
+    this.localSufficient = false,
+  })  : assert(fetchLocal != null || streamLocal != null),
+        assert(fetchLocal == null || streamLocal == null),
+        assert(!localSufficient || fetchLocal != null),
+        super._(identifier);
 
   @override
   Future<void> _execute(CancellationReceiver receiver) async {
-    final localResult = await fetchLocal();
+    if (fetchLocal != null) {
+      final localResult = await fetchLocal!.execute(identifier).cancel(receiver).tapRight(_addValue);
 
-    if (receiver.canceled) return;
+      await localResult.consume(
+        onLeft: (_) => _fetch(receiver),
+        onRight: (_) async {
+          if (!localSufficient) await _fetch(receiver);
+        },
+      );
+    } else {
+      await streamLocal!.execute(identifier).cancel(receiver).tapRight((stream) {
+        _streamSubscription = stream.listen((data) => data.tapRight((value) => value.let(_addValue)));
+      }).invoke();
 
-    await localResult.consume(
-      onRight: (stream) => _streamLocal(receiver, stream),
-      onLeft: (simple) => _simpleLocal(receiver, simple),
-    );
-  }
-
-  Future<void> _streamLocal(CancellationReceiver receiver, Result<Stream<Result<T?>>> local) async {
-    local.tapRight((stream) {
-      _streamSubscription = stream.listen((data) => data.tapRight((value) => value.let(_addValue)));
-    }).invoke();
-
-    await _fetch(receiver);
-  }
-
-  Future<void> _simpleLocal(CancellationReceiver receiver, Result<T> local) async {
-    local.tapRight(_addValue).invoke();
-
-    await _fetch(receiver);
+      await _fetch(receiver);
+    }
   }
 
   Future<void> _fetch(CancellationReceiver receiver) async {
-    await fetchRemote().cancel(receiver).consume(
+    await fetchRemote.execute(identifier).cancel(receiver).consume(
           onRight: (value) async {
-            saveLocal(value);
+            saveLocal.execute(Tuple(first: identifier, second: value));
             _addValue(value);
           },
           onLeft: (failure) => snapshot.consume(
