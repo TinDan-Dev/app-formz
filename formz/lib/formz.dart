@@ -54,6 +54,9 @@ export 'src/nav/router_delegate.dart' show FormzRouterPage, FormzRouterDelegate,
 export 'src/nav/router_dialog.dart' show DialogReturnScope;
 export 'src/nav/router_widget.dart' show FormzRouterWidget;
 export 'src/utils/after_init.dart';
+export 'src/utils/delegate/delegating_change_notifier.dart' show DelegatingChangeNotifier;
+export 'src/utils/delegate/delegating_future.dart' show DelegatingFuture;
+export 'src/utils/delegate/delegating_stream.dart' show DelegatingStream;
 export 'src/utils/extensions.dart';
 export 'src/utils/hash.dart' show stableHash, stableHashList;
 export 'src/utils/lazy.dart';

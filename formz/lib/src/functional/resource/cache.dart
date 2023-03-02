@@ -90,6 +90,16 @@ class Cache<T extends Object> {
     return value;
   }
 
+  Future<T> getOrInsertAsync(int key, {required Future<T> create(), required int now}) async {
+    final cached = get(key, now: now);
+    if (cached != null) return cached;
+
+    final value = await create();
+    insert(key, value: value, now: now);
+
+    return value;
+  }
+
   void clear() {
     if (disposeEntries) {
       for (final entry in _map.values) {

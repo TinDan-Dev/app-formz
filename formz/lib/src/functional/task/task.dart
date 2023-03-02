@@ -44,6 +44,12 @@ abstract class Task<In, Out> {
   Task<In, Out> retry({int? retries, Duration? delay}) => _TaskRetry(this, retries, delay);
 
   Task<In, Out> synchronized(Mutex mutex) => _TaskSynchronized(this, mutex);
+
+  Task<In, Out> listen({
+    void onExecute(In input)?,
+    void onResult(Result<Out> result, bool cancelled)?,
+  }) =>
+      _TaskListener(this, onExecute: onExecute, onResult: onResult);
 }
 
 abstract class SimpleTask<In, Out> extends Task<In, Out> {
@@ -153,5 +159,24 @@ class _TaskSynchronized<In, Out> extends Task<In, Out> {
 
       return task.execute(input, receiver);
     });
+  }
+}
+
+class _TaskListener<In, Out> extends Task<In, Out> {
+  final Task<In, Out> task;
+
+  final void Function(In input)? onExecute;
+  final void Function(Result<Out> result, bool cancelled)? onResult;
+
+  _TaskListener(this.task, {this.onExecute, this.onResult});
+
+  @override
+  Future<Result<Out>> execute(In input, [CancellationReceiver receiver = const CancellationReceiver.unused()]) async {
+    onExecute?.call(input);
+
+    final result = await task.execute(input, receiver);
+    onResult?.call(result, receiver.canceled);
+
+    return result;
   }
 }
