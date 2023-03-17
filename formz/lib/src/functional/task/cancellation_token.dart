@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../result/result_failures.dart';
+
 /// Used by actions that can be cancelled.
 abstract class CancellationReceiver implements ChangeNotifier {
   const CancellationReceiver();
@@ -8,6 +10,13 @@ abstract class CancellationReceiver implements ChangeNotifier {
 
   /// Whether the action should stop executing.
   bool get canceled;
+
+  /// Throws an exception when canceled
+  void throwIfCanceled() {
+    if (canceled) {
+      throw CanceledFailure('the task was canceled', trace: StackTrace.current);
+    }
+  }
 }
 
 class _UnusedCancellationReceiver extends CancellationReceiver {
