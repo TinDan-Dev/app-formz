@@ -22,6 +22,12 @@ extension EitherIterableExtension<L, R> on Iterable<Either<L, R>> {
   }
 }
 
+extension EitherFutureIterableExtension<L, R> on Future<Iterable<Either<L, R>>> {
+  Future<Iterable<L>> whereLeft([void onRight(R right)?]) async => (await this).whereLeft(onRight);
+
+  Future<Iterable<R>> whereRight([void onLeft(L left)?]) async => (await this).whereRight(onLeft);
+}
+
 extension EitherStreamExtension<L, R> on Stream<Either<L, R>> {
   Stream<L> whereLeft([void onRight(R right)?]) async* {
     await for (final value in this) {
